@@ -7,10 +7,6 @@
     "url": "https://www.zenuml.com/"
   },
   "baseUrl": "https://pensive-murdock-1f6fa1.netlify.com/",
-  "lifecycle": {
-    "installed": "/installed",
-    "uninstalled": "/uninstalled"
-  },
   "enableLicensing": true,
   "links": {
     "self": "/atlassian-connect.json",
