@@ -45,7 +45,14 @@
         ],
         "featured": true
       }
-    ]
+    ],
+    "configurePage": {
+      "url": "/settings.html",
+      "name": {
+        "value": "AWS Widgets Settings"
+      },
+      "key": "aws-widgets-settings-configure-page"
+    }
   },
   "apiMigrations": {
     "gdpr": true
