@@ -1,7 +1,7 @@
 {
   "key": "com.aws.widget.confluence-addon",
-  "name": "ZenUML Sequence Diagram",
-  "description": "ZenUML Sequence Diagram add-on",
+  "name": "AWS Widgets",
+  "description": "Live document for your AWS resources.",
   "vendor": {
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
