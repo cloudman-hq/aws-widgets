@@ -6,7 +6,7 @@
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://vibrant-leavitt-dcf42d.netlify.com/",
+  "baseUrl": "https://pensive-murdock-1f6fa1.netlify.com/",
   "lifecycle": {
     "installed": "/installed",
     "uninstalled": "/uninstalled"
