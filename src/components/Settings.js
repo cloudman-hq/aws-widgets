@@ -1,5 +1,4 @@
 import React from 'react';
-import AWS from 'aws-sdk'
 
 class EC2 extends React.Component {
 
@@ -26,8 +25,25 @@ class EC2 extends React.Component {
   saveSettings(e) {
     e.preventDefault();
     console.log('Saving credentials.');
-    // TODO: Save settings
-    console.log('Credentials saved.')
+    // eslint-disable-next-line no-undef
+    if (AP) {
+      // eslint-disable-next-line no-undef
+      AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials', {
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ accessKey: this.state.accessKey, secretKey: this.state.secretKey}),
+        success: function(response){
+          console.log(response);
+        },
+        error: function(error){
+          console.log(error);
+        }
+      });
+      console.log('Credentials saved.')
+    } else {
+      console.log('Credentials is not saved as AP is not defined.')
+    }
+
   }
 
   render() {
