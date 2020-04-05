@@ -12,6 +12,7 @@ class EC2 extends React.Component {
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.saveSettings = this.saveSettings.bind(this);
+    this.loadSettings = this.loadSettings.bind(this);
   }
   handleInputChange(event) {
     const value = event.target.value;
@@ -20,6 +21,26 @@ class EC2 extends React.Component {
     this.setState({
       [name]: value
     });
+  }
+
+  loadSettings(e) {
+    e.preventDefault();
+    // eslint-disable-next-line no-undef
+    if (AP) {
+      // eslint-disable-next-line no-undef
+      AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
+        success: function(response){
+          console.log(response);
+        },
+        error: function(error){
+          console.log(error);
+        }
+      });
+      console.log('Credentials loaded.')
+    } else {
+      console.log('Credentials is not loaded as AP is not defined.')
+    }
+
   }
 
   saveSettings(e) {
@@ -67,6 +88,9 @@ class EC2 extends React.Component {
         </label>
         <button onClick={this.saveSettings}>
           Save
+        </button>
+        <button onClick={this.loadSettings}>
+          Load
         </button>
       </div>
     )
