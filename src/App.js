@@ -1,5 +1,7 @@
 import React from 'react';
 import EC2 from './components/EC2';
+import Settings from './components/Settings'
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -24,7 +26,7 @@ function App() {
         </nav>
         <Switch>
           <Route path="/settings">
-            <div>Here comes the settings</div>
+            <Settings/>
           </Route>
           <Route path="/">
             <EC2/>
