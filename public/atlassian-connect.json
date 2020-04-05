@@ -47,7 +47,7 @@
       }
     ],
     "configurePage": {
-      "url": "/settings.html",
+      "url": "/settings",
       "name": {
         "value": "AWS Widgets Settings"
       },
