@@ -7,7 +7,7 @@
     "url": "https://www.zenuml.com/"
   },
   "baseUrl": "https://awswidgets.zenuml.com/",
-  "enableLicensing": true,
+  "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",
     "homepage": "https://www.zenuml.com"
