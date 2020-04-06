@@ -6,7 +6,7 @@
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://pensive-murdock-1f6fa1.netlify.com/",
+  "baseUrl": "https://awswidgets.netlify.com/",
   "enableLicensing": true,
   "links": {
     "self": "/atlassian-connect.json",
