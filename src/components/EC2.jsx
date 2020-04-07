@@ -17,8 +17,9 @@ class EC2 extends React.Component {
       AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: function(response){
           console.log(response);
-          const accessKey = response.value.accessKey;
-          const secretKey = response.value.second;
+          const jsonResponse = JSON.parse(response);
+          const accessKey = jsonResponse.value.accessKey;
+          const secretKey = jsonResponse.value.second;
 
           this.setState({
             accessKey: accessKey,
