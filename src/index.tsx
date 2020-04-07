@@ -4,7 +4,11 @@ import './main';
 import App from './components/App';
 
 const render = (Main: React.FunctionComponent) => {
-  ReactDom.render(<Main />, document.querySelector('#app-root'));
+  ReactDom.render(
+    <React.StrictMode>
+      <Main />
+    </React.StrictMode>,
+    document.querySelector('#app-root'));
 };
 
 render(App);
