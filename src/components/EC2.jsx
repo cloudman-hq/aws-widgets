@@ -14,16 +14,25 @@ class EC2 extends React.Component {
     // eslint-disable-next-line no-undef
     if (AP) {
       // eslint-disable-next-line no-undef
-      AP.request('/rest/atlassian-connect/1/addons/confluence-helloworld-addon/properties/aws-credentials?jsonValue=true', {
+      AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: function(response){
           console.log(response);
+          const accessKey = response.value.accessKey;
+          const secretKey = response.value.second;
+
+          this.setState({
+            accessKey: accessKey,
+            secretKey: secretKey
+          });
         },
         error: function(error){
           console.log(error);
         }
       });
+      console.log('Credentials loaded.')
+    } else {
+      console.log('Credentials is not loaded as AP is not defined.')
     }
-
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.describeEc2 = this.describeEc2.bind(this);
