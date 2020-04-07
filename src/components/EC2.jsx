@@ -11,17 +11,19 @@ class EC2 extends React.Component {
       secretKey: ''
     };
 
+    const that = this;
     // eslint-disable-next-line no-undef
     if (AP) {
       // eslint-disable-next-line no-undef
       AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: function(response){
           console.log(response);
+          // TODO: test if response is not a JSON string.
           const jsonResponse = JSON.parse(response);
           const accessKey = jsonResponse.value.accessKey;
-          const secretKey = jsonResponse.value.second;
+          const secretKey = jsonResponse.value.secretKey;
 
-          this.setState({
+          that.setState({
             accessKey: accessKey,
             secretKey: secretKey
           });
