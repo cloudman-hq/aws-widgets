@@ -1,6 +1,7 @@
 import React from 'react';
 import EC2 from './components/EC2';
 import Settings from './components/Settings'
+import Demo from './components/Demo'
 
 import {
   BrowserRouter as Router,
@@ -14,6 +15,9 @@ function App() {
     <Router>
       <div>
         <Switch>
+          <Route path="/demo">
+            <Demo/>
+          </Route>
           <Route path="/settings">
             <Settings/>
           </Route>
