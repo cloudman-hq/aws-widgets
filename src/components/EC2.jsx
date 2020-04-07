@@ -11,6 +11,20 @@ class EC2 extends React.Component {
       secretKey: ''
     };
 
+    // eslint-disable-next-line no-undef
+    if (AP) {
+      // eslint-disable-next-line no-undef
+      AP.request('/rest/atlassian-connect/1/addons/confluence-helloworld-addon/properties/aws-credentials?jsonValue=true', {
+        success: function(response){
+          console.log(response);
+        },
+        error: function(error){
+          console.log(error);
+        }
+      });
+    }
+
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.describeEc2 = this.describeEc2.bind(this);
   }
@@ -47,22 +61,6 @@ class EC2 extends React.Component {
   render() {
     return (
       <div>
-        <label>
-          Access Key:
-          <input
-            name="accessKey"
-            type="string"
-            value={this.state.accessKey}
-            onChange={this.handleInputChange}/>
-        </label>
-        <label>
-          Secret Key:
-          <input
-            name="secretKey"
-            type="string"
-            value={this.state.secretKey}
-            onChange={this.handleInputChange}/>
-        </label>
         <button onClick={this.describeEc2}>
           Describe
         </button>
