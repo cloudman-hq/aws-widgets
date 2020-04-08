@@ -1,7 +1,7 @@
 import React from 'react';
 import EC2 from './components/EC2';
 import Settings from './components/Settings'
-import Demo from './components/Demo'
+import Demo from './components/Settings'
 
 import {
   BrowserRouter as Router,

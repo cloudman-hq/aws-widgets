@@ -12,9 +12,8 @@ class EC2 extends React.Component {
     };
 
     const that = this;
-    // eslint-disable-next-line no-undef
+    const AP = window.AP;
     if (AP) {
-      // eslint-disable-next-line no-undef
       AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: function(response){
           console.log(response);
