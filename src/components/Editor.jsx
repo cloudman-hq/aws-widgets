@@ -8,10 +8,10 @@ class EC2 extends React.Component {
 
     this.state = {
       accessKey: props.accessKey,
-      secretKey: props.secretKey
+      secretKey: props.secretKey,
+      id: null,
+      resourceState: 'unknown'
     };
-
-    const that = this;
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.describeEc2 = this.describeEc2.bind(this);
@@ -22,7 +22,7 @@ class EC2 extends React.Component {
     const name = event.target.name;
 
     this.setState({
-      [name]: value
+      id: value
     });
   }
 
@@ -35,8 +35,9 @@ class EC2 extends React.Component {
       this.state.secretKey || this.props.secretKey);
     var ec2 = new AWS.EC2();
     const params = {
-      InstanceIds: [ this.state.arn ]
+      InstanceIds: [ this.state.id ]
     };
+    const that = this;
     ec2.describeInstances(params, function(err, data) {
       if (err) {
         console.log(err, err.stack);
@@ -44,7 +45,8 @@ class EC2 extends React.Component {
       }
       else {
         console.log(data);
-        alert('Succeeded! Check your console for the list of EC2 instances.');
+        const instanceState = data.Reservations[0].Instances[0].State;
+        that.setState({resourceState: instanceState.Name})
       }
     });
   }
@@ -53,9 +55,8 @@ class EC2 extends React.Component {
     return (
       <div>
         <label>
-          ARN:
+          ARN or resource id such as an EC2 instance ID:
           <input
-            name="arn"
             type="string"
             onChange={this.handleInputChange}/>
         </label>
@@ -63,6 +64,7 @@ class EC2 extends React.Component {
         <button onClick={this.describeEc2}>
           Describe
         </button>
+        <label> Status: {this.state.resourceState}</label>
       </div>
     )
   }
