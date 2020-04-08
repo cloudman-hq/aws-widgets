@@ -7,8 +7,8 @@ class EC2 extends React.Component {
     super(props);
 
     this.state = {
-      accessKey: '',
-      secretKey: ''
+      accessKey: props.accessKey,
+      secretKey: props.secretKey
     };
 
     const that = this;
@@ -53,7 +53,8 @@ class EC2 extends React.Component {
     console.log('Describe EC2');
     AWS.config.region = 'ap-southeast-2';
 
-    AWS.config.credentials = new AWS.Credentials(this.state.accessKey, this.state.secretKey);
+    AWS.config.credentials = new AWS.Credentials(this.state.accessKey || this.props.accessKey,
+      this.state.secretKey || this.props.secretKey);
     var ec2 = new AWS.EC2();
     ec2.describeInstances({}, function(err, data) {
       if (err) {
