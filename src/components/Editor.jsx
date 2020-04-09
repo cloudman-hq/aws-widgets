@@ -45,8 +45,10 @@ class EC2 extends React.Component {
       }
       else {
         console.log(data);
-        const instanceState = data.Reservations[0].Instances[0].State;
-        that.setState({resourceState: instanceState.Name})
+        let instance = data.Reservations[0].Instances[0];
+        const instanceState = instance.State.Name;
+        const availabilityZone = instance.Placement.AvailabilityZone;
+        that.setState({resourceState: instanceState, availabilityZone})
       }
     });
   }
@@ -55,15 +57,19 @@ class EC2 extends React.Component {
     return (
       <div>
         <label>
-          ARN or resource id such as an EC2 instance ID:
+          ARN or Resource ID:
           <input
             type="string"
+            placeholder="e.g. i-04308dbefa6eb6ac"
             onChange={this.handleInputChange}/>
         </label>
 
         <button onClick={this.describeEc2}>
           Describe
         </button>
+        <dl>
+          <dt>AZ:</dt> <dd>{this.state.availabilityZone}</dd>
+        </dl>
         <label> Status: {this.state.resourceState}</label>
       </div>
     )
