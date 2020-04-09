@@ -1,5 +1,16 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Local development environment
+
+This application can be tested on developer's local environment with **storybook**.
+
+### `yarn storybook`
+Starts the storybook. Open storybook at http://localhost:9009/?path=/story/demo--editor-component.
+
+![storybook editor](./public/storybook-editor.png)
+
+Input your access key, secret key and resource id and click the **Describe** button.
+
 ## Available Scripts
 
 In the project directory, you can run:
