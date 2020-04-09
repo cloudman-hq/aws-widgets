@@ -1,7 +1,7 @@
 import React from 'react';
-import EC2 from './components/EC2';
 import Settings from './components/Settings'
 import Demo from './components/Settings'
+import Editor from './components/Editor'
 
 import {
   BrowserRouter as Router,
@@ -15,6 +15,9 @@ function App() {
     <Router>
       <div>
         <Switch>
+          <Route path="/editor">
+            <Editor/>
+          </Route>
           <Route path="/demo">
             <Demo/>
           </Route>
@@ -22,7 +25,7 @@ function App() {
             <Settings/>
           </Route>
           <Route path="/">
-            <EC2/>
+            <Editor/>
           </Route>
         </Switch>
       </div>
