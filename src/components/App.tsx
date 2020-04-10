@@ -1,25 +1,23 @@
 import * as React from 'react';
-import EC2Component from './EC2';
 import SettingsComponent from './Settings';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from 'react-router-dom';
+import RouteComponent from './Route';
+import { inject, observer } from 'mobx-react';
 
-const App: React.FunctionComponent = () => {
-  return <Router>
-    <div>
-      <Switch>
-        <Route path="/settings">
-          <SettingsComponent />
-        </Route>
-        <Route path="/">
-          <EC2Component />
-        </Route>
-      </Switch>
-    </div>
-  </Router>;
-};
+@inject(({ rootStore }) => ({
+  appStore: rootStore.getAppStore(),
+}))
+@observer
+class App extends React.Component<any, any> {
+  public render() {
+    const { appStore } = this.props;
+    const { appName } = appStore;
+    return <>
+      <h1>{appName}</h1>
+      <SettingsComponent />
+      <RouteComponent />
+      <button onClick={() => appStore.setAppName('abc')}>SetName</button>
+    </>;
+  }
+}
 
 export default App;
