@@ -1,6 +1,6 @@
 import * as React from 'react';
-import SettingsComponent from './Settings';
-import RouteComponent from './Route';
+import Settings from './Settings';
+import Route from './Route';
 import { inject, observer } from 'mobx-react';
 
 @inject(({ rootStore }) => ({
@@ -13,8 +13,8 @@ class App extends React.Component<any, any> {
     const { appName } = appStore;
     return <>
       <h1>{appName}</h1>
-      <SettingsComponent />
-      <RouteComponent />
+      <Settings />
+      <Route />
       <button onClick={() => appStore.setAppName('abc')}>SetName</button>
     </>;
   }

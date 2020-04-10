@@ -7,7 +7,7 @@ interface State {
 
 class SettingsComponent extends React.Component<any, State> {
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.state = {
@@ -25,17 +25,17 @@ class SettingsComponent extends React.Component<any, State> {
     } as Pick<State, keyof State>);
   }
 
-  public loadSettings = (e) => {
+  public loadSettings = (e: any) => {
     e.preventDefault();
     // eslint-disable-next-line no-undef
     if ((window as any).AP) {
       // eslint-disable-next-line no-undef
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
-        success: (response) => {
+        success: (response: any) => {
           // tslint:disable-next-line: no-console
           console.log(response);
         },
-        error: (error) => {
+        error: (error: any) => {
           // tslint:disable-next-line: no-console
           console.log(error);
         },
@@ -48,7 +48,7 @@ class SettingsComponent extends React.Component<any, State> {
     }
   }
 
-  public saveSettings = (e) => {
+  public saveSettings = (e: any) => {
     e.preventDefault();
     // tslint:disable-next-line: no-console
     console.log('Saving credentials.');
@@ -59,11 +59,11 @@ class SettingsComponent extends React.Component<any, State> {
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify({ accessKey: this.state.accessKey, secretKey: this.state.secretKey }),
-        success: (response) => {
+        success: (response: any) => {
           // tslint:disable-next-line: no-console
           console.log(response);
         },
-        error: (error) => {
+        error: (error: any) => {
           // tslint:disable-next-line: no-console
           console.log(error);
         },

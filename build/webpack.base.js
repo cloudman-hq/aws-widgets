@@ -15,10 +15,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
-        options: {
-          transpileOnly: true
-        }
+        loader: 'ts-loader'
       },
       {
         test: /\.(sa|sc|c)ss$/,

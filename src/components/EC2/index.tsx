@@ -8,7 +8,7 @@ interface State {
 
 class EC2Component extends React.Component<any, State> {
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.state = {
@@ -20,7 +20,7 @@ class EC2Component extends React.Component<any, State> {
     if ((window as any).AP) {
       // eslint-disable-next-line no-undef
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
-        success: (response) => {
+        success: (response: any) => {
           // tslint:disable-next-line: no-console
           console.log(response);
           const accessKey = response.value.accessKey;
@@ -31,7 +31,7 @@ class EC2Component extends React.Component<any, State> {
             secretKey,
           });
         },
-        error: (error) => {
+        error: (error: any) => {
           // tslint:disable-next-line: no-console
           console.log(error);
         },
@@ -69,7 +69,7 @@ class EC2Component extends React.Component<any, State> {
       } else {
         // tslint:disable-next-line: no-console
         console.log(data);
-        const instances = (data as any).Reservations.flatMap(r => r.Instances.map(i => `${i.InstanceId}: ${i.State.Name}`));
+        const instances = (data as any).Reservations.flatMap((r: any) => r.Instances.map((i: any) => `${i.InstanceId}: ${i.State.Name}`));
         // tslint:disable-next-line: no-console
         console.log(instances);
         alert('Succeeded! Check your console for the list of EC2 instances.');

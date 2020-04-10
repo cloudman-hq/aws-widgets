@@ -1,19 +1,25 @@
 {
+    "defaultSeverity": "error",
     "extends": [
-      "tslint:recommended",
-      "tslint-react",
-      "tslint-eslint-rules",
-      "tslint-config-prettier",
-      "tslint-config-airbnb"
+        "tslint:recommended",
+        "tslint-react",
+        "tslint-eslint-rules",
+        "tslint-config-prettier",
+        "tslint-config-airbnb"
     ],
+    "jsRules": {},
     "rules": {
-      "no-boolean-literal-compare": false,
-      "ordered-imports": false,
-      "variable-name": false,
-      "jsx-no-lambda": false,
-      "jsx-boolean-value": false,
-      "object-literal-sort-keys": false,
-      "import-name": false,
-      "align": false
-    }
-  }
+        "jsx-no-lambda": false,
+        "import-name": false,
+        "no-boolean-literal-compare": false,
+        "jsx-boolean-value": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "build",
+            "node_modules",
+            "src/**/*.stories.tsx"
+        ]
+    },
+    "rulesDirectory": []
+}
