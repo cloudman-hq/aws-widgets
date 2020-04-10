@@ -1,7 +1,7 @@
 import React from 'react';
 import AWS from 'aws-sdk'
 import EC2 from './EC2'
-
+import Lambda from './Lambda'
 
 class Editor extends React.Component {
 
@@ -77,17 +77,6 @@ class Editor extends React.Component {
 
   render() {
 
-    function Lambda(props) {
-      return (
-        <div>
-          <dl>
-            <dt>Runtime</dt> <dd>{props.runtime}</dd>
-          </dl>
-          <label> Status: {props.resourceState}</label>
-        </div>
-      );
-    }
-
     let resourceCard;
     if (this.state.resourceType === 'lambda') {
       resourceCard = <Lambda runtime={this.state.lambdaRuntime}/>
@@ -100,6 +89,7 @@ class Editor extends React.Component {
           ARN or Resource ID:
           <input
             className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+            name="resourceId"
             type="string"
             placeholder="e.g. i-04308dbefa6eb6ac"
             onChange={this.handleInputChange}/>
