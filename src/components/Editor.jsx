@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 
 
 
-class EC2 extends React.Component {
+class Editor extends React.Component {
 
   constructor(props) {
     super(props);
@@ -22,7 +22,6 @@ class EC2 extends React.Component {
 
   handleInputChange(event) {
     const value = event.target.value;
-    const name = event.target.name;
 
     this.setState({
       id: value
@@ -130,4 +129,4 @@ class EC2 extends React.Component {
   }
 }
 
-export default EC2;
+export default Editor;
