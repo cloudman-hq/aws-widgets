@@ -55,6 +55,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@sambego/storybook-state": "^2.0.1",
     "aws-sdk": "^2.654.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
