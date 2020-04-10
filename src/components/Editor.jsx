@@ -1,6 +1,6 @@
 import React from 'react';
 import AWS from 'aws-sdk'
-
+import EC2 from './EC2'
 
 
 class Editor extends React.Component {
@@ -88,22 +88,11 @@ class Editor extends React.Component {
       );
     }
 
-    function Ec2(props) {
-      return (
-        <div>
-          <dl>
-            <dt>AZ:</dt> <dd>{props.availabilityZone}</dd>
-          </dl>
-          <label> Status: {props.resourceState}</label>
-        </div>
-      );
-    }
-
     let resourceCard;
     if (this.state.resourceType === 'lambda') {
       resourceCard = <Lambda runtime={this.state.lambdaRuntime}/>
     } else {
-      resourceCard = <Ec2 availabilityZone={this.state.availabilityZone} resourceState={this.state.resourceState}/>
+      resourceCard = <EC2 availabilityZone={this.state.availabilityZone} resourceState={this.state.resourceState}/>
     }
     return (
       <div>
