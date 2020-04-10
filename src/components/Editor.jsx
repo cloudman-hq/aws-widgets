@@ -39,7 +39,21 @@ class EC2 extends React.Component {
     if (this.state.id.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
       this.setState({ resourceType: 'lambda' });
-
+      var lambda = new AWS.Lambda();
+      const params = {
+        FunctionName: this.state.id
+      };
+      const that = this;
+      lambda.getFunction(params, function (err, data) {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(data);
+          that.setState({
+            lambdaRuntime: data.Configuration.Runtime
+          });
+        }
+      });
     } else {
       var ec2 = new AWS.EC2();
       const params = {
@@ -68,7 +82,7 @@ class EC2 extends React.Component {
       return (
         <div>
           <dl>
-            <dt>AZ:</dt> <dd>{props.availabilityZone}</dd>
+            <dt>Runtime</dt> <dd>{props.runtime}</dd>
           </dl>
           <label> Status: {props.resourceState}</label>
         </div>
@@ -88,7 +102,7 @@ class EC2 extends React.Component {
 
     let resourceCard;
     if (this.state.resourceType === 'lambda') {
-      resourceCard = <Lambda/>
+      resourceCard = <Lambda runtime={this.state.lambdaRuntime}/>
     } else {
       resourceCard = <Ec2 availabilityZone={this.state.availabilityZone} resourceState={this.state.resourceState}/>
     }
