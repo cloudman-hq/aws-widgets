@@ -37,7 +37,7 @@ class EC2 extends React.Component {
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.describeEc2 = this.describeEc2.bind(this);
+    this.describe = this.describeEc2.bind(this);
   }
   handleInputChange(event) {
     const value = event.target.value;
