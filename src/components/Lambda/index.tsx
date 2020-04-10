@@ -1,11 +1,6 @@
 import * as React from 'react';
 
-interface State {
-  name: string;
-  role: string;
-}
-
-class Lambda extends React.Component<any, State> {
+class Lambda extends React.Component<any> {
   constructor(props: any) {
     super(props);
   }

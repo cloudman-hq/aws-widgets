@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "tslint -c tslint.json './src/**/*.ts?(x)'",
+    "lint": "tslint -c tslint.json './src/**/*.ts?(x)' --fix",
     "build": "cross-env NODE_ENV=production webpack --mode production --config ./build/webpack.client.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.client.js",
     "storybook": "start-storybook -p 6006",

@@ -6,6 +6,6 @@ export default {
   component: Lambda
 }
 
-export const Lambda1 = () => (
+export const LambdaDemo = () => (
   <Lambda name="Test" role="Role"/>
 );
