@@ -33,7 +33,10 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [require('autoprefixer')]
+              plugins: () => [
+                require('tailwindcss')(path.join(__dirname, '../tailwind.js')),
+                require('autoprefixer')
+              ]
             }
           },
           'sass-loader',
