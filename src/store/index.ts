@@ -1,4 +1,4 @@
-import SettingsStore from './settingsStore';
+import { SettingsStore } from './settingsStore';
 import AppStore from './appStore';
 import 'mobx-react-lite/batchingForReactDom';
 

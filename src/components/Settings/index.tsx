@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Buttons, Container } from './style';
+import { subscribers } from '../../store/settingsStore';
 
 const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
   const {
     saveSettings,
     loadSettings,
-    onAccessKeyChange,
-    onSecretKeyChange,
     accessKey,
     secretKey,
   } = settingsStore;
@@ -23,7 +22,10 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
             name="accessKey"
             placeholder="Access key"
             value={accessKey}
-            onChange={onAccessKeyChange} />
+            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+              const value = event.currentTarget.value;
+              subscribers.accessKey$.next(value);
+            }} />
         </div>
         <div className="field-group">
           <label htmlFor="secretKey">Secret key</label>
@@ -34,7 +36,10 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
             name="secretKey"
             placeholder="Secret key"
             value={secretKey}
-            onChange={onSecretKeyChange} />
+            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+              const value = event.currentTarget.value;
+              subscribers.secretKey$.next(value);
+            }} />
         </div>
         <Buttons>
           <button onClick={saveSettings} className="aui-button aui-button-primary">

@@ -1,9 +1,21 @@
 import { observable, computed, action } from 'mobx';
+import { BehaviorSubject } from 'rxjs';
+
+const subscribers: any = {
+  accessKey$: new BehaviorSubject(''),
+  secretKey$: new BehaviorSubject(''),
+};
 
 class SettingsStore {
   private rootStore: any;
   constructor(rootStore: any) {
     this.rootStore = rootStore;
+    subscribers.accessKey$.subscribe((value: string) => {
+      this.setAccessKey(value);
+    });
+    subscribers.secretKey$.subscribe((value: string) => {
+      this.setSecretKey(value);
+    });
   }
 
   @observable accessKey = '';
@@ -67,14 +79,6 @@ class SettingsStore {
       console.log('Credentials is not saved as AP is not defined.');
     }
   }
-  @action onAccessKeyChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    this.setAccessKey(value);
-  }
-  @action onSecretKeyChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    this.setSecretKey(value);
-  }
 }
 
-export default SettingsStore;
+export { subscribers, SettingsStore };
