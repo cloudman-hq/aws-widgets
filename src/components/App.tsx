@@ -41,7 +41,7 @@ class App extends React.Component<any, any> {
       // tslint:disable-next-line: no-console
       console.log('Credentials is not loaded as AP is not defined.');
     }
-  };
+  }
 
   public render() {
     const { appStore } = this.props;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import EC2 from '../EC2';
-import Settings from '../Settings'
+import Settings from '../Settings';
 
 export default () => <>
   <Route path="/settings" component={Settings} />
