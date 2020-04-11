@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Settings from './Settings';
 import Route from './Route';
 import { inject, observer } from 'mobx-react';
+import { Switch, withRouter } from 'react-router-dom';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -41,17 +41,16 @@ class App extends React.Component<any, any> {
       // tslint:disable-next-line: no-console
       console.log('Credentials is not loaded as AP is not defined.');
     }
-  };
+  }
 
   public render() {
-    const { appStore } = this.props;
-    const { appName } = appStore;
+    const { location } = this.props;
     return <>
-      <h1>{appName}</h1>
-      <Route />
-      <button onClick={() => appStore.setAppName('abc')}>SetName</button>
+      <Switch location={location}>
+        <Route />
+      </Switch>
     </>;
   }
 }
 
-export default App;
+export default withRouter(App);

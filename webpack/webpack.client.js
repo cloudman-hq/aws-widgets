@@ -36,7 +36,7 @@ if (isDev) {
       errors: true
     },
     historyApiFallback: {
-      index: '/public/index.html'
+      index: '/'
     },
   }
   config.plugins.push(new webpack.SourceMapDevToolPlugin())

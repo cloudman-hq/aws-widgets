@@ -14,9 +14,7 @@ const render = (Main: any) => {
     <React.StrictMode>
       <Provider rootStore={new RootStore()}>
         <Router>
-          <Switch>
-            <Main />
-          </Switch>
+          <Main />
         </Router>
       </Provider>
     </React.StrictMode>,
