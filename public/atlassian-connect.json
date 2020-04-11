@@ -6,7 +6,7 @@
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://awswidgets.zenuml.com/",
+  "baseUrl": "https://ce9f0fa3.ngrok.io",
   "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",

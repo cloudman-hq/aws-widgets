@@ -8,16 +8,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@atlassian/aui@8.5.1/dist/aui/aui-prototyping.css">
     <script src="https://connect-cdn.atl-paas.net/all.js"></script>
     <script id="connect-loader">
+        console.log('setting up editor dialog....');
         AP.require(["confluence", "dialog"], function (confluence, dialog) {
+          console.log('Inside the AP.require method()');
+          if (!dialog) {
+            // Not in the editing mode.
+            return;
+          }
           function onSubmit() {
+            console.log('Inside the onSubmit method()');
             // cache the description of the resource
             // const macroBody = rootStore.getAppStore().description;
             let resourceId = rootStore.getAppStore().resourceId;
+            console.log('resourceId', resourceId);
             confluence.saveMacro({resourceId: resourceId}, resourceId);
             confluence.closeMacroEditor();
             return true;
           }
           dialog.getButton("submit").bind(onSubmit);
+          console.log('DONE: setting up editor dialog....');
+
         });
     </script>
 </head>
