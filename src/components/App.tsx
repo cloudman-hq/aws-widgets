@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Route from './Route';
-import {inject, observer} from 'mobx-react';
-import {Switch, withRouter} from 'react-router-dom';
+import { inject, observer } from 'mobx-react';
+import { Switch, withRouter } from 'react-router-dom';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),

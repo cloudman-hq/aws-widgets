@@ -32,6 +32,17 @@
         },
         "outputType": "block",
         "bodyType": "none",
+        "editor": {
+          "url": "/editor",
+          "editTitle": {
+            "value": "Update"
+          },
+          "insertTitle": {
+            "value": "Add an AWS Resource to the page"
+          },
+          "width": "1240px",
+          "height": "500px"
+        },
         "icon": {
           "width": 16,
           "height": 16,
