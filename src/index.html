@@ -6,11 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@atlassian/aui@8.5.1/dist/aui/aui-prototyping.css">
+    <script src="https://connect-cdn.atl-paas.net/all.js"></script>
+    <script id="connect-loader">
+        AP.require(["confluence", "dialog"], function (confluence, dialog) {
+          function onSubmit() {
+            // cache the description of the resource
+            // const macroBody = rootStore.getAppStore().description;
+            confluence.saveMacro({resourceId: rootStore.getAppStore().resourceId})
+            confluence.closeMacroEditor();
+            return true;
+          }
+          dialog.getButton("submit").bind(onSubmit);
+        });
+    </script>
 </head>
 
 <body>
-    <div id="app-root"></div>
-    <script src="https://connect-cdn.atl-paas.net/all.js"></script>
+<div id="app-root"></div>
 </body>
 
 </html>

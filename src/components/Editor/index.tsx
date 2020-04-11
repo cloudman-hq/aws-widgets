@@ -5,7 +5,6 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 
 interface State {
-  resourceId: string;
   resourceType: string;
   resourceDescription: any;
 }
@@ -23,7 +22,6 @@ class Editor extends React.Component<any, State> {
 
     this.state = {
       resourceType: 'unknown',
-      resourceId: null,
       resourceDescription: {},
     };
 
@@ -34,9 +32,7 @@ class Editor extends React.Component<any, State> {
   handleInputChange(event: React.FormEvent<HTMLInputElement>) {
     const value = event.currentTarget.value;
 
-    this.setState({
-      resourceId: value,
-    });
+    this.props.appStore.setResourceId(value);
   }
 
   describe(e: any) {
@@ -45,12 +41,13 @@ class Editor extends React.Component<any, State> {
 
     AWS.config.credentials = new AWS.Credentials(this.props.settingsStore.accessKey,
                                                  this.props.settingsStore.secretKey);
-    if (this.state.resourceId.indexOf('arn:aws:lambda') === 0) {
+    let resourceId = this.props.appStore.resourceId;
+    if (resourceId.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
       this.setState({ resourceType: 'lambda' });
       const lambda = new AWS.Lambda();
       const params = {
-        FunctionName: this.state.resourceId,
+        FunctionName: resourceId,
       };
       lambda.getFunction(params, (err: any, data: any) => {
         if (!err) {
@@ -64,7 +61,7 @@ class Editor extends React.Component<any, State> {
     } else {
       const ec2 = new AWS.EC2();
       const params = {
-        InstanceIds: [this.state.resourceId],
+        InstanceIds: [resourceId],
       };
       ec2.describeInstances(params, (err: any, data: any) => {
         if (err) {
@@ -99,6 +96,7 @@ class Editor extends React.Component<any, State> {
             name="resourceId"
             type="string"
             placeholder="e.g. i-04308dbefa6eb6ac"
+            value={this.props.appStore.resourceId}
             onChange={this.handleInputChange}/>
         </label>
 

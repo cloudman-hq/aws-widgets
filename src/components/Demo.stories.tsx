@@ -119,7 +119,7 @@ export const AppStory = () => (
       </div>
     </form>
     <Router>
-    <App/>
+    <App location="/editor"/>
     </Router>
   </Provider>
 );

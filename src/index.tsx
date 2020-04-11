@@ -6,10 +6,11 @@ import { Provider } from 'mobx-react';
 import RootStore from './store';
 import { BrowserRouter as Router } from 'react-router-dom';
 // tslint:disable-next-line: variable-name
+let rootStore = new RootStore();
 const render = (Main: any) => {
   ReactDom.render(
     <React.StrictMode>
-      <Provider rootStore={new RootStore()}>
+      <Provider rootStore={rootStore}>
         <Router>
           <Main />
         </Router>
@@ -19,7 +20,8 @@ const render = (Main: any) => {
 };
 
 render(App);
-
+// @ts-ignore
+window.rootStore = rootStore;
 if ((module as any).hot) {
   (module as any).hot.accept('./components/App', () => {
     const nextApp = require('./components/App').default;
