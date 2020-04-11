@@ -5,7 +5,7 @@ import Settings from '../Settings';
 import Editor from '../Editor';
 
 export default () => <>
-  <Route path="/" exact render={() => <Redirect to="/ec2" />} />
+  <Route path="/" exact render={() => <Redirect to="/editor" />} />
   <Route path="/settings" component={Settings} />
   <Route path="/editor" component={Editor} />
   <Route path="/ec2" component={EC2} />
