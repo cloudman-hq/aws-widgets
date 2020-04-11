@@ -12,7 +12,8 @@
           function onSubmit() {
             // cache the description of the resource
             // const macroBody = rootStore.getAppStore().description;
-            confluence.saveMacro({resourceId: rootStore.getAppStore().resourceId})
+            let resourceId = rootStore.getAppStore().resourceId;
+            confluence.saveMacro({resourceId: resourceId}, resourceId);
             confluence.closeMacroEditor();
             return true;
           }

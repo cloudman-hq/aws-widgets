@@ -41,7 +41,7 @@ class Editor extends React.Component<any, State> {
 
     AWS.config.credentials = new AWS.Credentials(this.props.settingsStore.accessKey,
                                                  this.props.settingsStore.secretKey);
-    let resourceId = this.props.appStore.resourceId;
+    const resourceId = this.props.appStore.resourceId;
     if (resourceId.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
       this.setState({ resourceType: 'lambda' });

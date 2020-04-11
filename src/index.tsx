@@ -6,7 +6,7 @@ import { Provider } from 'mobx-react';
 import RootStore from './store';
 import { BrowserRouter as Router } from 'react-router-dom';
 // tslint:disable-next-line: variable-name
-let rootStore = new RootStore();
+const rootStore = new RootStore();
 const render = (Main: any) => {
   ReactDom.render(
     <React.StrictMode>
