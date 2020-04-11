@@ -3,6 +3,14 @@ import {State, Store} from '@sambego/storybook-state';
 import EC2 from '../components/EC2'
 import Editor from '../components/Editor'
 import '../styles/app.css'
+import {
+  BrowserRouter as Router,
+  Switch,
+} from 'react-router-dom';
+import { Provider } from 'mobx-react';
+import RootStore from '../store';
+
+import App from "./App";
 
 export default {
   title: 'Demo',
@@ -84,4 +92,34 @@ export const EditorComponent = () => (
     </div>
 
   </div>
+);
+
+export const AppStory = () => (
+  <Provider rootStore={new RootStore()}>
+    <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Access Key:
+          <input
+            className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+            name="accessKey"
+            type="string"
+            onChange={handleInputChange}/>
+        </label>
+      </div>
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Secret Key:
+          <input
+            className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+            name="secretKey"
+            type="string"
+            onChange={handleInputChange}/>
+        </label>
+      </div>
+    </form>
+    <Router>
+    <App/>
+    </Router>
+  </Provider>
 );

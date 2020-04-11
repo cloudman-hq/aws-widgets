@@ -79,6 +79,7 @@ class SettingsComponent extends React.Component<any, State> {
   render() {
     return (
       <div>
+        <h1>Settings</h1>
         <label>
           Access Key:
           <input
