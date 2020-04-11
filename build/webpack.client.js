@@ -6,6 +6,7 @@ const webpackMerge = require('webpack-merge');
 const baseConfig = require('./webpack.base');
 const isDev = process.env.NODE_ENV !== 'production';
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const config = webpackMerge(baseConfig, {
   entry: {
@@ -19,7 +20,10 @@ const config = webpackMerge(baseConfig, {
       template: path.join(__dirname, '../src/index.html'),
     }),
     new CleanWebpackPlugin(),
-    new ForkTsCheckerWebpackPlugin()
+    new ForkTsCheckerWebpackPlugin(),
+    new CopyPlugin([
+      path.join(__dirname, '../public/atlassian-connect.json'),
+    ]),
   ],
 })
 
@@ -31,7 +35,6 @@ if (isDev) {
     overlay: {
       errors: true
     },
-    publicPath: '/public/',
     historyApiFallback: {
       index: '/public/index.html'
     },

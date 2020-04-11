@@ -6,7 +6,6 @@ const isDev = process.env.NODE_ENV !== 'production';
 module.exports = {
   output: {
     path: path.join(__dirname, '../dist'),
-    publicPath: '/public/'
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss']
