@@ -6,6 +6,7 @@ import Editor from '../Editor';
 
 export default () => <>
   <Route path="/" exact render={() => <Redirect to="/editor" />} />
+  <Route path="/index.html" exact render={() => <Redirect to="/editor" />} />
   <Route path="/settings" component={Settings} />
   <Route path="/editor" component={Editor} />
   <Route path="/ec2" component={EC2} />
