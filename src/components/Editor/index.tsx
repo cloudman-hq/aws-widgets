@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
+import { inject, observer } from 'mobx-react';
 
 interface State {
   resourceId: string;
@@ -9,6 +10,12 @@ interface State {
   resourceDescription: any;
 }
 
+@inject(({ rootStore }) => ({
+  appStore: rootStore.getAppStore(),
+  settingsStore: rootStore.getSettingsStore(),
+}))
+
+@observer
 class Editor extends React.Component<any, State> {
 
   constructor(props: any) {
@@ -36,7 +43,8 @@ class Editor extends React.Component<any, State> {
     e.preventDefault();
     AWS.config.region = 'ap-southeast-2';
 
-    AWS.config.credentials = new AWS.Credentials(this.props.accessKey, this.props.secretKey);
+    AWS.config.credentials = new AWS.Credentials(this.props.settingsStore.accessKey,
+                                                 this.props.settingsStore.secretKey);
     if (this.state.resourceId.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
       this.setState({ resourceType: 'lambda' });
