@@ -4,10 +4,7 @@ import './styles/main';
 import App from './components/App';
 import { Provider } from 'mobx-react';
 import RootStore from './store';
-import {
-  BrowserRouter as Router,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 // tslint:disable-next-line: variable-name
 const render = (Main: any) => {
   ReactDom.render(

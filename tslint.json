@@ -12,7 +12,8 @@
         "jsx-no-lambda": false,
         "import-name": false,
         "no-boolean-literal-compare": false,
-        "jsx-boolean-value": false
+        "jsx-boolean-value": false,
+        "variable-name": false
     },
     "linterOptions": {
         "exclude": [

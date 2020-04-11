@@ -1,5 +1,6 @@
 import SettingsStore from './settingsStore';
 import AppStore from './appStore';
+import 'mobx-react-lite/batchingForReactDom';
 
 export default class RootStore {
   private settingsStore: any;
