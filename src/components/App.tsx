@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Route from './Route';
-import { inject, observer } from 'mobx-react';
-import { Switch, withRouter } from 'react-router-dom';
+import {inject, observer} from 'mobx-react';
+import {Switch, withRouter} from 'react-router-dom';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -25,10 +25,9 @@ class App extends React.Component<any, any> {
       // eslint-disable-next-line no-undef
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: (response: any) => {
-          // tslint:disable-next-line: no-console
-          console.log(response);
-          this.settingsStore.accessKey = response.value.accessKey;
-          this.settingsStore.secretKey = response.value.second;
+          const jsonResponse = JSON.parse(response);
+          this.settingsStore.accessKey = jsonResponse.value.accessKey;
+          this.settingsStore.secretKey = jsonResponse.value.secretKey;
         },
         error: (error: any) => {
           // tslint:disable-next-line: no-console
