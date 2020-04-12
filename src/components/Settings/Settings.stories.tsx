@@ -1,16 +1,17 @@
 import * as React from 'react';
+import Settings from '.';
+import { storiesOf } from '@storybook/react'
+import { Provider } from 'mobx-react';
+import RootStore from '../../store';
 
-import SettingsComponent from '.';
+const withProvider = (story: any) => (
+  <Provider rootStore={new RootStore()}>
+    {story()}
+  </Provider>
+)
 
-export default {
-  title: 'Settings',
-  component: SettingsComponent,
-};
-
-export const Emoji = () => (
-  <SettingsComponent />
-);
-
-Emoji.story = {
-  name: 'Settings',
-};
+storiesOf('Settings', module)
+  .addDecorator(withProvider)
+  .add('default', () => (
+    <Settings />
+  ));
