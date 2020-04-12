@@ -41,13 +41,13 @@ class App extends React.Component<any, any> {
     }
   }
 
-  private loadMacroDataAndMacroBody() {
+  private loadMacroDataAndMacroBody = () => {
     if ((window as any).AP) {
       (window as any).AP.confluence.getMacroBody(function (body: string) {
         this.appStore.setResourceId(body);
       });
     }
-  }
+  };
 
   public render() {
     const { location } = this.props;
