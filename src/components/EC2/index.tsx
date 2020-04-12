@@ -79,6 +79,7 @@ class EC2Component extends React.Component<any, State> {
   render() {
     return (
       <div>
+        <label>EC2 Component</label>
         <button onClick={this.describeEc2}>
           Describe
         </button>

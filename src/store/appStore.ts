@@ -3,6 +3,8 @@ import { observable, action } from 'mobx';
 class AppStore {
   @observable appName = '';
   @observable resourceId = '';
+  @observable resourceType = '';
+  @observable resourceDescription = {};
 
   private rootStore: any;
   constructor(rootStore: any) {
@@ -14,6 +16,14 @@ class AppStore {
 
   @action public setResourceId(id: string) {
     this.resourceId = id;
+  }
+
+  @action public setResourceType(type: string) {
+    this.resourceType = type;
+  }
+
+  @action public setResourceDescription(desc: any) {
+    this.resourceDescription = desc;
   }
 }
 export default AppStore;

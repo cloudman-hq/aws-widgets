@@ -3,8 +3,10 @@ import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
+import Viewer from '../Viewer';
 
 interface State {
+  resourceId: string;
   resourceType: string;
   resourceDescription: any;
 }
@@ -21,6 +23,7 @@ class Editor extends React.Component<any, State> {
     super(props);
 
     this.state = {
+      resourceId: '',
       resourceType: 'unknown',
       resourceDescription: {},
     };
@@ -32,7 +35,9 @@ class Editor extends React.Component<any, State> {
   handleInputChange(event: React.FormEvent<HTMLInputElement>) {
     const value = event.currentTarget.value;
 
-    this.props.appStore.setResourceId(value);
+    this.setState({
+      resourceId: value,
+    });
   }
 
   describe(e: any) {
@@ -41,41 +46,8 @@ class Editor extends React.Component<any, State> {
 
     AWS.config.credentials = new AWS.Credentials(this.props.settingsStore.accessKey,
                                                  this.props.settingsStore.secretKey);
-    const resourceId = this.props.appStore.resourceId;
-    if (resourceId.indexOf('arn:aws:lambda') === 0) {
-      // describe lambda
-      this.setState({ resourceType: 'lambda' });
-      const lambda = new AWS.Lambda();
-      const params = {
-        FunctionName: resourceId,
-      };
-      lambda.getFunction(params, (err: any, data: any) => {
-        if (!err) {
-          this.setState({
-            resourceDescription: {
-              lambdaRuntime: data.Configuration.Runtime,
-            },
-          });
-        }
-      });
-    } else {
-      const ec2 = new AWS.EC2();
-      const params = {
-        InstanceIds: [resourceId],
-      };
-      ec2.describeInstances(params, (err: any, data: any) => {
-        if (err) {
-          alert('Failed');
-        } else {
-          const instance = data.Reservations[0].Instances[0];
-          const instanceState = instance.State.Name;
-          const availabilityZone = instance.Placement.AvailabilityZone;
-          this.setState({
-            resourceDescription: { availabilityZone, resourceState: instanceState },
-          });
-        }
-      });
-    }
+    const resourceId = this.state.resourceId;
+    this.props.appStore.setResourceId(resourceId);
   }
 
   render() {
@@ -96,7 +68,7 @@ class Editor extends React.Component<any, State> {
             name="resourceId"
             type="string"
             placeholder="e.g. i-04308dbefa6eb6ac"
-            value={this.props.appStore.resourceId}
+            value={this.state.resourceId}
             onChange={this.handleInputChange}/>
         </label>
 
@@ -106,7 +78,7 @@ class Editor extends React.Component<any, State> {
           Describe
         </button>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          {resourceCard}
+          <Viewer/>
         </div>
       </div>
     );

@@ -15,9 +15,10 @@ class App extends React.Component<any, any> {
     // Try to load setting from app.properties
     this.settingsStore = props.settingsStore;
     this.loadSettings();
+    this.loadMacroDataAndMacroBody();
   }
 
-  loadSettings = () => {
+  private loadSettings = () => {
     this.settingsStore.setAccessKey('loaded-accesskey');
     this.settingsStore.setSecretKey('loaded-secretkey');
     // eslint-disable-next-line no-undef
@@ -39,6 +40,14 @@ class App extends React.Component<any, any> {
     } else {
       // tslint:disable-next-line: no-console
       console.log('Credentials is not loaded as AP is not defined.');
+    }
+  }
+
+  private loadMacroDataAndMacroBody() {
+    if ((window as any).AP) {
+      (window as any).AP.confluence.getMacroBody(function (body: string) {
+        this.appStore.setResourceId(body);
+      });
     }
   }
 
