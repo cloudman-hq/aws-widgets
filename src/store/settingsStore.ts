@@ -18,8 +18,8 @@ class SettingsStore {
     });
   }
 
-  @observable accessKey = '';
-  @observable secretKey = '';
+  @observable accessKey = 'default-accessKey';
+  @observable secretKey = 'defaault-secretKey';
   @computed get toJson() {
     return {
       accessKey: this.accessKey,
@@ -32,26 +32,7 @@ class SettingsStore {
   @action setSecretKey = (secretKey: string) => {
     this.secretKey = secretKey;
   }
-  @action loadSettings = (e: any) => {
-    e.preventDefault();
-    if ((window as any).AP) {
-      (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
-        success: (response: any) => {
-          // tslint:disable-next-line: no-console
-          console.log(response);
-        },
-        error: (error: any) => {
-          // tslint:disable-next-line: no-console
-          console.log(error);
-        },
-      });
-      // tslint:disable-next-line: no-console
-      console.log('Credentials loaded.');
-    } else {
-      // tslint:disable-next-line: no-console
-      console.log('Credentials is not loaded as AP is not defined.');
-    }
-  }
+
   @action saveSettings = (e: any) => {
     e.preventDefault();
     // tslint:disable-next-line: no-console

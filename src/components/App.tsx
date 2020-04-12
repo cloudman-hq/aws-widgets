@@ -19,8 +19,6 @@ class App extends React.Component<any, any> {
   }
 
   private loadSettings = () => {
-    this.settingsStore.setAccessKey('loaded-accesskey');
-    this.settingsStore.setSecretKey('loaded-secretkey');
     // eslint-disable-next-line no-undef
     if ((window as any).AP) {
       // eslint-disable-next-line no-undef
