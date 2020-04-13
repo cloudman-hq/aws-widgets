@@ -39,11 +39,12 @@ class Viewer extends React.Component<any, State> {
       availabilityZone: '',
       resourceState: '',
     };
-    let resourceType = '';
     if (resourceId.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
-      resourceType = 'lambda';
-      this.props.appStore.setResourceType(resourceType);
+      this.setState({
+        resourceType: 'lambda',
+      });
+      // this.props.appStore.setResourceType(resourceType);
       const lambda = new AWS.Lambda();
       const params = {
         FunctionName: resourceId,
@@ -60,15 +61,18 @@ class Viewer extends React.Component<any, State> {
         }
       });
     } else {
-      this.props.appStore.setResourceType('EC2');
-
+      // this.props.appStore.setResourceType('EC2');
+      this.setState({
+        resourceType: 'EC2',
+      });
       const ec2 = new AWS.EC2();
       const params = {
         InstanceIds: [resourceId],
       };
       ec2.describeInstances(params, (err: any, data: any) => {
         if (err) {
-          alert('Failed');
+          // tslint:disable-next-line: no-console
+          console.error(err);
         } else {
           const instance = data.Reservations[0].Instances[0];
           const instanceState = instance.State.Name;
@@ -93,7 +97,8 @@ class Viewer extends React.Component<any, State> {
     }
     return (
       <div>
-        <label>{this.props.settingsStore.accessKey}</label>
+        <label>Access Key: {this.props.settingsStore.accessKey}</label>
+        <label>Resource ID:{this.props.appStore.resourceId}</label>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
           {resourceCard}
         </div>

@@ -14,6 +14,8 @@ class App extends React.Component<any, any> {
     super(props);
     // Try to load setting from app.properties
     this.settingsStore = props.settingsStore;
+    this.loadSettings = this.loadSettings.bind(this);
+    this.loadMacroDataAndMacroBody = this.loadMacroDataAndMacroBody.bind(this);
     this.loadSettings();
     this.loadMacroDataAndMacroBody();
   }
@@ -25,8 +27,8 @@ class App extends React.Component<any, any> {
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: (response: any) => {
           const jsonResponse = JSON.parse(response);
-          this.settingsStore.accessKey = jsonResponse.value.accessKey;
-          this.settingsStore.secretKey = jsonResponse.value.secretKey;
+          this.props.settingsStore.accessKey = jsonResponse.value.accessKey;
+          this.props.settingsStore.secretKey = jsonResponse.value.secretKey;
         },
         error: (error: any) => {
           // tslint:disable-next-line: no-console
@@ -42,12 +44,21 @@ class App extends React.Component<any, any> {
   }
 
   private loadMacroDataAndMacroBody = () => {
+    // tslint:disable-next-line: no-console
+    console.log('load macro data...');
     if ((window as any).AP) {
-      (window as any).AP.confluence.getMacroBody(function (body: string) {
-        this.appStore.setResourceId(body);
+      // (window as any).AP.confluence.getMacroBody(function (body: string) {
+      //   this.appStore.setResourceId(body);
+      // });
+      // tslint:disable-next-line: no-console
+      console.log('load macro data...2');
+      (window as any).AP.confluence.getMacroData((data: any) => {
+        // tslint:disable-next-line: no-console
+        console.log('load macro data...3.2');
+        this.props.appStore.setResourceId(data.resourceId);
       });
     }
-  };
+  }
 
   public render() {
     const { location } = this.props;
@@ -55,7 +66,7 @@ class App extends React.Component<any, any> {
       <Switch location={location}>
         <Route />
       </Switch>
-      <footer>This is the App component: 202004121304</footer>
+      <footer>This is the App component: 202004121504</footer>
     </>;
   }
 }
