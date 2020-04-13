@@ -88,7 +88,7 @@ class Viewer extends React.Component<any, State> {
   render() {
 
     let resourceCard;
-    if (this.props.appStore.resourceType === 'lambda') {
+    if (this.state.resourceType === 'lambda') {
       resourceCard = <Lambda runtime={this.props.appStore.resourceDescription.lambdaRuntime}/>;
     } else {
       resourceCard = <EC2
