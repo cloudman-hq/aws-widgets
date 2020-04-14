@@ -1,5 +1,5 @@
-import { SettingsStore } from './settingsStore';
-import AppStore from './appStore';
+import { SettingsStore } from './components/Settings/SettingsStore';
+import AppStore from './components/App/AppStore';
 import 'mobx-react-lite/batchingForReactDom';
 
 export default class RootStore {

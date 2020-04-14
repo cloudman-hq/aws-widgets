@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Buttons, Container } from './style';
-import { subscribers } from '../../store/settingsStore';
+import { subscribers } from './SettingsStore';
 
 const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
   const {
