@@ -1,14 +1,11 @@
 import * as React from 'react';
-import {State, Store} from '@sambego/storybook-state';
+import { State, Store } from '@sambego/storybook-state';
 import EC2 from '../components/EC2'
 import Editor from '../components/Editor'
 import '../styles/app.css'
-import {
-  BrowserRouter as Router,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'mobx-react';
-import RootStore from '../store';
+import RootStore from '../RootStore';
 
 import App from "./App";
 
@@ -39,7 +36,7 @@ export const EC2Component = () => (
         name="accessKey"
         type="string"
 
-        onChange={handleInputChange}/>
+        onChange={handleInputChange} />
     </label>
     <label>
       Secret Key:
@@ -47,11 +44,11 @@ export const EC2Component = () => (
         name="secretKey"
         type="string"
 
-        onChange={handleInputChange}/>
+        onChange={handleInputChange} />
     </label>
 
     <State store={store}>
-      <EC2/>
+      <EC2 />
     </State>
   </div>
 );
@@ -69,7 +66,7 @@ export const EditorComponent = () => (
               name="accessKey"
               type="string"
 
-              onChange={handleInputChange}/>
+              onChange={handleInputChange} />
           </label>
         </div>
         <div className="mb-4">
@@ -79,14 +76,14 @@ export const EditorComponent = () => (
               className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
               name="secretKey"
               type="string"
-              onChange={handleInputChange}/>
+              onChange={handleInputChange} />
           </label>
         </div>
       </form>
 
       <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <State store={store}>
-          <Editor accessKey={store.state.accessKey} secretKey={store.state.secretKey}/>
+          <Editor accessKey={store.state.accessKey} secretKey={store.state.secretKey} />
         </State>
       </form>
     </div>
@@ -104,7 +101,7 @@ export const AppStory = () => (
             className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
             name="accessKey"
             type="string"
-            onChange={handleInputChange}/>
+            onChange={handleInputChange} />
         </label>
       </div>
       <div className="mb-4">
@@ -114,12 +111,12 @@ export const AppStory = () => (
             className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
             name="secretKey"
             type="string"
-            onChange={handleInputChange}/>
+            onChange={handleInputChange} />
         </label>
       </div>
     </form>
     <Router>
-    <App location="/editor"/>
+      <App location="/editor" />
     </Router>
   </Provider>
 );

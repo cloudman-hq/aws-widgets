@@ -3,7 +3,7 @@ import * as ReactDom from 'react-dom';
 import './styles/main';
 import App from './components/App';
 import { Provider } from 'mobx-react';
-import RootStore from './store';
+import RootStore from './RootStore';
 import { BrowserRouter as Router } from 'react-router-dom';
 // tslint:disable-next-line: variable-name
 const rootStore = new RootStore();

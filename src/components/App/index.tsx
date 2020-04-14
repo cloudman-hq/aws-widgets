@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Route from './Route';
+import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { Switch, withRouter } from 'react-router-dom';
 

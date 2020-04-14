@@ -2,7 +2,7 @@ import * as React from 'react';
 import Settings from '.';
 import { storiesOf } from '@storybook/react'
 import { Provider } from 'mobx-react';
-import RootStore from '../../store';
+import RootStore from '../../RootStore';
 
 const withProvider = (story: any) => (
   <Provider rootStore={new RootStore()}>
