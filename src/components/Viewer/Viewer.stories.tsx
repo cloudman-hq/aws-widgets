@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Editor from ".";
-import '../../styles/app.css';
+// import '../../styles/app.css';
 
 export default {
   title: 'Editor',

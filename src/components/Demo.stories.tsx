@@ -2,7 +2,7 @@ import * as React from 'react';
 import { State, Store } from '@sambego/storybook-state';
 import EC2 from '../components/EC2'
 import Editor from '../components/Editor'
-import '../styles/app.css'
+// import '../styles/app.css'
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import RootStore from '../RootStore';
@@ -14,18 +14,26 @@ export default {
   component: EC2,
 };
 
+let rootStore = new RootStore();
+
 const store = new Store({
   accessKey: '',
   secretKey: ''
 });
-
 function handleInputChange(event: any) {
   const value = event.target.value;
-  const name = event.target.name;
 
+  const name = event.target.name;
   store.set({
     [name]: value
   });
+
+  if (name === 'accessKey') {
+    rootStore.getSettingsStore().setAccessKey(value)
+  }
+  if (name === 'secretKey') {
+    rootStore.getSettingsStore().setSecretKey(value)
+  }
 }
 
 export const EC2Component = () => (
@@ -52,8 +60,8 @@ export const EC2Component = () => (
     </State>
   </div>
 );
-
 export const EditorComponent = () => (
+  <Provider rootStore={rootStore}>
   <div
     className="bg-white rounded-t-lg overflow-hidden border-t border-l border-r border-gray-400 p-4 px-3 py-10 bg-gray-200 flex justify-center">
     <div className="w-full max-w-xs">
@@ -89,6 +97,7 @@ export const EditorComponent = () => (
     </div>
 
   </div>
+  </Provider>
 );
 
 export const AppStory = () => (
