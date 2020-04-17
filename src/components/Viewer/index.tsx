@@ -45,7 +45,7 @@ class Viewer extends React.Component<any, State> {
       this.props.settingsStore.secretKey
     );
     const resourceId = this.props.appStore.resourceId;
-    let trigger = { data: "" };
+    let tags = { tags: "" };
     let resourceDescription: ResourceDescription = {
       lambdaName: "",
       lambdaRuntime: "",
@@ -69,24 +69,14 @@ class Viewer extends React.Component<any, State> {
         Resource: resourceId,
       };
 
-      // lambda.getFunctionEventInvokeConfig(params, (err: any, data: any) => {
-      //   if (!err) {
-      //     console.log(JSON.stringify(data));
-      //     trigger = {
-      //       data: data,
-      //     };
-      //   }
-
-      //   this.props.appStore.setTrigger(trigger);
-      // });
       lambda.listTags(req, (err: any, data: any) => {
         if (!err) {
           console.log(JSON.stringify(data));
-          trigger = {
-            data: data,
+          tags = {
+            tags: data.Tags,
           };
         }
-        this.props.appStore.setTrigger(trigger);
+        this.props.appStore.setTags(tags);
       });
 
       lambda.getFunction(params, (err: any, data: any) => {
@@ -140,6 +130,7 @@ class Viewer extends React.Component<any, State> {
           runtime={this.props.appStore.resourceDescription.lambdaRuntime}
           role={this.props.appStore.resourceDescription.lambdaRole}
           name={this.props.appStore.resourceDescription.lambdaName}
+          // tags={this.props.appStore.tags}
         />
       );
     } else {

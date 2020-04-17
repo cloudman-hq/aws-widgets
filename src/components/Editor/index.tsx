@@ -54,7 +54,12 @@ class Editor extends React.Component<any, State> {
     let resourceCard;
     if (this.state.resourceType === "lambda") {
       resourceCard = (
-        <Lambda runtime={this.state.resourceDescription.lambdaRuntime} />
+        <Lambda
+          runtime={this.props.appStore.resourceDescription.lambdaRuntime}
+          role={this.props.appStore.resourceDescription.lambdaRole}
+          name={this.props.appStore.resourceDescription.lambdaName}
+          tags={this.props.appStore.tags}
+        />
       );
     } else {
       resourceCard = (

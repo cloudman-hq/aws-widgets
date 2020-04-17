@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 class Lambda extends React.Component<any> {
   constructor(props: any) {
@@ -9,9 +9,14 @@ class Lambda extends React.Component<any> {
     return (
       <div>
         <dl>
-          <dt>Name</dt><dd>{this.props.name}</dd>
-          <dt>Runtime</dt><dd>{this.props.runtime}</dd>
-          <dt>Role</dt><dd>{this.props.role}</dd>
+          <dt>Name</dt>
+          <dd>{this.props.name}</dd>
+          <dt>Runtime</dt>
+          <dd>{this.props.runtime}</dd>
+          <dt>Role</dt>
+          <dd>{this.props.role}</dd>
+          <dt>tags</dt>
+          <dd>{this.props.tags}</dd>
         </dl>
       </div>
     );

@@ -2,7 +2,7 @@ import { observable, action } from "mobx";
 
 class AppStore {
   @observable appName = "";
-  @observable trigger = "";
+  @observable tags = "";
   @observable resourceId = "";
   @observable resourceType = "";
   @observable resourceDescription = {};
@@ -23,8 +23,8 @@ class AppStore {
     this.resourceType = type;
   }
 
-  @action public setTrigger(trigger: string) {
-    this.trigger = trigger;
+  @action public setTags(tags: string) {
+    this.tags = tags;
   }
 
   @action public setResourceDescription(desc: any) {
