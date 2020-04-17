@@ -1,9 +1,9 @@
-import * as React from 'react';
-import * as AWS from 'aws-sdk';
-import Lambda from '../../components/Lambda';
-import EC2 from '../../components/EC2';
-import { inject, observer } from 'mobx-react';
-import Viewer from '../Viewer';
+import * as React from "react";
+import * as AWS from "aws-sdk";
+import Lambda from "../../components/Lambda";
+import EC2 from "../../components/EC2";
+import { inject, observer } from "mobx-react";
+import Viewer from "../Viewer";
 
 interface State {
   resourceId: string;
@@ -15,16 +15,14 @@ interface State {
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
-
 @observer
 class Editor extends React.Component<any, State> {
-
   constructor(props: any) {
     super(props);
 
     this.state = {
-      resourceId: '',
-      resourceType: 'unknown',
+      resourceId: "",
+      resourceType: "unknown",
       resourceDescription: {},
     };
 
@@ -42,22 +40,29 @@ class Editor extends React.Component<any, State> {
 
   describe(e: any) {
     e.preventDefault();
-    AWS.config.region = 'ap-southeast-2';
+    AWS.config.region = "ap-southeast-2";
 
-    AWS.config.credentials = new AWS.Credentials(this.props.settingsStore.accessKey,
-                                                 this.props.settingsStore.secretKey);
+    AWS.config.credentials = new AWS.Credentials(
+      this.props.settingsStore.accessKey,
+      this.props.settingsStore.secretKey
+    );
     const resourceId = this.state.resourceId;
     this.props.appStore.setResourceId(resourceId);
   }
 
   render() {
-
     let resourceCard;
-    if (this.state.resourceType === 'lambda') {
-      resourceCard = <Lambda runtime={this.state.resourceDescription.lambdaRuntime}/>;
+    if (this.state.resourceType === "lambda") {
+      resourceCard = (
+        <Lambda runtime={this.state.resourceDescription.lambdaRuntime} />
+      );
     } else {
-      resourceCard = <EC2 availabilityZone={this.state.resourceDescription.availabilityZone}
-                          resourceState={this.state.resourceDescription.resourceState}/>;
+      resourceCard = (
+        <EC2
+          availabilityZone={this.state.resourceDescription.availabilityZone}
+          resourceState={this.state.resourceDescription.resourceState}
+        />
+      );
     }
     return (
       <div>
@@ -69,16 +74,18 @@ class Editor extends React.Component<any, State> {
             type="string"
             placeholder="e.g. i-04308dbefa6eb6ac"
             value={this.state.resourceId}
-            onChange={this.handleInputChange}/>
+            onChange={this.handleInputChange}
+          />
         </label>
 
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={this.describe}>
+          onClick={this.describe}
+        >
           Describe
         </button>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          <Viewer/>
+          <Viewer />
         </div>
       </div>
     );

@@ -6,7 +6,7 @@
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://awswidgets.zenuml.com/",
+  "baseUrl": "https://6aac09bc.ngrok.io",
   "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",
@@ -15,10 +15,7 @@
   "authentication": {
     "type": "none"
   },
-  "scopes": [
-    "READ",
-    "WRITE"
-  ],
+  "scopes": ["READ", "WRITE"],
   "modules": {
     "dynamicContentMacros": [
       {
@@ -51,9 +48,7 @@
         "documentation": {
           "url": "https://www.zenuml.com/ZenUML_Sequence_Diagram_addon_help.html"
         },
-        "categories": [
-          "visuals"
-        ],
+        "categories": ["visuals"],
         "featured": true
       }
     ],

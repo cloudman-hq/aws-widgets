@@ -1,9 +1,10 @@
-import { observable, action } from 'mobx';
+import { observable, action } from "mobx";
 
 class AppStore {
-  @observable appName = '';
-  @observable resourceId = '';
-  @observable resourceType = '';
+  @observable appName = "";
+  @observable trigger = "";
+  @observable resourceId = "";
+  @observable resourceType = "";
   @observable resourceDescription = {};
 
   private rootStore: any;
@@ -20,6 +21,10 @@ class AppStore {
 
   @action public setResourceType(type: string) {
     this.resourceType = type;
+  }
+
+  @action public setTrigger(trigger: string) {
+    this.trigger = trigger;
   }
 
   @action public setResourceDescription(desc: any) {
