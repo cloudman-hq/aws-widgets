@@ -2,6 +2,9 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import TextField from '@atlaskit/textfield';
 import Button, { ButtonGroup } from '@atlaskit/button';
+import InfoIcon from '@atlaskit/icon/glyph/info';
+import Tooltip, { TooltipPrimitive } from '@atlaskit/tooltip';
+
 import { Checkbox } from '@atlaskit/checkbox';
 import Form, {
   CheckboxField,
@@ -20,8 +23,6 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
     accessKey,
     secretKey,
   } = settingsStore;
-
-
 
   function onSubmit(data: any) {
     subscribers.accessKey$.next(data.accessKey);
@@ -47,10 +48,11 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
             <Field name="accessKey" label="Access Key" isRequired defaultValue="">
               {({ fieldProps, error }) => (
                 <React.Fragment>
-                  <TextField autoComplete="off" {...fieldProps} />
+                  <TextField {...fieldProps} />
                   {!error && (
                     <HelperMessage>
-                      You can use letters, numbers & periods.
+                      The credentials are used to query the status of the AWS resources.
+                      We recommend that you give READONLY permission to it.
                     </HelperMessage>
                   )}
                   {error && (
@@ -72,7 +74,7 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
             >
               {({ fieldProps, error, valid, meta }) => (
                 <React.Fragment>
-                  <TextField type="password" {...fieldProps} />
+                  <TextField {...fieldProps} />
                   {!error && !valid && (
                     <HelperMessage>
                       Use 8 or more characters with a mix of letters, numbers &
@@ -90,18 +92,35 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
                 </React.Fragment>
               )}
             </Field>
-            <CheckboxField name="remember" label="Remember me" defaultIsChecked>
+            <CheckboxField name="encrypt" label="Encrypt the secret key" defaultIsChecked>
               {({ fieldProps }) => (
                 <Checkbox {...fieldProps} label="Encrypt before saving" />
               )}
             </CheckboxField>
+            <HelperMessage>
+              Please record your secret key somewhere safely. We (the vendor of this plugin)
+              will NOT be able access that key.
+            </HelperMessage>
             <FormFooter>
               <ButtonGroup>
                 <Button appearance="subtle">Cancel</Button>
                 <Button type="submit" appearance="primary" isLoading={submitting}>
-                  Sign up
+                  Save
                 </Button>
               </ButtonGroup>
+            </FormFooter>
+            <FormFooter>
+              <div style={{ margin: '5px', flexShrink: 0 }}>
+                <InfoIcon label="Why shall we set credentials here?"/>
+              </div>
+              <HelperMessage>
+                The credentials are provided here so that other users won't need to provide or
+                even need to know those credentials.
+
+                Your "Access Key" and "Secret Key" will be saved in your Confluence Instance.
+                They are NOT sent to us (the vendor of this plugin) in any way. You can always
+                replace the credentials as you wish at any time.
+              </HelperMessage>
             </FormFooter>
           </form>
         )}
