@@ -33,8 +33,7 @@ class SettingsStore {
     this.secretKey = secretKey;
   }
 
-  @action saveSettings = (e: any) => {
-    e.preventDefault();
+  @action saveSettings = () => {
     // tslint:disable-next-line: no-console
     console.log('Saving credentials.');
     // eslint-disable-next-line no-undef
