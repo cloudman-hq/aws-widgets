@@ -1,0 +1,33 @@
+.resource-root.lambda {
+    display: table;
+}
+
+.resource-root>.property {
+    display: table-row;
+}
+
+.resource-root>.property>label, .resource-root>.property>span {
+    display: table-cell;
+    padding: 5px;
+}
+
+.resource-root>.property>.field-name {
+    text-align: right;
+    font-weight: bold;
+}
+
+.resource-root>.property>.field-value,
+.resource-root>.property>.field-icon{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.resource-root>.property>.field-icon {
+    width: 20px;
+}
+.field-icon.lambda {
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url('../components/Lambda/AWS-Lambda_Lambda-Function_light-bg@4x.png');
+}

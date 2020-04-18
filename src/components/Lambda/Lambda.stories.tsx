@@ -7,5 +7,5 @@ export default {
 }
 
 export const LambdaDemo = () => (
-  <Lambda name="Test" role="Role"/>
+  <Lambda name="Test" role="Role" runtime="Node v12"/>
 );

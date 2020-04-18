@@ -102,7 +102,7 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               will NOT be able access that key.
             </HelperMessage>
             <FormFooter>
-              <ButtonGroup>
+              <ButtonGroup appearance="primary">
                 <Button appearance="subtle">Cancel</Button>
                 <Button type="submit" appearance="primary" isLoading={submitting}>
                   Save
