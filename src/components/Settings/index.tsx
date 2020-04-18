@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import TextField from '@atlaskit/textfield';
-import Button, { ButtonGroup } from '@atlaskit/button';
+import Button from '@atlaskit/button';
 import InfoIcon from '@atlaskit/icon/glyph/info';
-import Tooltip, { TooltipPrimitive } from '@atlaskit/tooltip';
 
 import { Checkbox } from '@atlaskit/checkbox';
 import Form, {
@@ -102,12 +101,10 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               will NOT be able access that key.
             </HelperMessage>
             <FormFooter>
-              <ButtonGroup appearance="primary">
-                <Button appearance="subtle">Cancel</Button>
-                <Button type="submit" appearance="primary" isLoading={submitting}>
-                  Save
-                </Button>
-              </ButtonGroup>
+              <Button appearance="subtle">Cancel</Button>
+              <Button type="submit" appearance="primary" isLoading={submitting}>
+                Save
+              </Button>
             </FormFooter>
             <FormFooter>
               <div style={{ margin: '5px', flexShrink: 0 }}>

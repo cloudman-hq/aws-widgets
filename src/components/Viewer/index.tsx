@@ -71,7 +71,6 @@ class Viewer extends React.Component<any, State> {
 
       lambda.listTags(req, (err: any, data: any) => {
         if (!err) {
-          console.log(JSON.stringify(data));
           tags = {
             tags: data.Tags,
           };
