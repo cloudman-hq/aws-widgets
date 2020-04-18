@@ -1,9 +1,9 @@
-import * as React from "react";
-import * as AWS from "aws-sdk";
-import Lambda from "../../components/Lambda";
-import EC2 from "../../components/EC2";
-import { inject, observer } from "mobx-react";
-import Viewer from "../Viewer";
+import * as React from 'react';
+import * as AWS from 'aws-sdk';
+import Lambda from '../../components/Lambda';
+import EC2 from '../../components/EC2';
+import { inject, observer } from 'mobx-react';
+import Viewer from '../Viewer';
 
 interface State {
   resourceId: string;
@@ -21,8 +21,8 @@ class Editor extends React.Component<any, State> {
     super(props);
 
     this.state = {
-      resourceId: "",
-      resourceType: "unknown",
+      resourceId: '',
+      resourceType: 'unknown',
       resourceDescription: {},
     };
 
@@ -40,11 +40,11 @@ class Editor extends React.Component<any, State> {
 
   describe(e: any) {
     e.preventDefault();
-    AWS.config.region = "ap-southeast-2";
+    AWS.config.region = 'ap-southeast-2';
 
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
-      this.props.settingsStore.secretKey
+      this.props.settingsStore.secretKey,
     );
     const resourceId = this.state.resourceId;
     this.props.appStore.setResourceId(resourceId);
@@ -52,7 +52,7 @@ class Editor extends React.Component<any, State> {
 
   render() {
     let resourceCard;
-    if (this.state.resourceType === "lambda") {
+    if (this.state.resourceType === 'lambda') {
       resourceCard = (
         <Lambda runtime={this.state.resourceDescription.lambdaRuntime} />
       );

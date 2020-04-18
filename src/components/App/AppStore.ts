@@ -1,10 +1,10 @@
-import { observable, action } from "mobx";
+import { observable, action } from 'mobx';
 
 class AppStore {
-  @observable appName = "";
-  @observable trigger = "";
-  @observable resourceId = "";
-  @observable resourceType = "";
+  @observable appName = '';
+  @observable trigger = '';
+  @observable resourceId = '';
+  @observable resourceType = '';
   @observable resourceDescription = {};
 
   private rootStore: any;
