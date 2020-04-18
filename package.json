@@ -58,6 +58,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@atlaskit/form": "^7.2.0",
     "aws-sdk": "^2.654.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
@@ -65,7 +66,10 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "rxjs": "^6.5.5",
-    "styled-components": "^5.0.1"
+    "styled-components": "^5.0.1",
+    "@atlaskit/textfield": "latest",
+    "@atlaskit/button": "latest",
+    "@atlaskit/checkbox": "latest"
   },
   "browserslist": {
     "production": [
