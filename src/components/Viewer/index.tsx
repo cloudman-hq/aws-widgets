@@ -1,10 +1,10 @@
-import * as React from "react";
-import * as AWS from "aws-sdk";
-import Lambda from "../../components/Lambda";
-import EC2 from "../../components/EC2";
-import { inject, observer } from "mobx-react";
-import { action, autorun, computed } from "mobx";
-import { ListTagsRequest } from "aws-sdk/clients/lambda";
+import * as React from 'react';
+import * as AWS from 'aws-sdk';
+import Lambda from '../../components/Lambda';
+import EC2 from '../../components/EC2';
+import { inject, observer } from 'mobx-react';
+import { action, autorun, computed } from 'mobx';
+import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 
 interface State {
   resourceType: string;
@@ -30,7 +30,7 @@ class Viewer extends React.Component<any, State> {
     super(props);
 
     this.state = {
-      resourceType: "unknown",
+      resourceType: 'unknown',
       resourceDescription: {},
     };
     this.describe = this.describe.bind(this);
@@ -38,27 +38,27 @@ class Viewer extends React.Component<any, State> {
   }
 
   describe() {
-    AWS.config.region = "ap-southeast-2";
+    AWS.config.region = 'ap-southeast-2';
 
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
-      this.props.settingsStore.secretKey
+      this.props.settingsStore.secretKey,
     );
     const resourceId = this.props.appStore.resourceId;
-    let tags = { tags: "" };
+    let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
-      lambdaName: "",
-      lambdaRuntime: "",
-      lambdaRole: "",
-      lastUpdateStatus: "",
-      availabilityZone: "",
-      resourceState: "",
+      lambdaName: '',
+      lambdaRuntime: '',
+      lambdaRole: '',
+      lastUpdateStatus: '',
+      availabilityZone: '',
+      resourceState: '',
     };
 
-    if (resourceId.indexOf("arn:aws:lambda") === 0) {
+    if (resourceId.indexOf('arn:aws:lambda') === 0) {
       // describe lambda
       this.setState({
-        resourceType: "lambda",
+        resourceType: 'lambda',
       });
       // this.props.appStore.setResourceType(resourceType);
       const lambda = new AWS.Lambda();
@@ -87,8 +87,8 @@ class Viewer extends React.Component<any, State> {
             lambdaRuntime: data.Configuration.Runtime,
             lambdaRole: data.Configuration.Role,
             lastUpdateStatus: data.Configuration.LastUpdateStatus,
-            availabilityZone: "",
-            resourceState: "",
+            availabilityZone: '',
+            resourceState: '',
           };
 
           this.props.appStore.setResourceDescription(resourceDescription);
@@ -97,7 +97,7 @@ class Viewer extends React.Component<any, State> {
     } else {
       // this.props.appStore.setResourceType('EC2');
       this.setState({
-        resourceType: "EC2",
+        resourceType: 'EC2',
       });
       const ec2 = new AWS.EC2();
       const params = {
@@ -113,7 +113,7 @@ class Viewer extends React.Component<any, State> {
           const availabilityZone = instance.Placement.AvailabilityZone;
           resourceDescription = {
             availabilityZone,
-            lambdaRuntime: "",
+            lambdaRuntime: '',
             resourceState: instanceState,
           };
           this.props.appStore.setResourceDescription(resourceDescription);
@@ -124,7 +124,7 @@ class Viewer extends React.Component<any, State> {
 
   render() {
     let resourceCard;
-    if (this.state.resourceType === "lambda") {
+    if (this.state.resourceType === 'lambda') {
       resourceCard = (
         <Lambda
           runtime={this.props.appStore.resourceDescription.lambdaRuntime}

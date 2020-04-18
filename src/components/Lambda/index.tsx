@@ -1,4 +1,5 @@
 import * as React from "react";
+import { LambdaCard } from './style';
 
 class Lambda extends React.Component<any> {
   constructor(props: any) {
@@ -7,7 +8,7 @@ class Lambda extends React.Component<any> {
 
   render() {
     return (
-      <div>
+      <LambdaCard className="lambda">
         <dl>
           <dt>Name</dt>
           <dd>{this.props.name}</dd>
@@ -18,7 +19,7 @@ class Lambda extends React.Component<any> {
           <dt>tags</dt>
           <dd>{this.props.tags}</dd>
         </dl>
-      </div>
+      </LambdaCard>
     );
   }
 }
