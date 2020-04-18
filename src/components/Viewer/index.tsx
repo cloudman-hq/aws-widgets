@@ -5,6 +5,7 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import { ErrorMessage } from '@atlaskit/form';
 
 interface State {
   resourceType: string;
@@ -37,8 +38,15 @@ class Viewer extends React.Component<any, State> {
     autorun(this.describe);
   }
 
-  describe() {
+  async describe() {
     AWS.config.region = 'ap-southeast-2';
+    if (!this.props.settingsStore.accessKey || !this.props.settingsStore.secretKey) {
+      // AccessKey and SecretKey are not provided
+      this.setState({
+        resourceType: 'Help',
+      });
+      return;
+    }
 
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
@@ -132,7 +140,7 @@ class Viewer extends React.Component<any, State> {
           // tags={this.props.appStore.tags}
         />
       );
-    } else {
+    } else if (this.state.resourceType === 'Help') {
       resourceCard = (
         <EC2
           availabilityZone={
@@ -140,6 +148,12 @@ class Viewer extends React.Component<any, State> {
           }
           resourceState={this.props.appStore.resourceDescription.resourceState}
         />
+      );
+    } else  {
+      resourceCard = (
+        <ErrorMessage>
+          The access has not been setup. Ask your administrator to set up.
+        </ErrorMessage>
       );
     }
     return (
