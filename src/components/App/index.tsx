@@ -54,7 +54,7 @@ class App extends React.Component<any, any> {
       console.log('load macro data...2');
       (window as any).AP.confluence.getMacroData((data: any) => {
         // tslint:disable-next-line: no-console
-        console.log('load macro data...3.2');
+        console.log('load macro data...3.2, data:', data);
         this.props.appStore.setResourceId(data.resourceId);
       });
     }

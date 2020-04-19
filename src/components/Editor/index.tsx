@@ -3,6 +3,7 @@ import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
 import Viewer from '../Viewer';
 
 interface State {
@@ -26,8 +27,16 @@ class Editor extends React.Component<any, State> {
       resourceDescription: {},
     };
 
+    this.init = this.init.bind(this);
+    autorun(this.init);
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.describe = this.describe.bind(this);
+  }
+
+  async init() {
+    const resourceId = this.props.appStore.resourceId;
+    this.setState({ resourceId });
   }
 
   handleInputChange(event: React.FormEvent<HTMLInputElement>) {

@@ -53,6 +53,7 @@ class Viewer extends React.Component<any, State> {
       this.props.settingsStore.secretKey,
     );
     const resourceId = this.props.appStore.resourceId;
+
     let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
@@ -137,10 +138,10 @@ class Viewer extends React.Component<any, State> {
           runtime={this.props.appStore.resourceDescription.lambdaRuntime}
           role={this.props.appStore.resourceDescription.lambdaRole}
           name={this.props.appStore.resourceDescription.lambdaName}
-          // tags={this.props.appStore.tags}
+        // tags={this.props.appStore.tags}
         />
       );
-    } else if (this.state.resourceType === 'Help') {
+    } else if (this.state.resourceType === 'EC2') {
       resourceCard = (
         <EC2
           availabilityZone={
@@ -149,7 +150,7 @@ class Viewer extends React.Component<any, State> {
           resourceState={this.props.appStore.resourceDescription.resourceState}
         />
       );
-    } else  {
+    } else {
       resourceCard = (
         <ErrorMessage>
           The access has not been setup. Ask your administrator to set up.
