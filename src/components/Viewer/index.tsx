@@ -144,9 +144,8 @@ class Viewer extends React.Component<any, State> {
     } else if (this.state.resourceType === 'EC2') {
       resourceCard = (
         <EC2
-          availabilityZone={
-            this.props.appStore.resourceDescription.availabilityZone
-          }
+          resourceId={this.props.appStore.resourceId}
+          availabilityZone={this.props.appStore.resourceDescription.availabilityZone}
           resourceState={this.props.appStore.resourceDescription.resourceState}
         />
       );
