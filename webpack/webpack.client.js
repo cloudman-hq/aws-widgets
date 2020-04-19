@@ -7,6 +7,7 @@ const baseConfig = require('./webpack.base');
 const isDev = process.env.NODE_ENV !== 'production';
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const config = webpackMerge(baseConfig, {
   entry: {
@@ -32,6 +33,7 @@ if (isDev) {
   config.devServer = {
     host: '0.0.0.0',
     port: '8888',
+    open: true,
     hot: true,
     overlay: {
       errors: true
@@ -39,8 +41,22 @@ if (isDev) {
     historyApiFallback: {
       index: '/'
     },
+    before: function (app, server, compiler) {
+      app.get('*.js', function (req, res, next) {
+        req.url = req.url + '.gz';
+        res.set('Content-Encoding', 'gzip');
+        res.set('Content-Type', 'text/javascript');
+        next();
+      });
+    }
   }
-  config.plugins.push(new webpack.SourceMapDevToolPlugin())
+  config.plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerPort: 8081,
+      openAnalyzer: true
+    }),
+    new webpack.SourceMapDevToolPlugin()
+  )
 }
 
 module.exports = config;
