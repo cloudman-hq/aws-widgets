@@ -62,6 +62,7 @@
   "dependencies": {
     "@atlaskit/button": "latest",
     "@atlaskit/checkbox": "latest",
+    "@atlaskit/css-reset": "^5.0.10",
     "@atlaskit/form": "^7.2.0",
     "@atlaskit/textfield": "latest",
     "@atlaskit/tooltip": "^15.2.5",
