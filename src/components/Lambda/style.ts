@@ -1,39 +1,56 @@
 import styled from 'styled-components';
 
-const LambdaCard = styled.div`
-  & div:nth-child(1) {
-    border-bottom: 0;
-    border-radius: 3px 3px 0 0;
-  }
-  & div:last-child {
-    border-top: 0;
-    border-radius: 0 0 3px 3px;
-  }
+const CardWrapper = styled.div`
+  background-color: #F2F3F6;
+  width: 400px;
+  border: 1px solid #F2F3F6;
+  border-radius: 5px;
 `;
-const LambdaCardItemLabel = styled.div`
-  padding: 0.5em;
-  text-align: right;
-  font-style: inherit;
-  color: rgb(107, 119, 140);
-  font-weight: 600;
-`;
-const LambdaCardItemValue = styled.div`
-`;
-const LambdaCardItemIcon = styled.img`
-  max-height: 2em;
-`;
-const LambdaCardItem = styled.div`
+
+const CardTitle = styled.div`
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 50px;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
   align-items: center;
-  max-height: 50px;
-  background-color: #F9FAFB;
-  border: 2px solid #DADDE2;
+  width: 100%;
 
-  & ${LambdaCardItemLabel}, ${LambdaCardItemIcon}, ${LambdaCardItemValue} {
-      flex:1
+  & h4{
+    padding-left: 0.5em;
+    flex:1;
+    color: rgb(52, 69, 99);
+    font-size: 1.1428571428571428em;
   }
 `;
 
-export { LambdaCard, LambdaCardItem, LambdaCardItemLabel, LambdaCardItemValue, LambdaCardItemIcon };
+const CardIcon = styled.img`
+  max-height: 1.75em;
+  padding-right: 0.5em;
+`;
+
+const CardContent = styled.div`
+  margin: 0.5em;
+  background-color: white;
+  border-radius: 3px;
+  padding: 5px;
+`;
+
+const PropertyWrapper = styled.div`
+  width: 100%;
+  & h5{
+    display: inline-block;
+    width: 6em;
+  }
+  & span{
+    font-size: 0.9em
+  }
+`;
+
+export {
+  CardWrapper,
+  CardTitle,
+  CardIcon,
+  CardContent,
+  PropertyWrapper,
+};
