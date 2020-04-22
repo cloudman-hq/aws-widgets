@@ -11,7 +11,7 @@ const CardTitle = styled.div`
   position: relative;
   top: 0;
   left: 0;
-  height: 50px;
+  height: 45px;
   display: flex;
   align-items: center;
   width: 100%;
