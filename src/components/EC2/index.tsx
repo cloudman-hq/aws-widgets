@@ -1,19 +1,15 @@
 import * as React from 'react';
+import Ec2Card from "./Ec2Card";
+import Ec2Property from "./Ec2Property";
 
 class EC2Component extends React.Component<any> {
   render() {
     return (
-      <div>
-        <div>EC2 Instance {this.props.resourceId}:</div>
-        <div>
-          <label>Instance State:</label>
-          <span>{this.props.resourceState}</span>
-        </div>
-        <div>
-          <label>Availability Zone:</label>
-          <span>{this.props.availabilityZone}</span>
-        </div>
-      </div>
+      <Ec2Card title="EC2">
+        <Ec2Property name="Name" value={this.props.resourceId} />
+        <Ec2Property name="State" value={this.props.resourceState} />
+        <Ec2Property name="AZ" value={this.props.availabilityZone} />
+      </Ec2Card>
     );
   }
 }
