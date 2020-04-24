@@ -1,6 +1,4 @@
 import * as React from 'react';
-// import '../../styles/style.css';
-// import Icon from '@atlaskit/icon/cjs/components/Icon';
 import lambdaLogo from './AWS-Lambda_Lambda-Function_light-bg_4x.svg';
 import LambdaCard from './LambdaCard';
 import LambdaProperty from './LambdaProperty';
