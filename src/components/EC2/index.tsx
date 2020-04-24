@@ -1,6 +1,6 @@
 import * as React from 'react';
-import Ec2Card from "./Ec2Card";
-import Ec2Property from "./Ec2Property";
+import Ec2Card from './Ec2Card';
+import Ec2Property from './Ec2Property';
 
 class EC2Component extends React.Component<any> {
   render() {
