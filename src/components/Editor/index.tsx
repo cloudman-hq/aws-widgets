@@ -1,14 +1,11 @@
 import * as React from 'react';
 import * as AWS from 'aws-sdk';
-import Lambda from '../../components/Lambda';
-import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import Viewer from '../Viewer';
-import Form, {CheckboxField, ErrorMessage, Field, FormFooter, HelperMessage, ValidMessage} from "@atlaskit/form";
-import TextField from "@atlaskit/textfield/dist/cjs/components/Textfield";
-import {Checkbox} from "@atlaskit/checkbox";
-import Button from "@atlaskit/button/dist/cjs/components/Button";
+import Form, { ErrorMessage, Field, FormFooter, HelperMessage} from '@atlaskit/form';
+import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
+import Button from '@atlaskit/button/dist/cjs/components/Button';
 
 interface State {
   resourceId: string;
@@ -63,24 +60,6 @@ class Editor extends React.Component<any, State> {
   }
 
   render() {
-    let resourceCard;
-    if (this.state.resourceType === 'lambda') {
-      resourceCard = (
-        <Lambda
-          runtime={this.props.appStore.resourceDescription.lambdaRuntime}
-          role={this.props.appStore.resourceDescription.lambdaRole}
-          name={this.props.appStore.resourceDescription.lambdaName}
-          tags={this.props.appStore.tags}
-        />
-      );
-    } else {
-      resourceCard = (
-        <EC2
-          availabilityZone={this.state.resourceDescription.availabilityZone}
-          resourceState={this.state.resourceDescription.resourceState}
-        />
-      );
-    }
     return (
       <div style={{
         display: 'flex',
@@ -110,8 +89,6 @@ class Editor extends React.Component<any, State> {
                 )}
               </Field>
 
-
-
               <FormFooter>
                 <Button type="submit" appearance="primary" isLoading={submitting}>
                   Describe
@@ -125,8 +102,7 @@ class Editor extends React.Component<any, State> {
 
         </Form>
         <hr/>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-        </div>
+        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex"/>
       </div>
     );
   }

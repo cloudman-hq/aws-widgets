@@ -18,9 +18,6 @@ import { subscribers } from './SettingsStore';
 const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
   const {
     saveSettings,
-    loadSettings,
-    accessKey,
-    secretKey,
   } = settingsStore;
 
   function onSubmit(data: any) {
@@ -101,7 +98,6 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               will NOT be able access that key.
             </HelperMessage>
             <FormFooter>
-              <Button appearance="subtle">Cancel</Button>
               <Button type="submit" appearance="primary" isLoading={submitting}>
                 Save
               </Button>
