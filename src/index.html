@@ -29,6 +29,13 @@
           console.log('DONE: setting up editor dialog....');
 
         });
+
+        setTimeout(function () {
+          let width = document.body.scrollWidth;
+          let height = document.body.scrollHeight;
+          console.log('Resize to ', width, height);
+          AP.resize(width, height);
+        }, 1000);
     </script>
 </head>
 
