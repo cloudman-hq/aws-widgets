@@ -95,7 +95,7 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
             </CheckboxField>
             <HelperMessage>
               Please record your secret key somewhere safely. We (the vendor of this plugin)
-              will NOT be able access that key.
+              do NOT have access that key.
             </HelperMessage>
             <FormFooter>
               <Button type="submit" appearance="primary" isLoading={submitting}>
