@@ -7,10 +7,12 @@ import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
+import Spinner from '@atlaskit/spinner';
 
 interface State {
   resourceType: string;
   resourceDescription: any;
+  isLoading: boolean;
 }
 
 interface ResourceDescription {
@@ -34,11 +36,11 @@ class Viewer extends React.Component<any, State> {
     this.state = {
       resourceType: 'unknown',
       resourceDescription: {},
+      isLoading: false,
     };
     this.describe = this.describe.bind(this);
     autorun(this.describe);
   }
-
   async describe() {
     AWS.config.region = 'ap-southeast-2';
     if (!this.props.settingsStore.accessKey || !this.props.settingsStore.secretKey) {
@@ -71,6 +73,9 @@ class Viewer extends React.Component<any, State> {
     };
 
     if (resourceId.indexOf('arn:aws:lambda') === 0) {
+      this.setState({
+        isLoading: true,
+      });
       // describe lambda
       this.setState({
         resourceType: 'lambda',
@@ -107,10 +112,14 @@ class Viewer extends React.Component<any, State> {
 
           this.props.appStore.setResourceDescription(resourceDescription);
         }
+        this.setState({
+          isLoading: false,
+        });
       });
     } else {
       // this.props.appStore.setResourceType('EC2');
       this.setState({
+        isLoading: true,
         resourceType: 'EC2',
       });
       const ec2 = new AWS.EC2();
@@ -132,12 +141,16 @@ class Viewer extends React.Component<any, State> {
           };
           this.props.appStore.setResourceDescription(resourceDescription);
         }
+        this.setState({
+          isLoading: false,
+        });
       });
     }
   }
 
   render() {
     let resourceCard;
+    const { isLoading } = this.state;
     if (this.state.resourceType === 'lambda') {
       resourceCard = (
         <Lambda
@@ -164,18 +177,20 @@ class Viewer extends React.Component<any, State> {
         </DefaultCard>
       );
     } else {
-      resourceCard = (
-        <DefaultCard title={'Warning'}>
-          <ErrorMessage>
-            The access has not been setup. Ask your administrator to set up.
-          </ErrorMessage>
-        </DefaultCard>
-      );
+      if (this.props.appStore.resourceId !== '') {
+        resourceCard = (
+          <DefaultCard title={'Warning'}>
+            <ErrorMessage>
+              The access has not been setup. Ask your administrator to set up.
+            </ErrorMessage>
+          </DefaultCard>
+        );
+      }
     }
     return (
       <div>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          {resourceCard}
+          {isLoading ? <Spinner size="medium" /> : resourceCard}
         </div>
       </div>
     );
