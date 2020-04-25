@@ -6,6 +6,7 @@ import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
+import DefaultCard from "./DefaultCard";
 
 interface State {
   resourceType: string;
@@ -156,15 +157,19 @@ class Viewer extends React.Component<any, State> {
       );
     } else if (this.state.resourceType === 'Initialised') {
       resourceCard = (
-        <HelperMessage>
-          Click the PEN icon below to provide a resource ID in the macro editor.
-        </HelperMessage>
+        <DefaultCard title={"Help"}>
+          <HelperMessage>
+            Click the PEN icon below to provide a resource ID in the macro editor.
+          </HelperMessage>
+        </DefaultCard>
       );
     } else {
       resourceCard = (
-        <ErrorMessage>
-          The access has not been setup. Ask your administrator to set up.
-        </ErrorMessage>
+        <DefaultCard title={"Warning"}>
+          <ErrorMessage>
+            The access has not been setup. Ask your administrator to set up.
+          </ErrorMessage>
+        </DefaultCard>
       );
     }
     return (
