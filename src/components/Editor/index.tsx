@@ -1,52 +1,23 @@
 import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import { inject, observer } from 'mobx-react';
-import { autorun } from 'mobx';
 import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 
-interface State {
-  resourceId: string;
-  resourceType: string;
-  resourceDescription: any;
-}
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
 @observer
-class Editor extends React.Component<any, State> {
+class Editor extends React.Component<any> {
   constructor(props: any) {
     super(props);
-
-    this.state = {
-      resourceId: '',
-      resourceType: 'unknown',
-      resourceDescription: {},
-    };
-
-    this.init = this.init.bind(this);
-    autorun(this.init);
-
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.describe = this.describe.bind(this);
   }
 
-  async init() {
-    const resourceId = this.props.appStore.resourceId;
-    this.setState({ resourceId });
-  }
-
-  handleInputChange(event: React.FormEvent<HTMLInputElement>) {
-    const value = event.currentTarget.value;
-
-    this.setState({
-      resourceId: value,
-    });
-  }
 
   describe(data: any) {
     AWS.config.region = 'ap-southeast-2';
