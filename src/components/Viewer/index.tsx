@@ -5,7 +5,7 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import {ErrorMessage, HelperMessage} from '@atlaskit/form';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 
 interface State {
   resourceType: string;
@@ -50,8 +50,8 @@ class Viewer extends React.Component<any, State> {
     const resourceId = this.props.appStore.resourceId;
     if (!resourceId) {
       this.setState({
-        resourceType: "Initialised"
-      })
+        resourceType: 'Initialised',
+      });
       return;
     }
     AWS.config.credentials = new AWS.Credentials(
@@ -59,7 +59,7 @@ class Viewer extends React.Component<any, State> {
       this.props.settingsStore.secretKey,
     );
 
-    let tags = { tags: '' };
+    const tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
       lambdaRuntime: '',
@@ -73,39 +73,6 @@ class Viewer extends React.Component<any, State> {
       // describe lambda
       this.setState({
         resourceType: 'lambda',
-      });
-      // this.props.appStore.setResourceType(resourceType);
-      const lambda = new AWS.Lambda();
-      const params = {
-        FunctionName: resourceId,
-      };
-      const req: ListTagsRequest = {
-        Resource: resourceId,
-      };
-
-      lambda.listTags(req, (err: any, data: any) => {
-        if (!err) {
-          tags = {
-            tags: data.Tags,
-          };
-        }
-        this.props.appStore.setTags(tags);
-      });
-
-      lambda.getFunction(params, (err: any, data: any) => {
-        if (!err) {
-          // console.log(JSON.stringify(data));
-          resourceDescription = {
-            lambdaName: data.Configuration.FunctionName,
-            lambdaRuntime: data.Configuration.Runtime,
-            lambdaRole: data.Configuration.Role,
-            lastUpdateStatus: data.Configuration.LastUpdateStatus,
-            availabilityZone: '',
-            resourceState: '',
-          };
-
-          this.props.appStore.setResourceDescription(resourceDescription);
-        }
       });
     } else {
       // this.props.appStore.setResourceType('EC2');
@@ -139,12 +106,7 @@ class Viewer extends React.Component<any, State> {
     let resourceCard;
     if (this.state.resourceType === 'lambda') {
       resourceCard = (
-        <Lambda
-          runtime={this.props.appStore.resourceDescription.lambdaRuntime}
-          role={this.props.appStore.resourceDescription.lambdaRole}
-          name={this.props.appStore.resourceDescription.lambdaName}
-        // tags={this.props.appStore.tags}
-        />
+        <Lambda />
       );
     } else if (this.state.resourceType === 'EC2') {
       resourceCard = (

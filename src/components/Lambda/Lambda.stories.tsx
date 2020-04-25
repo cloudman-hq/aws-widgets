@@ -1,11 +1,17 @@
 import * as React from 'react'
 import Lambda from '.'
+import { Provider } from 'mobx-react';
+import RootStore from '../../RootStore';
+import { storiesOf } from '@storybook/react';
 
-export default {
-  title: 'Lambda',
-  component: Lambda
-}
+const withProvider = (story: any) => (
+  <Provider rootStore={new RootStore()}>
+    {story()}
+  </Provider>
+)
 
-export const LambdaDemo = () => (
-  <Lambda name="Test" role="Role" runtime="Node v12"/>
-);
+storiesOf('Lambda', module)
+  .addDecorator(withProvider)
+  .add('default', () => (
+    <Lambda />
+  ));

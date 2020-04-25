@@ -34,16 +34,25 @@ const CardContent = styled.div`
   background-color: white;
   border-radius: 3px;
   padding: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const PropertyWrapper = styled.div`
   width: 100%;
-  & h5{
+  display: flex;
+  margin: 2px 0;
+  & .property-name{
     display: inline-block;
-    width: 6em;
+    min-width: 6em;
   }
-  & span{
-    font-size: 0.9em
+  & .property-value{
+    display: inline-block;
+    font-size: 0.9em;
+    margin: 0;
+    padding: 0;
   }
 `;
 
