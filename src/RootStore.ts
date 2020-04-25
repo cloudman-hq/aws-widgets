@@ -3,8 +3,8 @@ import AppStore from './components/App/AppStore';
 import 'mobx-react-lite/batchingForReactDom';
 
 export default class RootStore {
-  private settingsStore: any;
-  private appStore: any;
+  private readonly settingsStore: SettingsStore;
+  private readonly appStore: AppStore;
 
   constructor() {
     this.settingsStore = new SettingsStore(this);
