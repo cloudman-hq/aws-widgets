@@ -66,7 +66,6 @@ class App extends React.Component<any, any> {
       <Switch location={location}>
         <Route />
       </Switch>
-      <footer>This is the App component: 202004121504</footer>
     </>;
   }
 }
