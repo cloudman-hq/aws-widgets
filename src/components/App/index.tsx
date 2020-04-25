@@ -18,6 +18,7 @@ class App extends React.Component<any, any> {
     this.loadMacroDataAndMacroBody = this.loadMacroDataAndMacroBody.bind(this);
     this.loadSettings();
     this.loadMacroDataAndMacroBody();
+    setTimeout(this.loadMacroDataAndMacroBody, 5000);
   }
 
   private loadSettings = () => {
