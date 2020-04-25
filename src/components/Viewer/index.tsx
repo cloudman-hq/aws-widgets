@@ -3,7 +3,7 @@ import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
-import { action, autorun, computed } from 'mobx';
+import { autorun } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
