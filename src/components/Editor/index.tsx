@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {inject, observer} from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import Viewer from '../Viewer';
-import Form, {ErrorMessage, Field, FormFooter, HelperMessage} from '@atlaskit/form';
+import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 
@@ -62,8 +62,6 @@ class Editor extends React.Component<any> {
           )}
 
         </Form>
-        <hr/>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex"/>
       </div>
     );
   }
