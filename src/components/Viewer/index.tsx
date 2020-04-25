@@ -177,7 +177,8 @@ class Viewer extends React.Component<any, State> {
         </DefaultCard>
       );
     } else {
-      if (this.props.appStore.resourceId !== '') {
+      const { resourceId } = this.props.appStore;
+      if (resourceId !== '' && resourceId.indexOf('arn:aws:lambda') !== 0 && resourceId.indexOf('arn:aws:ec2') !== 0) {
         resourceCard = (
           <DefaultCard title={'Warning'}>
             <ErrorMessage>
