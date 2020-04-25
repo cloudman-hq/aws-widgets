@@ -167,7 +167,13 @@ class Viewer extends React.Component<any, State> {
         </ErrorMessage>
       );
     }
-    return resourceCard;
+    return (
+      <div>
+        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
+          {resourceCard}
+        </div>
+      </div>
+    );
   }
 }
 
