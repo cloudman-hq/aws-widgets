@@ -5,7 +5,7 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import {ErrorMessage, HelperMessage} from '@atlaskit/form';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 
 interface State {
   resourceType: string;
@@ -50,8 +50,8 @@ class Viewer extends React.Component<any, State> {
     const resourceId = this.props.appStore.resourceId;
     if (!resourceId) {
       this.setState({
-        resourceType: "Initialised"
-      })
+        resourceType: 'Initialised',
+      });
       return;
     }
     AWS.config.credentials = new AWS.Credentials(
