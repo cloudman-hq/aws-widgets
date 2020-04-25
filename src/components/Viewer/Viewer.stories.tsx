@@ -1,12 +1,12 @@
 import * as React from 'react'
-import Editor from ".";
+import Viewer from ".";
 // import '../../styles/app.css';
 
 export default {
-  title: 'Editor',
-  component: Editor
+  title: 'Viewer',
+  component: Viewer
 }
 
-export const EditorDemo = () => (
-  <Editor accessKey="Test" secretKey="Role"/>
+export const ViewerDemo = () => (
+  <Viewer accessKey="Test" secretKey="Role"/>
 );
