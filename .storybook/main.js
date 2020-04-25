@@ -14,6 +14,9 @@ module.exports = {
       options: {
         transpileOnly: true
       }
+    }, {
+      test: /\.scss$/,
+      use: ['style-loader', 'css-loader', 'sass-loader']
     });
     return config;
   },

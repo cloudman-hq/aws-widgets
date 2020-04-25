@@ -1,6 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
+const CompressionPlugin = require('compression-webpack-plugin');
 const isDev = process.env.NODE_ENV !== 'production';
 
 module.exports = {
@@ -9,6 +9,25 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss']
+  },
+  performance: {
+    hints: false
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        awsSdk: {
+          test: /[\\/]node_modules[\\/]((aws-sdk).*)[\\/]/,
+          name: 'aws-sdk',
+          chunks: 'all'
+        },
+        vendors: {
+          test: /[\\/]node_modules[\\/]((?!aws-sdk).*)[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        },
+      }
+    }
   },
   module: {
     rules: [
@@ -50,6 +69,10 @@ module.exports = {
     ]
   },
   plugins: [
+    new CompressionPlugin({
+      test: /\.js(\?.*)?$/i,
+      algorithm: 'gzip',
+    }),
     new MiniCssExtractPlugin({
       filename: isDev ? '[name].css' : '[name].[hash].css',
       chunkFilename: isDev ? '[id].css' : '[id].[hash].css'

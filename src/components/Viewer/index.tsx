@@ -5,7 +5,8 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import { ErrorMessage } from '@atlaskit/form';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
+import DefaultCard from './DefaultCard';
 
 interface State {
   resourceType: string;
@@ -47,12 +48,18 @@ class Viewer extends React.Component<any, State> {
       });
       return;
     }
-
+    const resourceId = this.props.appStore.resourceId;
+    if (!resourceId) {
+      this.setState({
+        resourceType: 'Initialised',
+      });
+      return;
+    }
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
       this.props.settingsStore.secretKey,
     );
-    const resourceId = this.props.appStore.resourceId;
+
     let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
@@ -137,34 +144,38 @@ class Viewer extends React.Component<any, State> {
           runtime={this.props.appStore.resourceDescription.lambdaRuntime}
           role={this.props.appStore.resourceDescription.lambdaRole}
           name={this.props.appStore.resourceDescription.lambdaName}
-          // tags={this.props.appStore.tags}
+        // tags={this.props.appStore.tags}
         />
       );
-    } else if (this.state.resourceType === 'Help') {
+    } else if (this.state.resourceType === 'EC2') {
       resourceCard = (
         <EC2
-          availabilityZone={
-            this.props.appStore.resourceDescription.availabilityZone
-          }
+          resourceId={this.props.appStore.resourceId}
+          availabilityZone={this.props.appStore.resourceDescription.availabilityZone}
           resourceState={this.props.appStore.resourceDescription.resourceState}
         />
       );
-    } else  {
+    } else if (this.state.resourceType === 'Initialised') {
       resourceCard = (
-        <ErrorMessage>
-          The access has not been setup. Ask your administrator to set up.
-        </ErrorMessage>
+        <DefaultCard title={'Help'}>
+          <HelperMessage>
+            Click the PEN icon below to provide a resource ID in the macro editor.
+          </HelperMessage>
+        </DefaultCard>
+      );
+    } else {
+      resourceCard = (
+        <DefaultCard title={'Warning'}>
+          <ErrorMessage>
+            The access has not been setup. Ask your administrator to set up.
+          </ErrorMessage>
+        </DefaultCard>
       );
     }
     return (
       <div>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
           {resourceCard}
-        </div>
-        <div>
-          <label>Debug area</label>
-          <label>Access Key: {this.props.settingsStore.accessKey}</label>
-          <label>Resource ID:{this.props.appStore.resourceId}</label>
         </div>
       </div>
     );

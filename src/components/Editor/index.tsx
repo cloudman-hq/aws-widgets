@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as AWS from 'aws-sdk';
-import Lambda from '../../components/Lambda';
-import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
 import Viewer from '../Viewer';
+import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
+import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
+import Button from '@atlaskit/button/dist/cjs/components/Button';
 
 interface State {
   resourceId: string;
@@ -26,8 +28,16 @@ class Editor extends React.Component<any, State> {
       resourceDescription: {},
     };
 
+    this.init = this.init.bind(this);
+    autorun(this.init);
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.describe = this.describe.bind(this);
+  }
+
+  async init() {
+    const resourceId = this.props.appStore.resourceId;
+    this.setState({ resourceId });
   }
 
   handleInputChange(event: React.FormEvent<HTMLInputElement>) {
@@ -38,60 +48,61 @@ class Editor extends React.Component<any, State> {
     });
   }
 
-  describe(e: any) {
-    e.preventDefault();
+  describe(data: any) {
     AWS.config.region = 'ap-southeast-2';
 
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
       this.props.settingsStore.secretKey,
     );
-    const resourceId = this.state.resourceId;
+    const resourceId = data.resourceId;
     this.props.appStore.setResourceId(resourceId);
   }
 
   render() {
-    let resourceCard;
-    if (this.state.resourceType === 'lambda') {
-      resourceCard = (
-        <Lambda
-          runtime={this.props.appStore.resourceDescription.lambdaRuntime}
-          role={this.props.appStore.resourceDescription.lambdaRole}
-          name={this.props.appStore.resourceDescription.lambdaName}
-          tags={this.props.appStore.tags}
-        />
-      );
-    } else {
-      resourceCard = (
-        <EC2
-          availabilityZone={this.state.resourceDescription.availabilityZone}
-          resourceState={this.state.resourceDescription.resourceState}
-        />
-      );
-    }
     return (
-      <div>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          ARN or Resource ID:
-          <input
-            className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
-            name="resourceId"
-            type="string"
-            placeholder="e.g. i-04308dbefa6eb6ac"
-            value={this.state.resourceId}
-            onChange={this.handleInputChange}
-          />
-        </label>
+      <div style={{
+        display: 'flex',
+        width: '400px',
+        maxWidth: '100%',
+        margin: '0 auto',
+        flexDirection: 'column',
+      }}>
+        <Form <{resourceId: string}> onSubmit={this.describe}>
+          {({ formProps, submitting }: any) => (
+            <form {...formProps}>
+              <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
+                {({ fieldProps, error }: any) => (
+                  <React.Fragment>
+                    <TextField {...fieldProps} />
+                    {!error && (
+                      <HelperMessage>
+                        A resource ID can be an EC2 instance ID or a Lambda function ARN.
+                      </HelperMessage>
+                    )}
+                    {error && (
+                      <ErrorMessage>
+                        The above resource cannot be found.
+                      </ErrorMessage>
+                    )}
+                  </React.Fragment>
+                )}
+              </Field>
 
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={this.describe}
-        >
-          Describe
-        </button>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          <Viewer />
-        </div>
+              <FormFooter>
+                <Button type="submit" appearance="primary" isLoading={submitting}>
+                  Describe
+                </Button>
+              </FormFooter>
+              <FormFooter>
+                <Viewer />
+              </FormFooter>
+            </form>
+          )}
+
+        </Form>
+        <hr/>
+        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex"/>
       </div>
     );
   }

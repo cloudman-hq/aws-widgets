@@ -18,6 +18,7 @@ class App extends React.Component<any, any> {
     this.loadMacroDataAndMacroBody = this.loadMacroDataAndMacroBody.bind(this);
     this.loadSettings();
     this.loadMacroDataAndMacroBody();
+    setTimeout(this.loadMacroDataAndMacroBody, 5000);
   }
 
   private loadSettings = () => {
@@ -54,7 +55,7 @@ class App extends React.Component<any, any> {
       console.log('load macro data...2');
       (window as any).AP.confluence.getMacroData((data: any) => {
         // tslint:disable-next-line: no-console
-        console.log('load macro data...3.2');
+        console.log('load macro data...3.2, data:', data);
         this.props.appStore.setResourceId(data.resourceId);
       });
     }
@@ -66,7 +67,6 @@ class App extends React.Component<any, any> {
       <Switch location={location}>
         <Route />
       </Switch>
-      <footer>This is the App component: 202004121504</footer>
     </>;
   }
 }

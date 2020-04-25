@@ -18,9 +18,6 @@ import { subscribers } from './SettingsStore';
 const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
   const {
     saveSettings,
-    loadSettings,
-    accessKey,
-    secretKey,
   } = settingsStore;
 
   function onSubmit(data: any) {
@@ -42,10 +39,10 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
       <Form<{ accessKey: string; secretKey: string; remember: boolean }>
         onSubmit={onSubmit}
       >
-        {({ formProps, submitting }) => (
+        {({ formProps, submitting }: any) => (
           <form {...formProps}>
             <Field name="accessKey" label="Access Key" isRequired defaultValue="">
-              {({ fieldProps, error }) => (
+              {({ fieldProps, error }: any) => (
                 <React.Fragment>
                   <TextField {...fieldProps} />
                   {!error && (
@@ -67,11 +64,11 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               label="Secret Key"
               defaultValue=""
               isRequired
-              validate={value =>
+              validate={(value: any) =>
                 value && value.length < 8 ? 'TOO_SHORT' : undefined
               }
             >
-              {({ fieldProps, error, valid, meta }) => (
+              {({ fieldProps, error, valid, meta }: any) => (
                 <React.Fragment>
                   <TextField {...fieldProps} />
                   {!error && !valid && (
@@ -92,7 +89,7 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               )}
             </Field>
             <CheckboxField name="encrypt" label="Encrypt the secret key" defaultIsChecked>
-              {({ fieldProps }) => (
+              {({ fieldProps }: any) => (
                 <Checkbox {...fieldProps} label="Encrypt before saving" />
               )}
             </CheckboxField>
@@ -101,14 +98,13 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
               will NOT be able access that key.
             </HelperMessage>
             <FormFooter>
-              <Button appearance="subtle">Cancel</Button>
               <Button type="submit" appearance="primary" isLoading={submitting}>
                 Save
               </Button>
             </FormFooter>
             <FormFooter>
               <div style={{ margin: '5px', flexShrink: 0 }}>
-                <InfoIcon label="Why shall we set credentials here?"/>
+                <InfoIcon label="Why shall we set credentials here?" />
               </div>
               <HelperMessage>
                 The credentials are provided here so that other users won't need to provide or
