@@ -3,7 +3,7 @@ import * as AWS from 'aws-sdk';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import Viewer from '../Viewer';
-import Form, { ErrorMessage, Field, FormFooter, HelperMessage} from '@atlaskit/form';
+import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 

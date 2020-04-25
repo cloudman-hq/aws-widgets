@@ -5,7 +5,7 @@ import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { action, autorun, computed } from 'mobx';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import { ErrorMessage } from '@atlaskit/form';
+import {ErrorMessage, HelperMessage} from '@atlaskit/form';
 
 interface State {
   resourceType: string;
@@ -47,12 +47,17 @@ class Viewer extends React.Component<any, State> {
       });
       return;
     }
-
+    const resourceId = this.props.appStore.resourceId;
+    if (!resourceId) {
+      this.setState({
+        resourceType: "Initialised"
+      })
+      return;
+    }
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
       this.props.settingsStore.secretKey,
     );
-    const resourceId = this.props.appStore.resourceId;
 
     let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
@@ -149,6 +154,12 @@ class Viewer extends React.Component<any, State> {
           resourceState={this.props.appStore.resourceDescription.resourceState}
         />
       );
+    } else if (this.state.resourceType === 'Initialised') {
+      resourceCard = (
+        <HelperMessage>
+          Click the PEN icon below to provide a resource ID in the macro editor.
+        </HelperMessage>
+      );
     } else {
       resourceCard = (
         <ErrorMessage>
@@ -156,13 +167,7 @@ class Viewer extends React.Component<any, State> {
         </ErrorMessage>
       );
     }
-    return (
-      <div>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          {resourceCard}
-        </div>
-      </div>
-    );
+    return resourceCard;
   }
 }
 
