@@ -1,12 +1,24 @@
 import * as React from 'react'
 import Editor from ".";
-// import '../../styles/app.css';
+import RootStore from "../../RootStore";
+import {Provider} from "mobx-react";
+import {storiesOf} from "@storybook/react";
 
-export default {
-  title: 'Editor',
-  component: Editor
+
+const withProvider = (story: any) => {
+  let rootStore = new RootStore();
+  rootStore.getAppStore()
+  rootStore.getSettingsStore().setAccessKey("key")
+  rootStore.getSettingsStore().setSecretKey("secret")
+  return (
+      <Provider rootStore={rootStore}>
+        {story()}
+      </Provider>
+  );
 }
 
-export const EditorDemo = () => (
-  <Editor accessKey="Test" secretKey="Role"/>
-);
+storiesOf('Editor', module)
+    .addDecorator(withProvider)
+    .add('default', () => (
+          <Editor />
+    ));
