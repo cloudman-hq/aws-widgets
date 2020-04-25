@@ -22,7 +22,7 @@ const Settings: React.FunctionComponent = ({ settingsStore }: any) => {
 
   function onSubmit(data: any) {
     subscribers.accessKey$.next(data.accessKey);
-    subscribers.secretKey$.next(data.secretkey);
+    subscribers.secretKey$.next(data.secretKey);
     saveSettings();
   }
 
