@@ -1,11 +1,9 @@
 import * as React from 'react';
-import * as AWS from 'aws-sdk';
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import Viewer from '../Viewer';
-import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
+import Form, {ErrorMessage, Field, FormFooter, HelperMessage} from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
-
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -15,19 +13,11 @@ import Button from '@atlaskit/button/dist/cjs/components/Button';
 class Editor extends React.Component<any> {
   constructor(props: any) {
     super(props);
-    this.describe = this.describe.bind(this);
+    this.setResourceId = this.setResourceId.bind(this);
   }
 
-
-  describe(data: any) {
-    AWS.config.region = 'ap-southeast-2';
-
-    AWS.config.credentials = new AWS.Credentials(
-      this.props.settingsStore.accessKey,
-      this.props.settingsStore.secretKey,
-    );
-    const resourceId = data.resourceId;
-    this.props.appStore.setResourceId(resourceId);
+  setResourceId(data: any) {
+    this.props.appStore.setResourceId(data.resourceId);
   }
 
   render() {
@@ -39,7 +29,7 @@ class Editor extends React.Component<any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{resourceId: string}> onSubmit={this.describe}>
+        <Form <{resourceId: string}> onSubmit={this.setResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
