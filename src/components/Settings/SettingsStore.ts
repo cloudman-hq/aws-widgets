@@ -19,7 +19,7 @@ class SettingsStore {
   }
 
   @observable accessKey = 'default-accessKey';
-  @observable secretKey = 'defaault-secretKey';
+  @observable secretKey = 'default-secretKey';
   @computed get toJson() {
     return {
       accessKey: this.accessKey,
