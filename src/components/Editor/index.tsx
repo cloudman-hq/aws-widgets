@@ -6,12 +6,7 @@ import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
-
-const macroKey = 'aws-widget-macro';
-
-const AP = (window as any).AP;
-
-const propertyKey = (uuid: string) => `${macroKey}-${uuid}-body`;
+import { AP, propertyKey } from '../App/shared';
 
 const saveMacro = (macroData: any, macroBodyProperty: any) => {
   AP.confluence.saveMacro(Object.assign({}, macroData, { updated_at: new Date() }));

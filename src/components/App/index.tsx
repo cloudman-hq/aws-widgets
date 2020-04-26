@@ -3,17 +3,7 @@ import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
-
-function getUrlParam(param: string) {
-  const match = (new RegExp(`${param}=([^&]*)`)).exec(window.location.search);
-  return match ? decodeURIComponent(match[1]) : '';
-}
-
-const macroKey = 'aws-widget-macro';
-
-const AP = (window as any).AP;
-
-const propertyKey = (uuid: string) => `${macroKey}-${uuid}-body`;
+import { getUrlParam, AP, propertyKey } from './shared';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
