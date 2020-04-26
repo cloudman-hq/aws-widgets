@@ -3,6 +3,11 @@ import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { Switch, withRouter } from 'react-router-dom';
 
+function getUrlParam(param: string) {
+  const match = (new RegExp(`${param}=([^&]*)`)).exec(window.location.search);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
@@ -18,7 +23,7 @@ class App extends React.Component<any, any> {
     this.loadMacroDataAndMacroBody = this.loadMacroDataAndMacroBody.bind(this);
     this.loadSettings();
     this.loadMacroDataAndMacroBody();
-    setTimeout(this.loadMacroDataAndMacroBody, 5000);
+    // setTimeout(this.loadMacroDataAndMacroBody, 5000);
   }
 
   private loadSettings = () => {
@@ -45,18 +50,21 @@ class App extends React.Component<any, any> {
   }
 
   private loadMacroDataAndMacroBody = () => {
-    // tslint:disable-next-line: no-console
-    console.log('load macro data...');
-    if ((window as any).AP) {
+    const resourceId = getUrlParam('resourceId');
+    if (resourceId) {
+      // tslint:disable-next-line: no-console
+      console.log('resourceId from query parameter:', resourceId);
+      this.props.appStore.setResourceId(resourceId);
+    } else if ((window as any).AP) {
       // (window as any).AP.confluence.getMacroBody(function (body: string) {
       //   this.appStore.setResourceId(body);
       // });
       // tslint:disable-next-line: no-console
-      console.log('load macro data...2');
+      console.log('start loading macro data...');
       (window as any).AP.confluence.getMacroData((data: any) => {
         // tslint:disable-next-line: no-console
-        console.log('load macro data...3.2, data:', data);
-        this.props.appStore.setResourceId(data.resourceId);
+        console.log('loaded macro data:', data);
+        this.props.appStore.setResourceId(data.resourceId || '');
       });
     }
   }
