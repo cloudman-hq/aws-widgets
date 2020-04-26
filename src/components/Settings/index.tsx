@@ -68,7 +68,7 @@ class Settings extends React.Component<any, State> {
     if (status === 'NOT_SET') {
       // do nothing
     } else if (status === 'REJECTED') {
-      statusMessage = <ErrorMessage>The Access Key or Secret Key is not correct</ErrorMessage>;
+      statusMessage = <ErrorMessage>The Access Key or Secret Key is not correct.</ErrorMessage>;
     } else if (status === 'FAILED') {
       statusMessage = <ErrorMessage>The credentials cannot be saved. Try again.</ErrorMessage>;
     }

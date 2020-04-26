@@ -2,15 +2,34 @@ import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import { inject, observer } from 'mobx-react';
-import { autorun } from 'mobx';
-import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import { ErrorMessage, HelperMessage } from '@atlaskit/form';
+import {inject, observer} from 'mobx-react';
+import {autorun} from 'mobx';
+import {ListTagsRequest} from 'aws-sdk/clients/lambda';
+import {ErrorMessage, HelperMessage} from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import Spinner from '@atlaskit/spinner';
 
+/**
+ * Include the following scenarios:
+ * 1. Access not setup - ACCESS_NOT_SETUP
+ * 2. Access keys not valid - ACCESS_NOT_VALID
+ * 3. Resource ID not provided - RESOURCE_ID_NOT_PROVIDED
+ * 4. Resource does not exist - RESOURCE_DOES_NOT_EXIST
+ * then all resources
+ */
+enum ResourceType {
+  UNKNOWN,
+  INITIALISING,
+  ACCESS_NOT_SETUP,
+  ACCESS_NOT_VALID,
+  RESOURCE_ID_NOT_PROVIDED,
+  RESOURCE_DOES_NOT_EXIST,
+  LAMBDA_FUNCTION,
+  EC2
+}
+
 interface State {
-  resourceType: string;
+  resourceType: ResourceType;
   resourceDescription: any;
   isLoading: boolean;
 }
@@ -24,7 +43,7 @@ interface ResourceDescription {
   resourceState?: string;
 }
 
-@inject(({ rootStore }) => ({
+@inject(({rootStore}) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
@@ -34,26 +53,27 @@ class Viewer extends React.Component<any, State> {
     super(props);
 
     this.state = {
-      resourceType: 'unknown',
+      resourceType: ResourceType.INITIALISING,
       resourceDescription: {},
       isLoading: false,
     };
     this.describe = this.describe.bind(this);
     autorun(this.describe);
   }
+
   async describe() {
     AWS.config.region = 'ap-southeast-2';
     if (!this.props.settingsStore.accessKey || !this.props.settingsStore.secretKey) {
       // AccessKey and SecretKey are not provided
       this.setState({
-        resourceType: 'Help',
+        resourceType: ResourceType.ACCESS_NOT_SETUP,
       });
       return;
     }
     const resourceId = this.props.appStore.resourceId;
     if (!resourceId) {
       this.setState({
-        resourceType: 'Initialised',
+        resourceType: ResourceType.RESOURCE_ID_NOT_PROVIDED,
       });
       return;
     }
@@ -62,7 +82,7 @@ class Viewer extends React.Component<any, State> {
       this.props.settingsStore.secretKey,
     );
 
-    let tags = { tags: '' };
+    let tags = {tags: ''};
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
       lambdaRuntime: '',
@@ -78,7 +98,7 @@ class Viewer extends React.Component<any, State> {
       });
       // describe lambda
       this.setState({
-        resourceType: 'lambda',
+        resourceType: ResourceType.LAMBDA_FUNCTION,
       });
       // this.props.appStore.setResourceType(resourceType);
       const lambda = new AWS.Lambda();
@@ -120,7 +140,7 @@ class Viewer extends React.Component<any, State> {
       // this.props.appStore.setResourceType('EC2');
       this.setState({
         isLoading: true,
-        resourceType: 'EC2',
+        resourceType: ResourceType.EC2,
       });
       const ec2 = new AWS.EC2();
       const params = {
@@ -150,48 +170,71 @@ class Viewer extends React.Component<any, State> {
 
   render() {
     let resourceCard;
-    const { isLoading } = this.state;
-    if (this.state.resourceType === 'lambda') {
-      resourceCard = (
-        <Lambda
-          runtime={this.props.appStore.resourceDescription.lambdaRuntime}
-          role={this.props.appStore.resourceDescription.lambdaRole}
-          name={this.props.appStore.resourceDescription.lambdaName}
-        // tags={this.props.appStore.tags}
-        />
-      );
-    } else if (this.state.resourceType === 'EC2') {
-      resourceCard = (
-        <EC2
-          resourceId={this.props.appStore.resourceId}
-          availabilityZone={this.props.appStore.resourceDescription.availabilityZone}
-          resourceState={this.props.appStore.resourceDescription.resourceState}
-        />
-      );
-    } else if (this.state.resourceType === 'Initialised') {
-      resourceCard = (
-        <DefaultCard title={'Help'}>
-          <HelperMessage>
-            Click the PEN icon below to provide a resource ID in the macro editor.
-          </HelperMessage>
-        </DefaultCard>
-      );
-    } else {
-      const { resourceId } = this.props.appStore;
-      if (resourceId !== '' && resourceId.indexOf('arn:aws:lambda') !== 0 && resourceId.indexOf('arn:aws:ec2') !== 0) {
+    const {isLoading} = this.state;
+    switch (this.state.resourceType) {
+      case ResourceType.UNKNOWN:
         resourceCard = (
-          <DefaultCard title={'Warning'}>
+          <DefaultCard title={'Unknown Error'}>
+            <ErrorMessage>
+              Unknown error happens. Please contact support.
+            </ErrorMessage>
+          </DefaultCard>);
+        break;
+      case ResourceType.INITIALISING:
+        resourceCard = (
+          <DefaultCard title={'Initialising'}>
+            <HelperMessage>
+              Initialising
+            </HelperMessage>
+          </DefaultCard>);
+        break;
+      case ResourceType.ACCESS_NOT_SETUP:
+        resourceCard = (
+          <DefaultCard title={'Access not setup'}>
             <ErrorMessage>
               The access has not been setup. Ask your administrator to set up.
             </ErrorMessage>
+          </DefaultCard>);
+
+        break;
+      case ResourceType.ACCESS_NOT_VALID:
+        break;
+      case ResourceType.RESOURCE_ID_NOT_PROVIDED:
+        resourceCard = (
+          <DefaultCard title={'Help'}>
+            <HelperMessage>
+              Click the PEN icon below to provide a resource ID in the macro editor.
+            </HelperMessage>
           </DefaultCard>
         );
-      }
+        break;
+      case ResourceType.RESOURCE_DOES_NOT_EXIST:
+        break;
+      case ResourceType.LAMBDA_FUNCTION:
+        resourceCard = (
+          <Lambda
+            runtime={this.props.appStore.resourceDescription.lambdaRuntime}
+            role={this.props.appStore.resourceDescription.lambdaRole}
+            name={this.props.appStore.resourceDescription.lambdaName}
+            // tags={this.props.appStore.tags}
+          />
+        );
+        break;
+      case ResourceType.EC2:
+        resourceCard = (
+          <EC2
+            resourceId={this.props.appStore.resourceId}
+            availabilityZone={this.props.appStore.resourceDescription.availabilityZone}
+            resourceState={this.props.appStore.resourceDescription.resourceState}
+          />
+        );
+        break;
     }
     return (
       <div>
         <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          {isLoading ? <Spinner size="medium" /> : resourceCard}
+          {isLoading ? <Spinner size="medium"/> : ''}
+          {resourceCard}
         </div>
       </div>
     );
