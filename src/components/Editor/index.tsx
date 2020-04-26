@@ -1,23 +1,101 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
+import { v4 as uuidv4 } from 'uuid';
 import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
+
+const macroKey = 'aws-widget-macro';
+
+const AP = (window as any).AP;
+
+const propertyKey = (uuid: string) => `${macroKey}-${uuid}-body`;
+
+const saveMacro = (macroData: any, macroBodyProperty: any) => {
+  AP.confluence.saveMacro(Object.assign({}, macroData, { updated_at: new Date() }));
+
+  macroBodyProperty.version.number = macroBodyProperty.version.number + 1;
+
+  AP.confluence.setContentProperty(macroBodyProperty, (result: any) => {
+    // tslint:disable-next-line: no-console
+    console.warn(result.error);
+  });
+};
+
+const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
+  AP.dialog.getButton('submit').bind(() => {
+    saveMacro(macroData, macroBodyProperty);
+
+    // tslint:disable-next-line: no-console
+    console.log(`saved macro with data: ${JSON.stringify(macroData)}, body property: ${JSON.stringify(macroBodyProperty)}`);
+
+    AP.confluence.closeMacroEditor();
+    return true;
+  });
+};
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
 @observer
-class Editor extends React.Component<any> {
+class Editor extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.setResourceId = this.setResourceId.bind(this);
+
+    this.init = this.init.bind(this);
+    autorun(this.init);
   }
 
   setResourceId(data: any) {
     this.props.appStore.setResourceId(data.resourceId);
+    this.state.macroBodyProperty.value.resourceId = data.resourceId;
+  }
+
+  async init() {
+    let macroData: any;
+    let macroBodyProperty: any;
+
+    const initializeProperty = (uuid: string) => {
+      const key = propertyKey(uuid);
+      macroBodyProperty = { key, value: {}, version: { number: 0 } };
+      // tslint:disable-next-line: no-console
+      console.log(`initialized macro body property: ${JSON.stringify(macroBodyProperty)}`);
+    };
+
+    const afterInit = () => {
+      registerOnSubmit(macroData, macroBodyProperty);
+      this.setState({ macroBodyProperty });
+    };
+
+    AP.confluence.getMacroData((data: any) => {
+      macroData = data;
+      if (!macroData || !macroData.uuid) {
+        macroData = { uuid: uuidv4() };
+        // tslint:disable-next-line: no-console
+        console.log(`initialized macro data: ${JSON.stringify(macroData)}`);
+
+        initializeProperty(macroData.uuid);
+
+        afterInit();
+      } else {
+        const key = propertyKey(macroData.uuid);
+        AP.confluence.getContentProperty(key, (property: any) => {
+          macroBodyProperty = property;
+          if (!macroBodyProperty) {
+            initializeProperty(macroData.uuid);
+          } else {
+            // tslint:disable-next-line: no-console
+            console.log(`loaded macro body property: ${JSON.stringify(macroBodyProperty)}`);
+          }
+
+          afterInit();
+        });
+      }
+    });
   }
 
   render() {
@@ -29,7 +107,7 @@ class Editor extends React.Component<any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{resourceId: string}> onSubmit={this.setResourceId}>
+        <Form <{ resourceId: string }> onSubmit={this.setResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">

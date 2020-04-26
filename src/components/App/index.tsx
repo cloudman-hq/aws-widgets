@@ -1,12 +1,19 @@
 import * as React from 'react';
 import Route from '../Route';
 import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
 
 function getUrlParam(param: string) {
   const match = (new RegExp(`${param}=([^&]*)`)).exec(window.location.search);
   return match ? decodeURIComponent(match[1]) : '';
 }
+
+const macroKey = 'aws-widget-macro';
+
+const AP = (window as any).AP;
+
+const propertyKey = (uuid: string) => `${macroKey}-${uuid}-body`;
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -20,10 +27,26 @@ class App extends React.Component<any, any> {
     // Try to load setting from app.properties
     this.settingsStore = props.settingsStore;
     this.loadSettings = this.loadSettings.bind(this);
-    this.loadMacroDataAndMacroBody = this.loadMacroDataAndMacroBody.bind(this);
     this.loadSettings();
-    this.loadMacroDataAndMacroBody();
-    // setTimeout(this.loadMacroDataAndMacroBody, 5000);
+
+    this.init = this.init.bind(this);
+    autorun(this.init);
+  }
+
+  async init() {
+    const uuid = getUrlParam('uuid') || '';
+    // tslint:disable-next-line: no-console
+    console.log('init uuid:', uuid);
+
+    if (uuid) {
+      const key = propertyKey(uuid);
+      AP.confluence.getContentProperty(key, (property: any) => {
+        // tslint:disable-next-line: no-console
+        console.log(`loaded macro body property: ${JSON.stringify(property)}`);
+        const resourceId = property && property.value && property.value.resourceId || '';
+        this.props.appStore.setResourceId(resourceId);
+      });
+    }
   }
 
   private loadSettings = () => {
@@ -46,26 +69,6 @@ class App extends React.Component<any, any> {
     } else {
       // tslint:disable-next-line: no-console
       console.log('Credentials is not loaded as AP is not defined.');
-    }
-  }
-
-  private loadMacroDataAndMacroBody = () => {
-    const resourceId = getUrlParam('resourceId');
-    if (resourceId) {
-      // tslint:disable-next-line: no-console
-      console.log('resourceId from query parameter:', resourceId);
-      this.props.appStore.setResourceId(resourceId);
-    } else if ((window as any).AP) {
-      // (window as any).AP.confluence.getMacroBody(function (body: string) {
-      //   this.appStore.setResourceId(body);
-      // });
-      // tslint:disable-next-line: no-console
-      console.log('start loading macro data...');
-      (window as any).AP.confluence.getMacroData((data: any) => {
-        // tslint:disable-next-line: no-console
-        console.log('loaded macro data:', data);
-        this.props.appStore.setResourceId(data.resourceId || '');
-      });
     }
   }
 
