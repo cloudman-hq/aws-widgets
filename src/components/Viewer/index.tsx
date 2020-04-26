@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import {inject, observer} from 'mobx-react';
-import {autorun} from 'mobx';
-import {ListTagsRequest} from 'aws-sdk/clients/lambda';
-import {ErrorMessage, HelperMessage} from '@atlaskit/form';
+import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
+import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import Spinner from '@atlaskit/spinner';
 
@@ -25,7 +25,7 @@ enum ResourceType {
   RESOURCE_ID_NOT_PROVIDED,
   RESOURCE_DOES_NOT_EXIST,
   LAMBDA_FUNCTION,
-  EC2
+  EC2,
 }
 
 interface State {
@@ -43,7 +43,7 @@ interface ResourceDescription {
   resourceState?: string;
 }
 
-@inject(({rootStore}) => ({
+@inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
@@ -82,7 +82,7 @@ class Viewer extends React.Component<any, State> {
       this.props.settingsStore.secretKey,
     );
 
-    let tags = {tags: ''};
+    let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
       lambdaRuntime: '',
@@ -170,7 +170,7 @@ class Viewer extends React.Component<any, State> {
 
   render() {
     let resourceCard;
-    const {isLoading} = this.state;
+    const { isLoading } = this.state;
     switch (this.state.resourceType) {
       case ResourceType.UNKNOWN:
         resourceCard = (
@@ -184,7 +184,7 @@ class Viewer extends React.Component<any, State> {
         resourceCard = (
           <DefaultCard title={'Initialising'}>
             <HelperMessage>
-              Initialising
+              We are retrieving data for you...
             </HelperMessage>
           </DefaultCard>);
         break;
