@@ -6,7 +6,7 @@
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://awswidgets.zenuml.com/",
+  "baseUrl": "https://aw-peng.netlify.app/",
   "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",
