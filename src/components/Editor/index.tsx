@@ -64,6 +64,7 @@ class Editor extends React.Component<any, any> {
     const afterInit = () => {
       registerOnSubmit(macroData, macroBodyProperty);
       this.setState({ macroBodyProperty });
+      this.props.appStore.setResourceId(macroBodyProperty.value.resourceId);
     };
 
     AP.confluence.getMacroData((data: any) => {
