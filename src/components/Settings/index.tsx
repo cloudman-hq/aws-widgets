@@ -135,14 +135,14 @@ class Settings extends React.Component<any, State> {
                   </React.Fragment>
                 )}
               </Field>
-              <CheckboxField name="encrypt" label="Encrypt the secret key" defaultIsChecked>
-                {({ fieldProps }: any) => (
-                  <Checkbox {...fieldProps} label="Encrypt before saving"/>
-                )}
-              </CheckboxField>
+              {/*<CheckboxField name="encrypt" label="Encrypt the secret key" defaultIsChecked>*/}
+              {/*  {({ fieldProps }: any) => (*/}
+              {/*    <Checkbox {...fieldProps} label="Encrypt before saving"/>*/}
+              {/*  )}*/}
+              {/*</CheckboxField>*/}
               <HelperMessage>
-                Please record your secret key somewhere safely. We (the vendor of this plugin)
-                do NOT have access that key.
+                Please keep your access key and secret key safe. We (the vendor of this plugin)
+                do NOT have access those keys.
               </HelperMessage>
               <FormFooter>
                 <Button type="submit" appearance="primary" isLoading={submitting}>
