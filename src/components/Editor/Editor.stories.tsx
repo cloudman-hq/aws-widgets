@@ -10,10 +10,15 @@ export default {
 
 let rootStore = new RootStore();
 
-export const WithoutAccessKeyAndSecret = () => {
-    return (
-        <Provider rootStore={rootStore}>
+export const WithoutAccessKeyAndSecret = () =>
+    <Provider rootStore={rootStore}>
+        <Editor/>
+    </Provider>;
+
+    export const WithAccessKeyAndSecret = () => {
+        rootStore.getSettingsStore().setAccessKey("key")
+        rootStore.getSettingsStore().setSecretKey("secret")
+        return <Provider rootStore={rootStore}>
             <Editor/>
-        </Provider>
-    );
-};
+        </Provider>;
+    };
