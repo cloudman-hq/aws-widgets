@@ -8,14 +8,14 @@ export default class RootStore {
 
   constructor() {
     this.settingsStore = new SettingsStore();
-    this.appStore = new AppStore(this);
+    this.appStore = new AppStore();
   }
 
-  public getSettingsStore(): any {
+  public getSettingsStore(): SettingsStore {
     return this.settingsStore;
   }
 
-  public getAppStore(): any {
+  public getAppStore(): AppStore {
     return this.appStore;
   }
 }
