@@ -8,3 +8,11 @@ it('The EC2 component should contains title: EC2', () => {
   render(<EC2/>);
   expect(screen.queryByText('EC2')).toBeInTheDocument();
 });
+
+it('The EC2 component should contains attribute names', () => {
+  const { getByText } = render(<EC2/>);
+  expect(getByText('Name:')).toBeInTheDocument();
+  expect(getByText('State:')).toBeInTheDocument();
+  expect(getByText('AZ:')).toBeInTheDocument();
+  expect(getByText('Key:')).toBeInTheDocument();
+});
