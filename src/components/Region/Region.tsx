@@ -1,8 +1,8 @@
-import * as React from "react";
-import {Simulate} from "react-dom/test-utils";
-import {inject, observer} from "mobx-react";
+import * as React from 'react';
+import { Simulate } from 'react-dom/test-utils';
+import { inject, observer } from 'mobx-react';
 interface State {
-  value: string
+  value: string;
 }
 
 class Region extends React.Component<any, State> {
@@ -22,7 +22,7 @@ class Region extends React.Component<any, State> {
           onChange={this.handleChange}
         />
       </div>
-    )
+    );
   }
 
   private handleChange(e: any) {

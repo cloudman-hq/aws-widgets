@@ -32,7 +32,14 @@ class Editor extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.setResourceId = this.setResourceId.bind(this);
-
+    this.state = {
+      macroBodyProperty: {
+        value: {
+          region: '',
+          resourceId: ''
+        }
+      }
+    };
     this.init = this.init.bind(this);
     autorun(this.init);
   }
@@ -40,6 +47,8 @@ class Editor extends React.Component<any, any> {
   setResourceId(data: any) {
     this.props.appStore.setResourceId(data.resourceId);
     this.state.macroBodyProperty.value.resourceId = data.resourceId;
+    this.props.appStore.setRegion(data.region);
+    this.state.macroBodyProperty.value.region = data.region;
   }
 
   async init() {
@@ -95,9 +104,26 @@ class Editor extends React.Component<any, any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{ resourceId: string }> onSubmit={this.setResourceId}>
+        <Form <{ region: string, resourceId: string }> onSubmit={this.setResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
+              <Field name="region" label="Region" isRequired defaultValue="">
+                {({ fieldProps, error }: any) => (
+                  <React.Fragment>
+                    <TextField {...fieldProps} />
+                    {!error && (
+                      <HelperMessage>
+                        The region where your resource are tied to.
+                      </HelperMessage>
+                    )}
+                    {error && (
+                      <ErrorMessage>
+                        The above region cannot be found.
+                      </ErrorMessage>
+                    )}
+                  </React.Fragment>
+                )}
+              </Field>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
