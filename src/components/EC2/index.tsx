@@ -9,7 +9,7 @@ class EC2Component extends React.Component<any> {
         <Ec2Property name="Name" value={this.props.resourceId} />
         <Ec2Property name="State" value={this.props.resourceState} />
         <Ec2Property name="AZ" value={this.props.availabilityZone} />
-        <Ec2Property name="Key" value={this.props.availabilityZone} />
+        <Ec2Property name="Key" value={''} />
       </Ec2Card>
     );
   }
