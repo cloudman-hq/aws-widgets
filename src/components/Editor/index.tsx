@@ -6,22 +6,14 @@ import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
+import { saveMacro } from "../Macro";
 import { AP, propertyKey } from '../App/shared';
 
-const saveMacro = (macroData: any, macroBodyProperty: any) => {
-  AP.confluence.saveMacro(Object.assign({}, macroData, { updated_at: new Date() }));
-
-  macroBodyProperty.version.number = macroBodyProperty.version.number + 1;
-
-  AP.confluence.setContentProperty(macroBodyProperty, (result: any) => {
-    // tslint:disable-next-line: no-console
-    console.warn(result.error);
-  });
-};
+const saveMacroToAP = saveMacro(AP);
 
 const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
   AP.dialog.getButton('submit').bind(() => {
-    saveMacro(macroData, macroBodyProperty);
+    saveMacroToAP(macroData, macroBodyProperty);
 
     // tslint:disable-next-line: no-console
     console.log(`saved macro with data: ${JSON.stringify(macroData)}, body property: ${JSON.stringify(macroBodyProperty)}`);
