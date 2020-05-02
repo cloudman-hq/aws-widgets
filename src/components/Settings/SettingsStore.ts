@@ -19,8 +19,11 @@ class SettingsStore {
     });
   }
 
-  @observable accessKey = 'default-accessKey';
-  @observable secretKey = 'default-secretKey';
+  @observable accessKey = '';
+  @observable secretKey = '';
+  @computed get isAccessSetup() {
+    return this.accessKey.length > 0 && this.secretKey.length > 0
+  }
   @computed get toJson() {
     return {
       accessKey: this.accessKey,

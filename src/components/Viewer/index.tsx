@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import { inject, observer } from 'mobx-react';
-import { autorun } from 'mobx';
-import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import { ErrorMessage, HelperMessage } from '@atlaskit/form';
+import {inject, observer} from 'mobx-react';
+import {autorun} from 'mobx';
+import {ListTagsRequest} from 'aws-sdk/clients/lambda';
+import {ErrorMessage, HelperMessage} from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import Spinner from '@atlaskit/spinner';
 
@@ -62,23 +62,22 @@ class Viewer extends React.Component<any, State> {
   }
 
   async describe() {
-    if (!this.props.settingsStore.accessKey || !this.props.settingsStore.secretKey) {
-      // AccessKey and SecretKey are not provided
+    // AccessKey or SecretKey are not provided
+    if (!this.props.settingsStore.isAccessSetup) {
       this.setState({
         resourceType: ResourceType.ACCESS_NOT_SETUP,
       });
       return;
     }
-    const region = this.props.appStore.getRegion();
     const resourceId = this.props.appStore.resourceId;
-    if (!resourceId || !region) {
+    if (!this.props.appStore.isRegionAndResourceSetup) {
       this.setState({
         resourceType: ResourceType.RESOURCE_ID_NOT_PROVIDED,
       });
       return;
     }
 
-    AWS.config.region = this.props.appStore.getRegion();
+    AWS.config.region = this.props.appStore.region;
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
       this.props.settingsStore.secretKey,

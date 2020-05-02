@@ -1,17 +1,22 @@
-import { observable, action } from 'mobx';
+import {observable, action, computed} from 'mobx';
 
 class AppStore {
   @observable appName = '';
   @observable tags = '';
   @observable resourceId = '';
   @observable resourceType = '';
-  @observable region: string;
+  @observable region = '';
 
   @observable resourceDescription = {};
   private rootStore: any;
   constructor(rootStore: any) {
     this.rootStore = rootStore;
   }
+
+  @computed get isRegionAndResourceSetup() {
+    return this.region.length > 0 && this.resourceId.length > 0;
+  }
+
   @action public setAppName(name: string) {
     this.appName = name;
   }
@@ -30,10 +35,6 @@ class AppStore {
 
   @action public setResourceDescription(desc: any) {
     this.resourceDescription = desc;
-  }
-
-  public getRegion() {
-    return this.region;
   }
 
   @action public setRegion(region: string) {
