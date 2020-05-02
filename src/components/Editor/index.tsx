@@ -1,62 +1,99 @@
 import * as React from 'react';
-import * as AWS from 'aws-sdk';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
+import { v4 as uuidv4 } from 'uuid';
 import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
+import { saveMacro } from '../Macro';
+import { AP, propertyKey } from '../App/shared';
 
-interface State {
-  resourceId: string;
-  resourceType: string;
-  resourceDescription: any;
-}
+const saveMacroToAP = saveMacro(AP);
+
+const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
+  AP.dialog.getButton('submit').bind(() => {
+    saveMacroToAP(macroData, macroBodyProperty);
+
+    // tslint:disable-next-line: no-console
+    console.log(`saved macro with data: ${JSON.stringify(macroData)}, body property: ${JSON.stringify(macroBodyProperty)}`);
+
+    AP.confluence.closeMacroEditor();
+    return true;
+  });
+};
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
 @observer
-class Editor extends React.Component<any, State> {
+class Editor extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-
+    this.setRegionAndResourceId = this.setRegionAndResourceId.bind(this);
     this.state = {
-      resourceId: '',
-      resourceType: 'unknown',
-      resourceDescription: {},
+      macroBodyProperty: {
+        value: {
+          region: '',
+          resourceId: '',
+        },
+      },
     };
-
     this.init = this.init.bind(this);
     autorun(this.init);
+  }
 
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.describe = this.describe.bind(this);
+  setRegionAndResourceId(data: any) {
+    this.props.appStore.setRegion(data.region);
+    this.state.macroBodyProperty.value.region = data.region;
+    this.props.appStore.setResourceId(data.resourceId);
+    this.state.macroBodyProperty.value.resourceId = data.resourceId;
   }
 
   async init() {
-    const resourceId = this.props.appStore.resourceId;
-    this.setState({ resourceId });
-  }
+    let macroData: any;
+    let macroBodyProperty: any;
 
-  handleInputChange(event: React.FormEvent<HTMLInputElement>) {
-    const value = event.currentTarget.value;
+    const initializeProperty = (uuid: string) => {
+      const key = propertyKey(uuid);
+      macroBodyProperty = { key, value: {}, version: { number: 0 } };
+      // tslint:disable-next-line: no-console
+      console.log(`initialized macro body property: ${JSON.stringify(macroBodyProperty)}`);
+    };
 
-    this.setState({
-      resourceId: value,
+    const afterInit = () => {
+      registerOnSubmit(macroData, macroBodyProperty);
+      this.setState({ macroBodyProperty });
+      this.props.appStore.setRegion(macroBodyProperty.value.region);
+      this.props.appStore.setResourceId(macroBodyProperty.value.resourceId);
+    };
+
+    AP.confluence.getMacroData((data: any) => {
+      macroData = data;
+      if (!macroData || !macroData.uuid) {
+        macroData = { uuid: uuidv4() };
+        // tslint:disable-next-line: no-console
+        console.log(`initialized macro data: ${JSON.stringify(macroData)}`);
+
+        initializeProperty(macroData.uuid);
+
+        afterInit();
+      } else {
+        const key = propertyKey(macroData.uuid);
+        AP.confluence.getContentProperty(key, (property: any) => {
+          macroBodyProperty = property;
+          if (!macroBodyProperty) {
+            initializeProperty(macroData.uuid);
+          } else {
+            // tslint:disable-next-line: no-console
+            console.log(`loaded macro body property: ${JSON.stringify(macroBodyProperty)}`);
+          }
+
+          afterInit();
+        });
+      }
     });
-  }
-
-  describe(data: any) {
-    AWS.config.region = 'ap-southeast-2';
-
-    AWS.config.credentials = new AWS.Credentials(
-      this.props.settingsStore.accessKey,
-      this.props.settingsStore.secretKey,
-    );
-    const resourceId = data.resourceId;
-    this.props.appStore.setResourceId(resourceId);
   }
 
   render() {
@@ -68,9 +105,26 @@ class Editor extends React.Component<any, State> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{resourceId: string}> onSubmit={this.describe}>
+        <Form <{ region: string, resourceId: string }> onSubmit={this.setRegionAndResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
+              <Field name="region" label="Region" isRequired defaultValue="">
+                {({ fieldProps, error }: any) => (
+                  <React.Fragment>
+                    <TextField {...fieldProps} />
+                    {!error && (
+                      <HelperMessage>
+                        The region where your resource are tied to.
+                      </HelperMessage>
+                    )}
+                    {error && (
+                      <ErrorMessage>
+                        The above region cannot be found.
+                      </ErrorMessage>
+                    )}
+                  </React.Fragment>
+                )}
+              </Field>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
@@ -101,8 +155,6 @@ class Editor extends React.Component<any, State> {
           )}
 
         </Form>
-        <hr/>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex"/>
       </div>
     );
   }

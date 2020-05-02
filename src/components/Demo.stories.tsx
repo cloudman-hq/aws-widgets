@@ -38,26 +38,7 @@ function handleInputChange(event: any) {
 
 export const EC2Component = () => (
   <div>
-    <label>
-      Access Key:
-      <input
-        name="accessKey"
-        type="string"
-
-        onChange={handleInputChange} />
-    </label>
-    <label>
-      Secret Key:
-      <input
-        name="secretKey"
-        type="string"
-
-        onChange={handleInputChange} />
-    </label>
-
-    <State store={store}>
-      <EC2 />
-    </State>
+    <EC2/>
   </div>
 );
 export const EditorComponent = () => (
@@ -89,11 +70,9 @@ export const EditorComponent = () => (
         </div>
       </form>
 
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <State store={store}>
           <Editor accessKey={store.state.accessKey} secretKey={store.state.secretKey} />
         </State>
-      </form>
     </div>
 
   </div>

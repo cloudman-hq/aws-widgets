@@ -11,7 +11,7 @@ const CardTitle = styled.div`
   position: relative;
   top: 0;
   left: 0;
-  height: 45px;
+  height: 30px;
   display: flex;
   align-items: center;
   width: 100%;
@@ -30,7 +30,7 @@ const CardIcon = styled.img`
 `;
 
 const CardContent = styled.div`
-  margin: 0.5em;
+  margin: 0 0.5em 0.5em 0.5em;
   background-color: white;
   border-radius: 3px;
   padding: 5px;

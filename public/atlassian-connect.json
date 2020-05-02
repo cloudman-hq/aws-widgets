@@ -15,7 +15,10 @@
   "authentication": {
     "type": "none"
   },
-  "scopes": ["READ", "WRITE"],
+  "scopes": [
+    "READ",
+    "WRITE"
+  ],
   "modules": {
     "dynamicContentMacros": [
       {
@@ -41,14 +44,16 @@
           "height": "500px"
         },
         "icon": {
-          "width": 16,
-          "height": 16,
+          "width": 192,
+          "height": 192,
           "url": "logo192.png"
         },
         "documentation": {
           "url": "https://www.zenuml.com/ZenUML_Sequence_Diagram_addon_help.html"
         },
-        "categories": ["visuals"],
+        "categories": [
+          "visuals"
+        ],
         "featured": true
       }
     ],

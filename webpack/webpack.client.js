@@ -8,13 +8,14 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+var GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const config = webpackMerge(baseConfig, {
   entry: {
     app: path.join(__dirname, "../src/index.tsx")
   },
   output: {
-    filename: '[name].[hash].js'
+    filename: '[name].[hash].[git-revision-hash].js'
   },
   plugins: [
     new HTMLWebpackPlugin({
@@ -24,10 +25,14 @@ const config = webpackMerge(baseConfig, {
     new ForkTsCheckerWebpackPlugin(),
     new CopyPlugin([
       path.join(__dirname, '../public/atlassian-connect.json'),
+      path.join(__dirname, '../public/logo192.png'),
       path.join(__dirname, '../public/_redirects'),
     ]),
+    new GitRevisionPlugin({
+      commithashCommand: 'rev-parse --short HEAD'
+    }),
   ],
-})
+});
 
 if (isDev) {
   config.devServer = {
