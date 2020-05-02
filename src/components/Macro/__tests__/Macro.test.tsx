@@ -1,4 +1,4 @@
-import { saveMacro } from "../index";
+import { saveMacro } from '../index';
 
 it('Save macro should update the updated time and increase the version number of content property',
    (done) => {
