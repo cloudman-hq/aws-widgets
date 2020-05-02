@@ -6,7 +6,7 @@ import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
-import { saveMacro } from "../Macro";
+import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
 
 const saveMacroToAP = saveMacro(AP);
