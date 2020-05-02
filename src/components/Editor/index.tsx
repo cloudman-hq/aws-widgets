@@ -31,7 +31,7 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
 class Editor extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    this.setResourceId = this.setResourceId.bind(this);
+    this.setRegionAndResourceId = this.setRegionAndResourceId.bind(this);
     this.state = {
       macroBodyProperty: {
         value: {
@@ -44,11 +44,11 @@ class Editor extends React.Component<any, any> {
     autorun(this.init);
   }
 
-  setResourceId(data: any) {
-    this.props.appStore.setResourceId(data.resourceId);
-    this.state.macroBodyProperty.value.resourceId = data.resourceId;
+  setRegionAndResourceId(data: any) {
     this.props.appStore.setRegion(data.region);
     this.state.macroBodyProperty.value.region = data.region;
+    this.props.appStore.setResourceId(data.resourceId);
+    this.state.macroBodyProperty.value.resourceId = data.resourceId;
   }
 
   async init() {
@@ -65,6 +65,7 @@ class Editor extends React.Component<any, any> {
     const afterInit = () => {
       registerOnSubmit(macroData, macroBodyProperty);
       this.setState({ macroBodyProperty });
+      this.props.appStore.setRegion(macroBodyProperty.value.region);
       this.props.appStore.setResourceId(macroBodyProperty.value.resourceId);
     };
 
@@ -104,7 +105,7 @@ class Editor extends React.Component<any, any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{ region: string, resourceId: string }> onSubmit={this.setResourceId}>
+        <Form <{ region: string, resourceId: string }> onSubmit={this.setRegionAndResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
               <Field name="region" label="Region" isRequired defaultValue="">
