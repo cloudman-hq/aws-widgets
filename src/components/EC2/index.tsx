@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Ec2Card from './Ec2Card';
 import Ec2Property from './Ec2Property';
-import * as AWS from "aws-sdk";
-import {autorun} from "mobx";
+import * as AWS from 'aws-sdk';
+import { autorun } from 'mobx';
 
 interface State {
   isLoading: boolean;
@@ -17,7 +17,7 @@ class EC2Component extends React.Component<any, State> {
       isLoading: false,
       resourceId: '',
       resourceState: '',
-      az: ''
+      az: '',
     };
     this.describe = this.describe.bind(this);
   }
@@ -45,7 +45,7 @@ class EC2Component extends React.Component<any, State> {
         const availabilityZone = instance.Placement.AvailabilityZone;
         this.setState({
           az: availabilityZone,
-          resourceState: instanceState
+          resourceState: instanceState,
         });
       }
       this.setState({

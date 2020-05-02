@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { CardWrapper, CardTitle, CardIcon, CardContent } from './style';
-import Spinner from "@atlaskit/spinner";
+import Spinner from '@atlaskit/spinner';
 
 interface Props {
   title: string;

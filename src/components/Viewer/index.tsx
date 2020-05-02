@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import {inject, observer} from 'mobx-react';
-import {autorun} from 'mobx';
-import {ErrorMessage, HelperMessage} from '@atlaskit/form';
+import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 
 /**
@@ -26,7 +26,7 @@ interface State {
   resourceDescription: any;
   isLoading: boolean;
 }
-@inject(({rootStore}) => ({
+@inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
