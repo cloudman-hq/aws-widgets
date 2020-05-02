@@ -1,5 +1,8 @@
+import { saveMacro } from "../index";
+
 it('Save macro should update the updated time and increase the version number of content property',
    (done) => {
+
      let localMacroData: any;
      let localContentProperty: any;
      const AP = {
@@ -20,11 +23,6 @@ it('Save macro should update the updated time and increase the version number of
          },
        },
      };
-     const saveMacro = (md: any, mbp: any) => {
-       AP.confluence.saveMacro(Object.assign({}, md, { updated_at: new Date() }));
-       mbp.version.number = mbp.version.number + 1;
-       AP.confluence.setContentProperty(mbp);
-     };
 
      const macroData = {
        uuid: 'uuid_1234',
@@ -35,7 +33,7 @@ it('Save macro should update the updated time and increase the version number of
          number: 0,
        },
      };
-     saveMacro(macroData, macroBodyProperty);
+     saveMacro(AP)(macroData, macroBodyProperty);
 
      AP.confluence.getMacroData((data: any) => {
        expect(data.uuid).toBe('uuid_1234');
