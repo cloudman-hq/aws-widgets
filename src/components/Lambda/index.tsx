@@ -89,7 +89,7 @@ class Lambda extends React.Component<any, State> {
 
   render() {
     return (
-      <LambdaCard title="Lambda" icon={lambdaLogo}>
+      <LambdaCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
         <LambdaProperty name={'Name'} value={this.state.name} />
         <LambdaProperty name={'Role'} value={this.state.role} />
         <LambdaProperty name={'Tags'} value={this.state.tags} />

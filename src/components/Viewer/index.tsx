@@ -1,12 +1,10 @@
 import * as React from 'react';
-import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import { inject, observer } from 'mobx-react';
-import { autorun } from 'mobx';
-import { ErrorMessage, HelperMessage } from '@atlaskit/form';
+import {inject, observer} from 'mobx-react';
+import {autorun} from 'mobx';
+import {ErrorMessage, HelperMessage} from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
-import Spinner from '@atlaskit/spinner';
 
 /**
  * Include the following scenarios:
@@ -28,17 +26,7 @@ interface State {
   resourceDescription: any;
   isLoading: boolean;
 }
-
-interface ResourceDescription {
-  lambdaName?: string;
-  lambdaRuntime?: string;
-  lambdaRole?: string;
-  lastUpdateStatus?: string;
-  availabilityZone?: string;
-  resourceState?: string;
-}
-
-@inject(({ rootStore }) => ({
+@inject(({rootStore}) => ({
   appStore: rootStore.getAppStore(),
   settingsStore: rootStore.getSettingsStore(),
 }))
@@ -61,56 +49,13 @@ class Viewer extends React.Component<any, State> {
       || !this.props.appStore.isRegionAndResourceSetup) {
       return;
     }
-    AWS.config.region = this.props.appStore.region;
-
-    AWS.config.credentials = this.props.settingsStore.awsCredentials;
-    let resourceDescription: ResourceDescription = {
-      lambdaName: '',
-      lambdaRuntime: '',
-      lambdaRole: '',
-      lastUpdateStatus: '',
-      availabilityZone: '',
-      resourceState: '',
-    };
-    const resourceId = this.props.appStore.resourceId;
-
     if (this.props.appStore.isLambda) {
-      this.setState({
-        isLoading: true,
-      });
-      // describe lambda
       this.setState({
         resourceType: ResourceType.LAMBDA_FUNCTION,
       });
-      // this.props.appStore.setResourceType(resourceType);
     } else {
-      // this.props.appStore.setResourceType('EC2');
       this.setState({
-        isLoading: true,
         resourceType: ResourceType.EC2,
-      });
-      const ec2 = new AWS.EC2();
-      const params = {
-        InstanceIds: [resourceId],
-      };
-      ec2.describeInstances(params, (err: any, data: any) => {
-        if (err) {
-          // tslint:disable-next-line: no-console
-          console.error(err);
-        } else {
-          const instance = data.Reservations[0].Instances[0];
-          const instanceState = instance.State.Name;
-          const availabilityZone = instance.Placement.AvailabilityZone;
-          resourceDescription = {
-            availabilityZone,
-            lambdaRuntime: '',
-            resourceState: instanceState,
-          };
-          this.props.appStore.setResourceDescription(resourceDescription);
-        }
-        this.setState({
-          isLoading: false,
-        });
       });
     }
   }
@@ -136,7 +81,6 @@ class Viewer extends React.Component<any, State> {
       );
     }
     let resourceCard;
-    const { isLoading } = this.state;
     switch (this.state.resourceType) {
       case ResourceType.UNKNOWN:
         resourceCard = (
@@ -156,26 +100,17 @@ class Viewer extends React.Component<any, State> {
         break;
       case ResourceType.LAMBDA_FUNCTION:
         resourceCard = (
-          <Lambda arn={this.props.appStore.resourceId} />
+          <Lambda arn={this.props.appStore.resourceId}/>
         );
         break;
       case ResourceType.EC2:
         resourceCard = (
-          <EC2
-            resourceId={this.props.appStore.resourceId}
-            availabilityZone={this.props.appStore.resourceDescription.availabilityZone}
-            resourceState={this.props.appStore.resourceDescription.resourceState}
-          />
+          <EC2 instanceId={this.props.appStore.resourceId}/>
         );
         break;
     }
     return (
-      <div>
-        <div className="border rounded leading-normal mt-5 px-4 py-2 max-w-sm w-full lg:max-w-full lg:flex">
-          {isLoading ? <Spinner size="medium"/> : ''}
-          {resourceCard}
-        </div>
-      </div>
+      resourceCard
     );
   }
 }
