@@ -20,10 +20,6 @@ import Spinner from '@atlaskit/spinner';
 enum ResourceType {
   UNKNOWN,
   INITIALISING,
-  ACCESS_NOT_SETUP,
-  ACCESS_NOT_VALID,
-  RESOURCE_ID_NOT_PROVIDED,
-  RESOURCE_DOES_NOT_EXIST,
   LAMBDA_FUNCTION,
   EC2,
 }
@@ -195,8 +191,6 @@ class Viewer extends React.Component<any, State> {
               We are retrieving data for you...
             </HelperMessage>
           </DefaultCard>);
-        break;
-      case ResourceType.RESOURCE_DOES_NOT_EXIST:
         break;
       case ResourceType.LAMBDA_FUNCTION:
         resourceCard = (
