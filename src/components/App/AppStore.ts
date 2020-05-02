@@ -8,6 +8,7 @@ class AppStore {
   @observable resourceDescription = {};
 
   private rootStore: any;
+  private region: string;
   constructor(rootStore: any) {
     this.rootStore = rootStore;
   }
@@ -29,6 +30,14 @@ class AppStore {
 
   @action public setResourceDescription(desc: any) {
     this.resourceDescription = desc;
+  }
+
+  public getRegion() {
+    return this.region;
+  }
+
+  @action public setRegion(region: string) {
+    this.region = region;
   }
 }
 export default AppStore;
