@@ -10,7 +10,7 @@ export default {
 
 let rootStore = new RootStore();
 
-export const EditorWithoutAccessKeyAndSecret = () => {
+export const WithoutAccessKeyAndSecret = () => {
     return (
         <Provider rootStore={rootStore}>
             <Editor/>
