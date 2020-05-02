@@ -22,7 +22,7 @@ class SettingsStore {
   @observable accessKey = '';
   @observable secretKey = '';
   @computed get isAccessSetup() {
-    return this.accessKey.length > 0 && this.secretKey.length > 0
+    return this.accessKey.length > 0 && this.secretKey.length > 0;
   }
   @computed get toJson() {
     return {
@@ -80,6 +80,16 @@ class SettingsStore {
         }
       },
     );
+  }
+
+  @computed get awsCredentials() {
+    if (!this.isAccessSetup) {
+      return null;
+    }
+    return new AWS.Credentials(
+      this.accessKey,
+      this.secretKey,
+    )
   }
 }
 

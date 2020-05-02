@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
-import {inject, observer} from 'mobx-react';
-import {autorun} from 'mobx';
-import {ListTagsRequest} from 'aws-sdk/clients/lambda';
-import {ErrorMessage, HelperMessage} from '@atlaskit/form';
+import { inject, observer } from 'mobx-react';
+import { autorun } from 'mobx';
+import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import Spinner from '@atlaskit/spinner';
 
@@ -78,10 +78,7 @@ class Viewer extends React.Component<any, State> {
     }
 
     AWS.config.region = this.props.appStore.region;
-    AWS.config.credentials = new AWS.Credentials(
-      this.props.settingsStore.accessKey,
-      this.props.settingsStore.secretKey,
-    );
+    AWS.config.credentials = this.props.settingsStore.awsCredentials;
 
     let tags = { tags: '' };
     let resourceDescription: ResourceDescription = {

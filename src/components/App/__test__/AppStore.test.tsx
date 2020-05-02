@@ -1,4 +1,4 @@
-import AppStore from "../AppStore";
+import AppStore from '../AppStore';
 
 it('should know if region and and resource are set up', () => {
   // TODO: It should not require rootStore

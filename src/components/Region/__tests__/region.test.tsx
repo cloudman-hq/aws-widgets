@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import {fireEvent, render} from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import * as React from 'react';
 
 import Region from '../Region';
