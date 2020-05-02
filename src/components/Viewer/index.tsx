@@ -62,25 +62,15 @@ class Viewer extends React.Component<any, State> {
   }
 
   async describe() {
-    // AccessKey or SecretKey are not provided
-    if (!this.props.settingsStore.isAccessSetup) {
-      this.setState({
-        resourceType: ResourceType.ACCESS_NOT_SETUP,
-      });
+    if (!this.props.settingsStore.isAccessSetup
+      || !this.props.appStore.isRegionAndResourceSetup) {
       return;
     }
-    const resourceId = this.props.appStore.resourceId;
-    if (!this.props.appStore.isRegionAndResourceSetup) {
-      this.setState({
-        resourceType: ResourceType.RESOURCE_ID_NOT_PROVIDED,
-      });
-      return;
-    }
-
     AWS.config.region = this.props.appStore.region;
-    AWS.config.credentials = this.props.settingsStore.awsCredentials;
 
+    AWS.config.credentials = this.props.settingsStore.awsCredentials;
     let tags = { tags: '' };
+
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
       lambdaRuntime: '',
@@ -89,6 +79,7 @@ class Viewer extends React.Component<any, State> {
       availabilityZone: '',
       resourceState: '',
     };
+    const resourceId = this.props.appStore.resourceId;
 
     if (this.props.appStore.isLambda) {
       this.setState({
@@ -167,6 +158,25 @@ class Viewer extends React.Component<any, State> {
   }
 
   render() {
+    if (!this.props.settingsStore.isAccessSetup) {
+      return (
+        <DefaultCard title={'Access not setup'}>
+          <ErrorMessage>
+            The access has not been setup. Ask your administrator to set up.
+          </ErrorMessage>
+        </DefaultCard>
+      );
+    }
+    if (!this.props.appStore.isRegionAndResourceSetup) {
+      return (
+        <DefaultCard title={'Region or resource ID not provided'}>
+          <HelperMessage>
+            Edit this page.
+            Click the PEN icon under this macro to provide a resource ID in the macro editor.
+          </HelperMessage>
+        </DefaultCard>
+      );
+    }
     let resourceCard;
     const { isLoading } = this.state;
     switch (this.state.resourceType) {
@@ -185,26 +195,6 @@ class Viewer extends React.Component<any, State> {
               We are retrieving data for you...
             </HelperMessage>
           </DefaultCard>);
-        break;
-      case ResourceType.ACCESS_NOT_SETUP:
-        resourceCard = (
-          <DefaultCard title={'Access not setup'}>
-            <ErrorMessage>
-              The access has not been setup. Ask your administrator to set up.
-            </ErrorMessage>
-          </DefaultCard>);
-
-        break;
-      case ResourceType.ACCESS_NOT_VALID:
-        break;
-      case ResourceType.RESOURCE_ID_NOT_PROVIDED:
-        resourceCard = (
-          <DefaultCard title={'Help'}>
-            <HelperMessage>
-              Click the PEN icon below to provide a resource ID in the macro editor.
-            </HelperMessage>
-          </DefaultCard>
-        );
         break;
       case ResourceType.RESOURCE_DOES_NOT_EXIST:
         break;
