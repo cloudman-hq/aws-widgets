@@ -8,10 +8,6 @@ class AppStore {
   @observable region = '';
 
   @observable resourceDescription = {};
-  private rootStore: any;
-  constructor(rootStore: any) {
-    this.rootStore = rootStore;
-  }
 
   @computed get isRegionAndResourceSetup() {
     return this.region.length > 0 && this.resourceId.length > 0;

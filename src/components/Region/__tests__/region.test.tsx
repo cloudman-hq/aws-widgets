@@ -5,7 +5,7 @@ import * as React from 'react';
 import Region from '../Region';
 import AppStore from '../../App/AppStore';
 
-const appStore = new AppStore({});
+const appStore = new AppStore();
 const setup = () => {
   const utils = render(<Region appStore={appStore} />);
   const input = utils.getByLabelText('region-input');

@@ -8,9 +8,7 @@ const subscribers: any = {
 };
 
 class SettingsStore {
-  private rootStore: any;
-  constructor(rootStore: any) {
-    this.rootStore = rootStore;
+  constructor() {
     subscribers.accessKey$.subscribe((value: string) => {
       this.setAccessKey(value);
     });
@@ -89,7 +87,7 @@ class SettingsStore {
     return new AWS.Credentials(
       this.accessKey,
       this.secretKey,
-    )
+    );
   }
 }
 
