@@ -13,6 +13,10 @@ class AppStore {
     return this.region.length > 0 && this.resourceId.length > 0;
   }
 
+  @computed get isLambda() {
+    return this.resourceId.indexOf('arn:aws:lambda') === 0;
+  }
+
   @action public setAppName(name: string) {
     this.appName = name;
   }

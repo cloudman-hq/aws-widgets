@@ -90,7 +90,7 @@ class Viewer extends React.Component<any, State> {
       resourceState: '',
     };
 
-    if (resourceId.indexOf('arn:aws:lambda') === 0) {
+    if (this.props.appStore.isLambda) {
       this.setState({
         isLoading: true,
       });
