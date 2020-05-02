@@ -62,7 +62,6 @@ class Viewer extends React.Component<any, State> {
   }
 
   async describe() {
-    AWS.config.region = 'ap-southeast-2';
     if (!this.props.settingsStore.accessKey || !this.props.settingsStore.secretKey) {
       // AccessKey and SecretKey are not provided
       this.setState({
@@ -70,13 +69,16 @@ class Viewer extends React.Component<any, State> {
       });
       return;
     }
+    const region = this.props.appStore.getRegion();
     const resourceId = this.props.appStore.resourceId;
-    if (!resourceId) {
+    if (!resourceId || !region) {
       this.setState({
         resourceType: ResourceType.RESOURCE_ID_NOT_PROVIDED,
       });
       return;
     }
+
+    AWS.config.region = this.props.appStore.getRegion();
     AWS.config.credentials = new AWS.Credentials(
       this.props.settingsStore.accessKey,
       this.props.settingsStore.secretKey,

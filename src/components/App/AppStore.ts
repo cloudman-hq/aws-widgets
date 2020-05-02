@@ -5,10 +5,10 @@ class AppStore {
   @observable tags = '';
   @observable resourceId = '';
   @observable resourceType = '';
-  @observable resourceDescription = {};
+  @observable region: string;
 
+  @observable resourceDescription = {};
   private rootStore: any;
-  private region: string;
   constructor(rootStore: any) {
     this.rootStore = rootStore;
   }

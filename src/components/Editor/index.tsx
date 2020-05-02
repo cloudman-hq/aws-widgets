@@ -36,9 +36,9 @@ class Editor extends React.Component<any, any> {
       macroBodyProperty: {
         value: {
           region: '',
-          resourceId: ''
-        }
-      }
+          resourceId: '',
+        },
+      },
     };
     this.init = this.init.bind(this);
     autorun(this.init);
