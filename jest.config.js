@@ -6,6 +6,7 @@ module.exports = {
   // ! ts, tsx is not included by default
   "moduleFileExtensions": ['js', 'jsx', 'ts', 'tsx'],
   "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
+    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.svg$": "jest-svg-transformer"
   },
-}
+};

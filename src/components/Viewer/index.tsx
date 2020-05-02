@@ -65,7 +65,7 @@ class Viewer extends React.Component<any, State> {
     AWS.config.region = this.props.appStore.region;
 
     AWS.config.credentials = this.props.settingsStore.awsCredentials;
-    let tags = { tags: '' };
+    const tags = { tags: '' };
 
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
@@ -86,41 +86,6 @@ class Viewer extends React.Component<any, State> {
         resourceType: ResourceType.LAMBDA_FUNCTION,
       });
       // this.props.appStore.setResourceType(resourceType);
-      const lambda = new AWS.Lambda();
-      const params = {
-        FunctionName: resourceId,
-      };
-      const req: ListTagsRequest = {
-        Resource: resourceId,
-      };
-
-      lambda.listTags(req, (err: any, data: any) => {
-        if (!err) {
-          tags = {
-            tags: data.Tags,
-          };
-        }
-        this.props.appStore.setTags(tags);
-      });
-
-      lambda.getFunction(params, (err: any, data: any) => {
-        if (!err) {
-          // console.log(JSON.stringify(data));
-          resourceDescription = {
-            lambdaName: data.Configuration.FunctionName,
-            lambdaRuntime: data.Configuration.Runtime,
-            lambdaRole: data.Configuration.Role,
-            lastUpdateStatus: data.Configuration.LastUpdateStatus,
-            availabilityZone: '',
-            resourceState: '',
-          };
-
-          this.props.appStore.setResourceDescription(resourceDescription);
-        }
-        this.setState({
-          isLoading: false,
-        });
-      });
     } else {
       // this.props.appStore.setResourceType('EC2');
       this.setState({
