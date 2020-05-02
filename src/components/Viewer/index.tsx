@@ -4,7 +4,6 @@ import Lambda from '../../components/Lambda';
 import EC2 from '../../components/EC2';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import Spinner from '@atlaskit/spinner';
@@ -65,8 +64,6 @@ class Viewer extends React.Component<any, State> {
     AWS.config.region = this.props.appStore.region;
 
     AWS.config.credentials = this.props.settingsStore.awsCredentials;
-    const tags = { tags: '' };
-
     let resourceDescription: ResourceDescription = {
       lambdaName: '',
       lambdaRuntime: '',
@@ -159,12 +156,7 @@ class Viewer extends React.Component<any, State> {
         break;
       case ResourceType.LAMBDA_FUNCTION:
         resourceCard = (
-          <Lambda
-            runtime={this.props.appStore.resourceDescription.lambdaRuntime}
-            role={this.props.appStore.resourceDescription.lambdaRole}
-            name={this.props.appStore.resourceDescription.lambdaName}
-            // tags={this.props.appStore.tags}
-          />
+          <Lambda arn={this.props.appStore.resourceId} />
         );
         break;
       case ResourceType.EC2:

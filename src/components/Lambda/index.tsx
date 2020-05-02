@@ -32,7 +32,7 @@ class Lambda extends React.Component<any, State> {
       runtime: '',
       lastUpdateStatus: '',
       az: '',
-      tags: ''
+      tags: '',
     };
     this.describe = this.describe.bind(this);
   }
@@ -50,8 +50,8 @@ class Lambda extends React.Component<any, State> {
     AWS.config.region = this.props.appStore.region;
 
     AWS.config.credentials = this.props.settingsStore.awsCredentials;
-    let tags = { tags: '' };
-    const resourceId = this.props.appStore.resourceId;
+    const tags = { tags: '' };
+    const resourceId = this.props.arn;
 
     const lambda = new AWS.Lambda();
     const params = {
@@ -64,8 +64,8 @@ class Lambda extends React.Component<any, State> {
     lambda.listTags(req, (err: any, data: any) => {
       if (!err) {
         this.setState({
-          tags: JSON.stringify(data.Tags)
-        })
+          tags: JSON.stringify(data.Tags),
+        });
       }
       this.props.appStore.setTags(tags);
     });
