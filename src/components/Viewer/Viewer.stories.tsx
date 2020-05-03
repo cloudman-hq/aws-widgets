@@ -1,12 +1,18 @@
 import * as React from 'react'
-import Editor from ".";
+import Viewer from ".";
+import RootStore from "../../RootStore";
+import {Provider} from "mobx-react";
 // import '../../styles/app.css';
 
 export default {
-  title: 'Editor',
-  component: Editor
+    title: 'Viewer',
+    component: Viewer
 }
 
-export const EditorDemo = () => (
-  <Editor accessKey="Test" secretKey="Role"/>
+let rootStore = new RootStore();
+
+export const ViewerDemo = () => (
+    <Provider rootStore={rootStore}>
+        <Viewer/>
+    </Provider>
 );
