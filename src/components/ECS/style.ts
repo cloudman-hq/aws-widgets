@@ -1,9 +1,9 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const CardWrapper = styled.div`
-  background-color: #F2F3F6;
+  background-color: #f2f3f6;
   width: 400px;
-  border: 1px solid #F2F3F6;
+  border: 1px solid #f2f3f6;
   border-radius: 5px;
 `;
 
@@ -16,9 +16,9 @@ const CardTitle = styled.div`
   align-items: center;
   width: 100%;
 
-  & h4{
+  & h4 {
     padding-left: 0.5em;
-    flex:1;
+    flex: 1;
     color: rgb(52, 69, 99);
     font-size: 1.1428571428571428em;
   }
@@ -38,19 +38,13 @@ const CardContent = styled.div`
 
 const PropertyWrapper = styled.div`
   width: 100%;
-  & h5{
+  & h5 {
     display: inline-block;
-    width: 6em;
+    width: 8em;
   }
-  & span{
-    font-size: 0.9em
+  & span {
+    font-size: 0.9em;
   }
 `;
 
-export {
-  CardWrapper,
-  CardTitle,
-  CardIcon,
-  CardContent,
-  PropertyWrapper,
-};
+export { CardWrapper, CardTitle, CardIcon, CardContent, PropertyWrapper };

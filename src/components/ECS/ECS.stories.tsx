@@ -6,4 +6,6 @@ export default {
   component: ECS,
 };
 
-export const ECSDemo = () => <ECS name="Test" role="Role" runtime="Node v12" />;
+export const ECSDemo = () => (
+  <ECS clusterName="Test" services="Role" tasks="Node v12" />
+);

@@ -1,5 +1,5 @@
-import * as React from "react";
-import { PropertyWrapper } from "./style";
+import * as React from 'react';
+import { PropertyWrapper } from './style';
 
 interface Props {
   name: string;

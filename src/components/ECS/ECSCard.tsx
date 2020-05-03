@@ -1,5 +1,5 @@
-import * as React from "react";
-import { CardWrapper, CardTitle, CardIcon, CardContent } from "./style";
+import * as React from 'react';
+import { CardWrapper, CardTitle, CardIcon, CardContent } from './style';
 
 interface Props {
   title: string;

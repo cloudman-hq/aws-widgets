@@ -1,7 +1,7 @@
 import * as React from "react";
 import ECSCard from "./ECSCard";
 import ECSProperty from "./ECSProperty";
-import { ECSLogo } from "./amazon_ecs-icon.svg";
+import ECSLogo from "./amazon_ecs-icon.svg";
 
 class ECS extends React.Component<any> {
   constructor(props: any) {
@@ -10,11 +10,10 @@ class ECS extends React.Component<any> {
 
   render() {
     return (
-      <ECSCard title="Lambda" icon={ECSLogo}>
-        <ECSProperty name={"Name"} value={this.props.name} />
-        <ECSProperty name={"Role"} value={this.props.role} />
-        <ECSProperty name={"Tags"} value={this.props.tags} />
-        <ECSProperty name={"Runtime"} value={this.props.runtime} />
+      <ECSCard title="ECS" icon={ECSLogo}>
+        <ECSProperty name={"clusterName"} value={this.props.clusterName} />
+        <ECSProperty name={"Serices"} value={this.props.serices} />
+        <ECSProperty name={"Tasks"} value={this.props.tasks} />
       </ECSCard>
     );
   }
