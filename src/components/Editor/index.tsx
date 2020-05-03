@@ -6,22 +6,14 @@ import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
+import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
 
-const saveMacro = (macroData: any, macroBodyProperty: any) => {
-  AP.confluence.saveMacro(Object.assign({}, macroData, { updated_at: new Date() }));
-
-  macroBodyProperty.version.number = macroBodyProperty.version.number + 1;
-
-  AP.confluence.setContentProperty(macroBodyProperty, (result: any) => {
-    // tslint:disable-next-line: no-console
-    console.warn(result.error);
-  });
-};
+const saveMacroToAP = saveMacro(AP);
 
 const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
   AP.dialog.getButton('submit').bind(() => {
-    saveMacro(macroData, macroBodyProperty);
+    saveMacroToAP(macroData, macroBodyProperty);
 
     // tslint:disable-next-line: no-console
     console.log(`saved macro with data: ${JSON.stringify(macroData)}, body property: ${JSON.stringify(macroBodyProperty)}`);
@@ -39,13 +31,22 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
 class Editor extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    this.setResourceId = this.setResourceId.bind(this);
-
+    this.setRegionAndResourceId = this.setRegionAndResourceId.bind(this);
+    this.state = {
+      macroBodyProperty: {
+        value: {
+          region: '',
+          resourceId: '',
+        },
+      },
+    };
     this.init = this.init.bind(this);
     autorun(this.init);
   }
 
-  setResourceId(data: any) {
+  setRegionAndResourceId(data: any) {
+    this.props.appStore.setRegion(data.region);
+    this.state.macroBodyProperty.value.region = data.region;
     this.props.appStore.setResourceId(data.resourceId);
     this.state.macroBodyProperty.value.resourceId = data.resourceId;
   }
@@ -64,6 +65,7 @@ class Editor extends React.Component<any, any> {
     const afterInit = () => {
       registerOnSubmit(macroData, macroBodyProperty);
       this.setState({ macroBodyProperty });
+      this.props.appStore.setRegion(macroBodyProperty.value.region);
       this.props.appStore.setResourceId(macroBodyProperty.value.resourceId);
     };
 
@@ -103,9 +105,26 @@ class Editor extends React.Component<any, any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{ resourceId: string }> onSubmit={this.setResourceId}>
+        <Form <{ region: string, resourceId: string }> onSubmit={this.setRegionAndResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
+              <Field name="region" label="Region" isRequired defaultValue="">
+                {({ fieldProps, error }: any) => (
+                  <React.Fragment>
+                    <TextField {...fieldProps} />
+                    {!error && (
+                      <HelperMessage>
+                        The region where your resource are tied to.
+                      </HelperMessage>
+                    )}
+                    {error && (
+                      <ErrorMessage>
+                        The above region cannot be found.
+                      </ErrorMessage>
+                    )}
+                  </React.Fragment>
+                )}
+              </Field>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>

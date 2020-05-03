@@ -8,9 +8,7 @@ const subscribers: any = {
 };
 
 class SettingsStore {
-  private rootStore: any;
-  constructor(rootStore: any) {
-    this.rootStore = rootStore;
+  constructor() {
     subscribers.accessKey$.subscribe((value: string) => {
       this.setAccessKey(value);
     });
@@ -19,8 +17,11 @@ class SettingsStore {
     });
   }
 
-  @observable accessKey = 'default-accessKey';
-  @observable secretKey = 'default-secretKey';
+  @observable accessKey = '';
+  @observable secretKey = '';
+  @computed get isAccessSetup() {
+    return this.accessKey.length > 0 && this.secretKey.length > 0;
+  }
   @computed get toJson() {
     return {
       accessKey: this.accessKey,
@@ -76,6 +77,16 @@ class SettingsStore {
 
         }
       },
+    );
+  }
+
+  @computed get awsCredentials() {
+    if (!this.isAccessSetup) {
+      return null;
+    }
+    return new AWS.Credentials(
+      this.accessKey,
+      this.secretKey,
     );
   }
 }

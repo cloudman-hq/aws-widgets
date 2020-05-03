@@ -34,6 +34,8 @@ class App extends React.Component<any, any> {
         // tslint:disable-next-line: no-console
         console.log(`loaded macro body property: ${JSON.stringify(property)}`);
         const resourceId = property && property.value && property.value.resourceId || '';
+        const region = property && property.value && property.value.region || '';
+        this.props.appStore.setRegion(region);
         this.props.appStore.setResourceId(resourceId);
       });
     }

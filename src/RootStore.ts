@@ -7,7 +7,7 @@ export default class RootStore {
   private appStore: any;
 
   constructor() {
-    this.settingsStore = new SettingsStore(this);
+    this.settingsStore = new SettingsStore();
     this.appStore = new AppStore(this);
   }
 
