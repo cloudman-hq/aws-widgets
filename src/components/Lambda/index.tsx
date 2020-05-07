@@ -47,9 +47,6 @@ class Lambda extends React.Component<any, State> {
       return;
     }
 
-    AWS.config.region = this.props.appStore.region;
-
-    AWS.config.credentials = this.props.settingsStore.awsCredentials;
     const tags = { tags: '' };
     const resourceId = this.props.arn;
 

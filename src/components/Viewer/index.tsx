@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
+import * as AWS from 'aws-sdk';
 
 /**
  * Include the following scenarios:
@@ -49,6 +50,10 @@ class Viewer extends React.Component<any, State> {
       || !this.props.appStore.isRegionAndResourceSetup) {
       return;
     }
+
+    AWS.config.credentials = this.props.settingsStore.awsCredentials;
+    AWS.config.region = this.props.appStore.region;
+
     if (this.props.appStore.isLambda) {
       this.setState({
         resourceType: ResourceType.LAMBDA_FUNCTION,
@@ -100,12 +105,12 @@ class Viewer extends React.Component<any, State> {
         break;
       case ResourceType.LAMBDA_FUNCTION:
         resourceCard = (
-          <Lambda arn={this.props.appStore.resourceId}/>
+          <Lambda arn={this.props.appStore.resourceId} />
         );
         break;
       case ResourceType.EC2:
         resourceCard = (
-          <EC2 instanceId={this.props.appStore.resourceId}/>
+          <EC2 instanceId={this.props.appStore.resourceId} />
         );
         break;
     }

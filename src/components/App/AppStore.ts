@@ -10,7 +10,7 @@ class AppStore {
   @observable resourceDescription = {};
 
   @computed get isRegionAndResourceSetup() {
-    return this.region.length > 0 && this.resourceId.length > 0;
+    return this.region && this.region.length > 0 && this.resourceId && this.resourceId.length > 0;
   }
 
   @computed get isLambda() {
