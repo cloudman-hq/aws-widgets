@@ -1,6 +1,6 @@
 import * as React from 'react';
-import Lambda from '../../components/Lambda';
-import EC2 from '../../components/EC2';
+import Lambda from './Resources/Lambda';
+import EC2 from './Resources/EC2';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';

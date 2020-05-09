@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { State, Store } from '@sambego/storybook-state';
-import EC2 from '../components/EC2'
+import EC2 from '../components/Viewer/Resources/EC2'
 import Editor from '../components/Editor'
 // import '../styles/app.css'
 import { BrowserRouter as Router } from 'react-router-dom';

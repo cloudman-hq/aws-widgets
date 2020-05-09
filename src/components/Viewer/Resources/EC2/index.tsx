@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import { autorun } from 'mobx';
-import ResourceProperty from '../Viewer/Common/ResourceProperty';
-import ResourceCard from '../Viewer/Common/ResourceCard';
+import ResourceCard from '../../Common/ResourceCard';
+import ResourceProperty from '../../Common/ResourceProperty';
 
 interface State {
   isLoading: boolean;
