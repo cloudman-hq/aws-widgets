@@ -12,7 +12,5 @@ it('S3Component should contains title: S3', () => {
 it('S3Component should contains attribute names', () => {
   const { getByText } = render(<S3Component/>);
   expect(getByText('Name:')).toBeInTheDocument();
-  expect(getByText('State:')).toBeInTheDocument();
-  expect(getByText('AZ:')).toBeInTheDocument();
-  expect(getByText('Key:')).toBeInTheDocument();
+  expect(getByText('IsPublic:')).toBeInTheDocument();
 });
