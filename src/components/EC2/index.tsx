@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Ec2Card from './Ec2Card';
-import Ec2Property from './Ec2Property';
 import * as AWS from 'aws-sdk';
 import { autorun } from 'mobx';
+import ResourceProperty from '../Viewer/Common/ResourceProperty';
+import ResourceCard from '../Viewer/Common/ResourceCard';
 
 interface State {
   isLoading: boolean;
@@ -57,12 +57,12 @@ class EC2Component extends React.Component<any, State> {
 
   render() {
     return (
-      <Ec2Card title="EC2" isLoading={this.state.isLoading}>
-        <Ec2Property name="Name" value={this.props.instanceId} />
-        <Ec2Property name="State" value={this.state.resourceState} />
-        <Ec2Property name="AZ" value={this.state.az} />
-        <Ec2Property name="Key" value={''} />
-      </Ec2Card>
+      <ResourceCard title="EC2" isLoading={this.state.isLoading}>
+        <ResourceProperty name="Name" value={this.props.instanceId} />
+        <ResourceProperty name="State" value={this.state.resourceState} />
+        <ResourceProperty name="AZ" value={this.state.az} />
+        <ResourceProperty name="Key" value={''} />
+      </ResourceCard>
     );
   }
 }

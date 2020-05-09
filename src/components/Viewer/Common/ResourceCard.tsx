@@ -8,7 +8,7 @@ interface Props {
   isLoading: boolean;
 }
 
-const Ec2Card: React.FunctionComponent<Props> = (props) => {
+const ResourceCard: React.FunctionComponent<Props> = (props) => {
   return <CardWrapper>
     <CardTitle>
       <h4>{props.title}</h4>
@@ -21,4 +21,4 @@ const Ec2Card: React.FunctionComponent<Props> = (props) => {
   </CardWrapper>;
 };
 
-export default Ec2Card;
+export default ResourceCard;

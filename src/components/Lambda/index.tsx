@@ -1,11 +1,11 @@
 import * as React from 'react';
 import lambdaLogo from './AWS-Lambda_Lambda-Function_light-bg_4x.svg';
-import LambdaCard from './LambdaCard';
-import LambdaProperty from './LambdaProperty';
 import { autorun } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as AWS from 'aws-sdk';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import ResourceCard from '../Viewer/Common/ResourceCard';
+import ResourceProperty from '../Viewer/Common/ResourceProperty';
 
 interface State {
   isLoading: boolean;
@@ -86,12 +86,12 @@ class Lambda extends React.Component<any, State> {
 
   render() {
     return (
-      <LambdaCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
-        <LambdaProperty name={'Name'} value={this.state.name} />
-        <LambdaProperty name={'Role'} value={this.state.role} />
-        <LambdaProperty name={'Tags'} value={this.state.tags} />
-        <LambdaProperty name={'Runtime'} value={this.state.runtime} />
-      </LambdaCard>
+      <ResourceCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
+        <ResourceProperty name={'Name'} value={this.state.name} />
+        <ResourceProperty name={'Role'} value={this.state.role} />
+        <ResourceProperty name={'Tags'} value={this.state.tags} />
+        <ResourceProperty name={'Runtime'} value={this.state.runtime} />
+      </ResourceCard>
     );
   }
 }
