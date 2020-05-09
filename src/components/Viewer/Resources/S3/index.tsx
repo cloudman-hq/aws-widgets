@@ -56,7 +56,7 @@ class S3Component extends React.Component<any, S3State> {
 
   render() {
     return (
-      <ResourceCard title="EC2" isLoading={this.state.isLoading}>
+      <ResourceCard title="S3" isLoading={this.state.isLoading}>
         <ResourceProperty name="Name" value={this.props.instanceId} />
         <ResourceProperty name="State" value={this.state.resourceState} />
         <ResourceProperty name="AZ" value={this.state.az} />
