@@ -4,13 +4,13 @@ import { autorun } from 'mobx';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceProperty from '../../Common/ResourceProperty';
 
-interface EC2State {
+interface S3State {
   isLoading: boolean;
   resourceId: string;
   resourceState: string;
   az: string;
 }
-class EC2Component extends React.Component<any, EC2State> {
+class S3Component extends React.Component<any, S3State> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -27,7 +27,6 @@ class EC2Component extends React.Component<any, EC2State> {
   }
 
   describe() {
-    // this.props.appStore.setResourceType('EC2');
     this.setState({
       isLoading: true,
     });
@@ -67,4 +66,4 @@ class EC2Component extends React.Component<any, EC2State> {
   }
 }
 
-export default EC2Component;
+export default S3Component;
