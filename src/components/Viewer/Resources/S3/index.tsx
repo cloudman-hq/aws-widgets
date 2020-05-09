@@ -25,17 +25,27 @@ class S3Component extends React.Component<any, S3State> {
     autorun(this.describe);
   }
 
-  describe() {
+  async describe() {
+    this.startLoading();
+    await this.loadProperties();
+    this.endLoading();
+  }
+
+  private async loadProperties() {
+    this.setState({
+      isPublic: await s3GetIsPublic(this.props.instanceId),
+    });
+  }
+
+  private endLoading() {
+    this.setState({
+      isLoading: false,
+    });
+  }
+
+  private startLoading() {
     this.setState({
       isLoading: true,
-    });
-    Promise.all([
-      s3GetIsPublic(this.props.instanceId),
-    ]).then((values) => {
-      this.setState({
-        isPublic: values[0],
-        isLoading: false,
-      });
     });
   }
 
