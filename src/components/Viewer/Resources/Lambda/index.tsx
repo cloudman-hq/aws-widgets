@@ -4,8 +4,8 @@ import { autorun } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as AWS from 'aws-sdk';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
-import ResourceCard from '../Viewer/Common/ResourceCard';
-import ResourceProperty from '../Viewer/Common/ResourceProperty';
+import ResourceCard from '../../Common/ResourceCard';
+import ResourceProperty from '../../Common/ResourceProperty';
 
 interface State {
   isLoading: boolean;
