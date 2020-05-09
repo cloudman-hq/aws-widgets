@@ -3,7 +3,7 @@ import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
-import { getUrlParam, AP, propertyKey } from './shared';
+import { getUrlParam, AP, propertyKey, decrypt } from './shared';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -48,8 +48,9 @@ class App extends React.Component<any, any> {
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: (response: any) => {
           const jsonResponse = JSON.parse(response);
-          this.props.settingsStore.accessKey = jsonResponse.value.accessKey;
-          this.props.settingsStore.secretKey = jsonResponse.value.secretKey;
+          const credential = decrypt(jsonResponse.value);
+          this.props.settingsStore.accessKey = credential.accessKey;
+          this.props.settingsStore.secretKey = credential.secretKey;
         },
         error: (error: any) => {
           // tslint:disable-next-line: no-console
