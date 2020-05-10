@@ -4,13 +4,13 @@ import { autorun } from 'mobx';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceProperty from '../../Common/ResourceProperty';
 
-interface State {
+interface EC2State {
   isLoading: boolean;
   resourceId: string;
   resourceState: string;
   az: string;
 }
-class EC2Component extends React.Component<any, State> {
+class EC2Component extends React.Component<any, EC2State> {
   constructor(props: any) {
     super(props);
     this.state = {

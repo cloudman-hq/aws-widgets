@@ -7,7 +7,7 @@ import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceProperty from '../../Common/ResourceProperty';
 
-interface State {
+interface LambdaState {
   isLoading: boolean;
   name: string;
   role: string;
@@ -22,7 +22,7 @@ interface State {
   settingsStore: rootStore.getSettingsStore(),
 }))
 @observer
-class Lambda extends React.Component<any, State> {
+class Lambda extends React.Component<any, LambdaState> {
   constructor(props: any) {
     super(props);
     this.state = {

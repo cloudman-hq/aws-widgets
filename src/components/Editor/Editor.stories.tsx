@@ -8,17 +8,17 @@ export default {
     component: Editor
 }
 
-let rootStore = new RootStore();
-
 export const WithoutAccessKeyAndSecret = () =>
-    <Provider rootStore={rootStore}>
+    <Provider rootStore={new RootStore()}>
         <Editor/>
     </Provider>;
 
-    export const WithAccessKeyAndSecret = () => {
-        rootStore.getSettingsStore().setAccessKey("key")
-        rootStore.getSettingsStore().setSecretKey("secret")
-        return <Provider rootStore={rootStore}>
-            <Editor/>
-        </Provider>;
-    };
+
+export const WithAccessKeyAndSecret = () => {
+    let rootStore = new RootStore();
+    rootStore.getSettingsStore().setAccessKey("key")
+    rootStore.getSettingsStore().setSecretKey("secret")
+    return <Provider rootStore={rootStore}>
+        <Editor/>
+    </Provider>;
+};
