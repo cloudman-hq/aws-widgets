@@ -40,7 +40,6 @@ export function log(...args: any[]) {
 }
 
 export function debug(...args: any[]) {
-  if (window.DEBUG) {
-    log(...args);
-  }
+  // tslint:disable-next-line: no-console
+  console.debug(...args);
 }

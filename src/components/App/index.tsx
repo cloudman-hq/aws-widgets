@@ -3,7 +3,8 @@ import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
-import { getUrlParam, AP, propertyKey, decrypt } from './shared';
+import { decrypt } from './shared';
+import { loadMacro } from '../Macro';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -24,20 +25,13 @@ class App extends React.Component<any, any> {
   }
 
   async init() {
-    const uuid = getUrlParam('uuid') || '';
-    // tslint:disable-next-line: no-console
-    console.log('init uuid:', uuid);
+    const body = await loadMacro();
 
-    if (uuid) {
-      const key = propertyKey(uuid);
-      AP.confluence.getContentProperty(key, (property: any) => {
-        // tslint:disable-next-line: no-console
-        console.log(`loaded macro body property: ${JSON.stringify(property)}`);
-        const resourceId = property && property.value && property.value.resourceId || '';
-        const region = property && property.value && property.value.region || '';
-        this.props.appStore.setRegion(region);
-        this.props.appStore.setResourceId(resourceId);
-      });
+    if (body) {
+      const resourceId = body.resourceId || '';
+      const region = body.region || '';
+      this.props.appStore.setRegion(region);
+      this.props.appStore.setResourceId(resourceId);
     }
   }
 
