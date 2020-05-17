@@ -3,7 +3,12 @@ import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { v4 as uuidv4 } from 'uuid';
 import Viewer from '../Viewer';
-import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
+import Form, {
+  ErrorMessage,
+  Field,
+  FormFooter,
+  HelperMessage,
+} from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 import { saveMacro } from '../Macro';
@@ -16,7 +21,11 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
     saveMacroToAP(macroData, macroBodyProperty);
 
     // tslint:disable-next-line: no-console
-    console.log(`saved macro with data: ${JSON.stringify(macroData)}, body property: ${JSON.stringify(macroBodyProperty)}`);
+    console.log(
+      `saved macro with data: ${JSON.stringify(
+        macroData,
+      )}, body property: ${JSON.stringify(macroBodyProperty)}`,
+    );
 
     AP.confluence.closeMacroEditor();
     return true;
@@ -59,7 +68,9 @@ class Editor extends React.Component<any, any> {
       const key = propertyKey(uuid);
       macroBodyProperty = { key, value: {}, version: { number: 0 } };
       // tslint:disable-next-line: no-console
-      console.log(`initialized macro body property: ${JSON.stringify(macroBodyProperty)}`);
+      console.log(
+        `initialized macro body property: ${JSON.stringify(macroBodyProperty)}`,
+      );
     };
 
     const afterInit = () => {
@@ -87,7 +98,9 @@ class Editor extends React.Component<any, any> {
             initializeProperty(macroData.uuid);
           } else {
             // tslint:disable-next-line: no-console
-            console.log(`loaded macro body property: ${JSON.stringify(macroBodyProperty)}`);
+            console.log(
+              `loaded macro body property: ${JSON.stringify(macroBodyProperty)}`,
+            );
           }
 
           afterInit();
@@ -98,14 +111,18 @@ class Editor extends React.Component<any, any> {
 
   render() {
     return (
-      <div style={{
-        display: 'flex',
-        width: '400px',
-        maxWidth: '100%',
-        margin: '0 auto',
-        flexDirection: 'column',
-      }}>
-        <Form <{ region: string, resourceId: string }> onSubmit={this.setRegionAndResourceId}>
+      <div
+        style={{
+          display: 'flex',
+          width: '400px',
+          maxWidth: '100%',
+          margin: '0 auto',
+          flexDirection: 'column',
+        }}
+      >
+        <Form<{ region: string; resourceId: string }>
+          onSubmit={this.setRegionAndResourceId}
+        >
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
               <Field name="region" label="Region" isRequired defaultValue="">
@@ -125,13 +142,19 @@ class Editor extends React.Component<any, any> {
                   </React.Fragment>
                 )}
               </Field>
-              <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
+              <Field
+                name="resourceId"
+                label="Resource ID"
+                isRequired
+                defaultValue=""
+              >
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
                     <TextField {...fieldProps} />
                     {!error && (
                       <HelperMessage>
-                        A resource ID can be an EC2 instance ID or a Lambda function ARN.
+                        A resource ID can be an EC2 instance ID or a Lambda
+                        function ARN.
                       </HelperMessage>
                     )}
                     {error && (
@@ -144,7 +167,11 @@ class Editor extends React.Component<any, any> {
               </Field>
 
               <FormFooter>
-                <Button type="submit" appearance="primary" isLoading={submitting}>
+                <Button
+                  type="submit"
+                  appearance="primary"
+                  isLoading={submitting}
+                >
                   Describe
                 </Button>
               </FormFooter>
@@ -153,7 +180,6 @@ class Editor extends React.Component<any, any> {
               </FormFooter>
             </form>
           )}
-
         </Form>
       </div>
     );

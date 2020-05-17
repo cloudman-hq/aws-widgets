@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
+import ECS from '../../components/ECS';
 
 /**
  * Include the following scenarios:
@@ -19,6 +20,7 @@ enum ResourceType {
   INITIALISING,
   LAMBDA_FUNCTION,
   EC2,
+  ECS,
 }
 
 interface State {
@@ -45,8 +47,10 @@ class Viewer extends React.Component<any, State> {
   }
 
   async describe() {
-    if (!this.props.settingsStore.isAccessSetup
-      || !this.props.appStore.isRegionAndResourceSetup) {
+    if (
+      !this.props.settingsStore.isAccessSetup ||
+      !this.props.appStore.isRegionAndResourceSetup
+    ) {
       return;
     }
     if (this.props.appStore.isLambda) {
@@ -55,7 +59,7 @@ class Viewer extends React.Component<any, State> {
       });
     } else {
       this.setState({
-        resourceType: ResourceType.EC2,
+        resourceType: ResourceType.ECS,
       });
     }
   }
@@ -74,8 +78,8 @@ class Viewer extends React.Component<any, State> {
       return (
         <DefaultCard title={'Region or resource ID not provided'}>
           <HelperMessage>
-            Edit this page.
-            Click the PEN icon under this macro to provide a resource ID in the macro editor.
+            Edit this page. Click the PEN icon under this macro to provide a
+            resource ID in the macro editor.
           </HelperMessage>
         </DefaultCard>
       );
@@ -88,30 +92,24 @@ class Viewer extends React.Component<any, State> {
             <ErrorMessage>
               Unknown error happens. Please contact support.
             </ErrorMessage>
-          </DefaultCard>);
+          </DefaultCard>
+        );
         break;
       case ResourceType.INITIALISING:
         resourceCard = (
           <DefaultCard title={'Initialising'}>
-            <HelperMessage>
-              We are retrieving data for you...
-            </HelperMessage>
-          </DefaultCard>);
+            <HelperMessage>We are retrieving data for you...</HelperMessage>
+          </DefaultCard>
+        );
         break;
       case ResourceType.LAMBDA_FUNCTION:
-        resourceCard = (
-          <Lambda arn={this.props.appStore.resourceId}/>
-        );
+        resourceCard = <Lambda arn={this.props.appStore.resourceId} />;
         break;
-      case ResourceType.EC2:
-        resourceCard = (
-          <EC2 instanceId={this.props.appStore.resourceId}/>
-        );
+      case ResourceType.ECS:
+        resourceCard = <ECS />;
         break;
     }
-    return (
-      resourceCard
-    );
+    return resourceCard;
   }
 }
 

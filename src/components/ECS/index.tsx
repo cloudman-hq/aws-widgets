@@ -2,7 +2,6 @@ import * as React from 'react';
 import ECSCard from './ECSCard';
 import ECSProperty from './ECSProperty';
 import ECSLogo from './amazon_ecs-icon.svg';
-import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import * as AWS from 'aws-sdk';
 
@@ -11,21 +10,18 @@ interface State {
   clusterName: string;
   services: string;
   tasks: string;
+  az: string;
 }
 
-@inject(({ rootStore }) => ({
-  appStore: rootStore.getAppStore(),
-  settingStore: rootStore.getSettingStore(),
-}))
-@observer
 class ECS extends React.Component<any, State> {
   constructor(props: any) {
     super(props);
     this.state = {
-      isLoading: true,
+      isLoading: false,
       clusterName: '',
       services: '',
       tasks: '',
+      az: '',
     };
     this.describe = this.describe.bind(this);
   }
@@ -35,24 +31,18 @@ class ECS extends React.Component<any, State> {
   }
 
   describe() {
-    if (
-      !this.props.settingsStore.isAccessSetup ||
-      !this.props.appStore.isRegionAndResourceSetup
-    ) {
-      return;
-    }
-
-    AWS.config.region = this.props.appStore.region;
-
-    AWS.config.credentials = this.props.settingsStore.awsCredentials;
+    this.setState({
+      isLoading: true,
+    });
 
     const ecs = new AWS.ECS();
-
     const params = {};
-    ecs.listClusters(params, function (err, data) {
+
+    ecs.listClusters(params, (err, data) => {
       if (!err) {
         this.setState({
-          clusterName: data.clusterArns,
+          clusterName: data.clusterArns[0],
+          isLoading: false,
         });
       }
       /*
@@ -65,10 +55,10 @@ class ECS extends React.Component<any, State> {
   */
     });
 
-    ecs.listServices(params, function (err, data) {
+    ecs.listServices(params, (err, data) => {
       if (!err) {
         this.setState({
-          services: data.serviceArns,
+          services: data.serviceArns[0],
         });
       }
       // an error occurred
@@ -84,10 +74,10 @@ class ECS extends React.Component<any, State> {
     const params1 = {
       cluster: 'test',
     };
-    ecs.listTasks(params1, function (err, data) {
+    ecs.listTasks(params1, (err, data) => {
       if (!err) {
         this.setState({
-          tasks: data.taskArns,
+          tasks: data.taskArns[0],
         });
       }
       /*
