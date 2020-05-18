@@ -18,7 +18,6 @@ describe('S3Service', () => {
       });
     const s3Service = new S3Service();
     const s: string = await s3Service.s3GetIsPublic('bucketName');
-        
     expect(s).toBe('true');
 
     AWSMock.restore('S3');
