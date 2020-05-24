@@ -154,7 +154,7 @@ class Settings extends React.Component<any, State> {
               </FormFooter>
               <FormFooter>
                 <div style={{ margin: '5px', flexShrink: 0 }}>
-                  <InfoIcon label="Why shall we set credentials here?"/>
+                  <InfoIcon label="Why shall we set credentials here?" />
                 </div>
                 <HelperMessage>
                   The credentials are provided here so that other users won't need to provide or
