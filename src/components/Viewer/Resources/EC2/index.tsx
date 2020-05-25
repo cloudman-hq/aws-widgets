@@ -9,6 +9,14 @@ interface EC2State {
   resourceId: string;
   resourceState: string;
   az: string;
+  keyName?: string;
+  tags: string[];
+  iamInstanceProfile?: string;
+  instanceType?: string;
+  privateIp?: string;
+  publicDns?: string;
+  securityGroups: string[];
+  storage?: string;
 }
 class EC2Component extends React.Component<any, EC2State> {
   constructor(props: any) {
@@ -18,6 +26,8 @@ class EC2Component extends React.Component<any, EC2State> {
       resourceId: '',
       resourceState: '',
       az: '',
+      tags: [],
+      securityGroups: [],
     };
     this.describe = this.describe.bind(this);
   }
@@ -40,12 +50,22 @@ class EC2Component extends React.Component<any, EC2State> {
         // tslint:disable-next-line: no-console
         console.error(err);
       } else {
-        const instance = data.Reservations[0].Instances[0];
+        const instance: any = data.Reservations[0].Instances[0];
         const instanceState = instance.State.Name;
         const availabilityZone = instance.Placement.AvailabilityZone;
+        const securityGroups = instance.SecurityGroups
+          && instance.SecurityGroups.map((g: any) => g.GroupName) || [];
         this.setState({
+          securityGroups,
           az: availabilityZone,
           resourceState: instanceState,
+          keyName: instance.KeyName,
+          tags: instance.Tags && instance.Tags.map((t: any) => `${t.Key}: ${t.Value}`),
+          iamInstanceProfile: instance.IamInstanceProfile && instance.IamInstanceProfile.Arn,
+          instanceType: instance.InstanceType,
+          privateIp: instance.PrivateIpAddress,
+          publicDns: instance.PublicDnsName,
+          storage: instance.RootDeviceType,
         });
       }
       this.setState({
@@ -60,8 +80,15 @@ class EC2Component extends React.Component<any, EC2State> {
       <ResourceCard title="EC2" isLoading={this.state.isLoading}>
         <ResourceProperty name="Name" value={this.props.instanceId} />
         <ResourceProperty name="State" value={this.state.resourceState} />
+        <ResourceProperty name="Type" value={this.state.instanceType} />
+        <ResourceProperty name="Storage" value={this.state.storage} />
         <ResourceProperty name="AZ" value={this.state.az} />
-        <ResourceProperty name="Key" value={''} />
+        <ResourceProperty name="Key" value={this.state.keyName} />
+        <ResourceProperty name="IAM" value={this.state.iamInstanceProfile} />
+        <ResourceProperty name="SGs" value={this.state.securityGroups.join(', ')} />
+        <ResourceProperty name="PrivateIp" value={this.state.privateIp} />
+        <ResourceProperty name="PublicDns" value={this.state.publicDns} />
+        <ResourceProperty name="Tags" value={this.state.tags.join(', ')} />
       </ResourceCard>
     );
   }
