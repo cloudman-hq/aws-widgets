@@ -5,7 +5,7 @@ import { inject, observer } from 'mobx-react';
 import * as AWS from 'aws-sdk';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
 import ResourceCard from '../../Common/ResourceCard';
-import ResourceProperty from '../../Common/ResourceProperty';
+import ResourceStringProperty from '../../Common/ResourceStringProperty';
 
 interface LambdaState {
   isLoading: boolean;
@@ -87,10 +87,10 @@ class Lambda extends React.Component<any, LambdaState> {
   render() {
     return (
       <ResourceCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
-        <ResourceProperty name={'Name'} value={this.state.name} />
-        <ResourceProperty name={'Role'} value={this.state.role} />
-        <ResourceProperty name={'Tags'} value={this.state.tags} />
-        <ResourceProperty name={'Runtime'} value={this.state.runtime} />
+        <ResourceStringProperty name={'Name'} value={this.state.name} />
+        <ResourceStringProperty name={'Role'} value={this.state.role} />
+        <ResourceStringProperty name={'Tags'} value={this.state.tags} />
+        <ResourceStringProperty name={'Runtime'} value={this.state.runtime} />
       </ResourceCard>
     );
   }

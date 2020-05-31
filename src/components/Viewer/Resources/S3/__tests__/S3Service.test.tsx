@@ -46,4 +46,20 @@ describe('S3Service', () => {
 
     AWSMock.restore('S3');
   });
+  it('should return s3GetBucketLifecycleConfiguration', async () => {
+    AWSMock.setSDKInstance(AWS);
+    AWSMock.mock(
+      'S3',
+      'getBucketLifecycleConfiguration',
+      (params: GetBucketPolicyStatusRequest, callback: (err: any, data: any) => void) => {
+        return callback(null, {
+          Rules: [{ ID: 'ID1' }, { ID: 'ID2' }],
+        });
+      });
+    const s3Service = new S3Service();
+    const s: string[] = await s3Service.s3GetBucketLifecycleConfiguration('bucketName');
+    expect(s).toStrictEqual(['ID1', 'ID2']);
+
+    AWSMock.restore('S3');
+  });
 });

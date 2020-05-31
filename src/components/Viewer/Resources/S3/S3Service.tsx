@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { AWSError, S3 } from 'aws-sdk';
 
 type BucketName = string;
 
@@ -16,7 +16,7 @@ export class S3Service {
         (value) => {
           return value.PolicyStatus.IsPublic.toString();
         },
-        (error: AWS.AWSError) => {
+        (error: AWSError) => {
           return `Property can not be loaded:${error.message}`;
         });
   }
@@ -33,8 +33,16 @@ export class S3Service {
             .SSEAlgorithm;
           return ('' !== defaultAlgorithm).toString();
         },
-        (error: AWS.AWSError) => {
+        (error: AWSError) => {
           return `Property can not be loaded:${error.message}`;
         });
+  }
+
+  async s3GetBucketLifecycleConfiguration(bucketName: BucketName): Promise<string[] | any[]> {
+    return this.s3.getBucketLifecycleConfiguration({ Bucket: bucketName })
+      .promise()
+      .then(
+        value => value.Rules.map(rule => rule.ID),
+        () => []);
   }
 }

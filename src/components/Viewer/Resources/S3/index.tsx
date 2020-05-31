@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { autorun } from 'mobx';
 import ResourceCard from '../../Common/ResourceCard';
-import ResourceProperty from '../../Common/ResourceProperty';
+import ResourceStringProperty from '../../Common/ResourceStringProperty';
 import { S3Service } from './S3Service';
 
 interface S3State {
@@ -9,6 +9,7 @@ interface S3State {
   resourceId: string;
   isPublic: string;
   isEncrypted: string;
+  lifecycleRuleIds: string[];
 }
 
 class S3Component extends React.Component<any, S3State> {
@@ -19,6 +20,7 @@ class S3Component extends React.Component<any, S3State> {
       resourceId: '',
       isPublic: '',
       isEncrypted: '',
+      lifecycleRuleIds: [],
     };
     this.describe = this.describe.bind(this);
   }
@@ -38,6 +40,7 @@ class S3Component extends React.Component<any, S3State> {
     this.setState({
       isPublic: await s3Service.s3GetIsPublic(this.props.instanceId),
       isEncrypted: await s3Service.s3GetIsEncrypted(this.props.instanceId),
+      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.instanceId),
     });
   }
 
@@ -56,9 +59,9 @@ class S3Component extends React.Component<any, S3State> {
   render() {
     return (
       <ResourceCard title="S3" isLoading={this.state.isLoading}>
-        <ResourceProperty name="Name" value={this.props.instanceId}/>
-        <ResourceProperty name="IsPublic" value={this.state.isPublic}/>
-        <ResourceProperty name="IsEncrypted" value={this.state.isEncrypted}/>
+        <ResourceStringProperty name="Name" value={this.props.instanceId}/>
+        <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
+        <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
       </ResourceCard>
     );
   }
