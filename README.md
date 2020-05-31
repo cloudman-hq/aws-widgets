@@ -1,5 +1,9 @@
-# Index
-* [Requirements Analyst](https://zenuml.atlassian.net/wiki/spaces/ZEN/pages/475300085/Requirements+Analyst)
+# [Requirements Analyst](https://zenuml.atlassian.net/wiki/spaces/ZEN/pages/475300085/Requirements+Analyst)
+
+# Deployment
+##Staging
+* Command: `yarn deploy:stage`
+* [Staging Test Page](https://awswidgets-stg.atlassian.net/wiki/spaces/AWS/pages/65686/Test+AWS+Widgets).
 
 ## Local development environment
 
