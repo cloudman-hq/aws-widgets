@@ -76,6 +76,7 @@
     "@atlaskit/checkbox": "latest",
     "@atlaskit/css-reset": "^5.0.10",
     "@atlaskit/form": "^7.2.0",
+    "@atlaskit/select": "^11.0.11",
     "@atlaskit/spinner": "^12.1.6",
     "@atlaskit/textfield": "latest",
     "@atlaskit/tooltip": "^15.2.5",

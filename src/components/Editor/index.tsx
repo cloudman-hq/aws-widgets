@@ -5,9 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
+import Select from '@atlaskit/select';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
+import regions from '../Aws/Regions';
 
 const saveMacroToAP = saveMacro(AP);
 
@@ -22,6 +24,11 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
     return true;
   });
 };
+
+interface FormData {
+  region: { label: string, value: string };
+  resourceId: string;
+}
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -44,9 +51,9 @@ class Editor extends React.Component<any, any> {
     autorun(this.init);
   }
 
-  setRegionAndResourceId(data: any) {
-    this.props.appStore.setRegion(data.region);
-    this.state.macroBodyProperty.value.region = data.region;
+  setRegionAndResourceId(data: FormData) {
+    this.props.appStore.setRegion(data.region.value);
+    this.state.macroBodyProperty.value.region = data.region.value;
     this.props.appStore.setResourceId(data.resourceId);
     this.state.macroBodyProperty.value.resourceId = data.resourceId;
   }
@@ -105,13 +112,17 @@ class Editor extends React.Component<any, any> {
         margin: '0 auto',
         flexDirection: 'column',
       }}>
-        <Form <{ region: string, resourceId: string }> onSubmit={this.setRegionAndResourceId}>
+        <Form<FormData> onSubmit={this.setRegionAndResourceId}>
           {({ formProps, submitting }: any) => (
             <form {...formProps}>
-              <Field name="region" label="Region" isRequired defaultValue="">
+              <Field name="region" label="Region" isRequired>
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
-                    <TextField {...fieldProps} />
+                    <Select {...fieldProps}
+                      options={regions}
+                      isSearchable={true}
+                      placeholder="Choose a Region"
+                    />
                     {!error && (
                       <HelperMessage>
                         The region where your resource are tied to.
