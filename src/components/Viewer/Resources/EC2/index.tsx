@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as AWS from 'aws-sdk';
 import { autorun } from 'mobx';
+import { observer } from 'mobx-react';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceProperty from '../../Common/ResourceProperty';
 
@@ -18,6 +19,8 @@ interface EC2State {
   securityGroups: string[];
   storage?: string;
 }
+
+@observer
 class EC2Component extends React.Component<any, EC2State> {
   constructor(props: any) {
     super(props);
