@@ -2,6 +2,7 @@ import * as React from 'react';
 import { autorun } from 'mobx';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceStringProperty from '../../Common/ResourceStringProperty';
+import ResourceArrayProperty from '../../Common/ResourceArrayProperty';
 import { S3Service } from './S3Service';
 
 interface S3State {
@@ -62,6 +63,7 @@ class S3Component extends React.Component<any, S3State> {
         <ResourceStringProperty name="Name" value={this.props.instanceId}/>
         <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
         <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
+        <ResourceArrayProperty name="IsEncrypted" array={this.state.lifecycleRuleIds}/>
       </ResourceCard>
     );
   }

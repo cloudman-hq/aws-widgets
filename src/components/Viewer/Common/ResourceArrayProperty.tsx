@@ -3,13 +3,14 @@ import { PropertyWrapper } from './style';
 
 interface Props {
   name: string;
-  value?: string;
+  array?: string[];
 }
 
 const ResourceArrayProperty: React.FunctionComponent<Props> = (props) => {
+
   return <PropertyWrapper>
     <h5>{props.name}:</h5>
-    <span>{props.value}</span>
+    <span>{props.array.length > 0 ? 'empty' : props.array.join(',')}</span>
   </PropertyWrapper>;
 };
 
