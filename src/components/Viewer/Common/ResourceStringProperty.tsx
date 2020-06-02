@@ -6,11 +6,11 @@ interface Props {
   value?: string;
 }
 
-const ResourceProperty: React.FunctionComponent<Props> = (props) => {
+const ResourceStringProperty: React.FunctionComponent<Props> = (props) => {
   return <PropertyWrapper>
     <h5>{props.name}:</h5>
     <span>{props.value}</span>
   </PropertyWrapper>;
 };
 
-export default ResourceProperty;
+export default ResourceStringProperty;

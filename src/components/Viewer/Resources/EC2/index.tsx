@@ -3,7 +3,7 @@ import * as AWS from 'aws-sdk';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import ResourceCard from '../../Common/ResourceCard';
-import ResourceProperty from '../../Common/ResourceProperty';
+import ResourceStringProperty from '../../Common/ResourceStringProperty';
 
 interface EC2State {
   isLoading: boolean;
@@ -81,17 +81,17 @@ class EC2Component extends React.Component<any, EC2State> {
   render() {
     return (
       <ResourceCard title="EC2" isLoading={this.state.isLoading}>
-        <ResourceProperty name="Name" value={this.props.instanceId} />
-        <ResourceProperty name="State" value={this.state.resourceState} />
-        <ResourceProperty name="Type" value={this.state.instanceType} />
-        <ResourceProperty name="Storage" value={this.state.storage} />
-        <ResourceProperty name="AZ" value={this.state.az} />
-        <ResourceProperty name="Key" value={this.state.keyName} />
-        <ResourceProperty name="IAM" value={this.state.iamInstanceProfile} />
-        <ResourceProperty name="SGs" value={this.state.securityGroups.join(', ')} />
-        <ResourceProperty name="PrivateIp" value={this.state.privateIp} />
-        <ResourceProperty name="PublicDns" value={this.state.publicDns} />
-        <ResourceProperty name="Tags" value={this.state.tags.join(', ')} />
+        <ResourceStringProperty name="Name" value={this.props.instanceId} />
+        <ResourceStringProperty name="State" value={this.state.resourceState} />
+        <ResourceStringProperty name="Type" value={this.state.instanceType} />
+        <ResourceStringProperty name="Storage" value={this.state.storage} />
+        <ResourceStringProperty name="AZ" value={this.state.az} />
+        <ResourceStringProperty name="Key" value={this.state.keyName} />
+        <ResourceStringProperty name="IAM" value={this.state.iamInstanceProfile} />
+        <ResourceStringProperty name="SGs" value={this.state.securityGroups.join(', ')} />
+        <ResourceStringProperty name="PrivateIp" value={this.state.privateIp} />
+        <ResourceStringProperty name="PublicDns" value={this.state.publicDns} />
+        <ResourceStringProperty name="Tags" value={this.state.tags.join(', ')} />
       </ResourceCard>
     );
   }
