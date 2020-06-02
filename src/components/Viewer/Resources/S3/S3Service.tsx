@@ -45,4 +45,11 @@ export class S3Service {
         value => value.Rules.map(rule => rule.ID),
         () => []);
   }
+  async s3GetBucketPolicy(bucketName: BucketName): Promise<string> {
+    return this.s3.getBucketPolicy({ Bucket: bucketName })
+      .promise()
+      .then(
+        value => value.Policy,
+        error => error.message);
+  }
 }
