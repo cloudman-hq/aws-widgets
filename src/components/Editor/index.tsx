@@ -5,11 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import Viewer from '../Viewer';
 import Form, { ErrorMessage, Field, FormFooter, HelperMessage } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
-import Select from '@atlaskit/select';
+import Select, { AsyncSelect } from '@atlaskit/select';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
 import regions from '../Aws/Regions';
+import resourceTypes from '../Aws/ResourceTypes';
 
 const saveMacroToAP = saveMacro(AP);
 
@@ -25,9 +26,14 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
   });
 };
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 interface FormData {
-  region: { label: string, value: string };
-  resourceId: string;
+  region: Option;
+  resourceId: any;
 }
 
 @inject(({ rootStore }) => ({
@@ -51,11 +57,27 @@ class Editor extends React.Component<any, any> {
     autorun(this.init);
   }
 
+  updateState(diff: any) {
+    this.setState(Object.assign({}, this.state, diff));
+  }
+
+  setRegion(region: string) {
+    this.updateState({ region });
+  }
+
+  setResourceType(resourceType: string) {
+    this.updateState({ resourceType });
+  }
+
   setRegionAndResourceId(data: FormData) {
     this.props.appStore.setRegion(data.region.value);
     this.state.macroBodyProperty.value.region = data.region.value;
-    this.props.appStore.setResourceId(data.resourceId);
-    this.state.macroBodyProperty.value.resourceId = data.resourceId;
+
+    const resourceId = data.resourceId.value || data.resourceId;
+    this.props.appStore.setResourceId(resourceId);
+    this.state.macroBodyProperty.value.resourceId = resourceId;
+
+    this.updateState({ macroBodyProperty: this.state.macroBodyProperty });
   }
 
   async init() {
@@ -113,15 +135,20 @@ class Editor extends React.Component<any, any> {
         flexDirection: 'column',
       }}>
         <Form<FormData> onSubmit={this.setRegionAndResourceId}>
-          {({ formProps, submitting }: any) => (
-            <form {...formProps}>
+          {(form: any) => (
+            <form {...form.formProps}>
               <Field name="region" label="Region" isRequired>
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
                     <Select {...fieldProps}
-                      options={regions}
+                      options={regions.map(r =>
+                        ({ label: `${r.label} (${r.value})`, value: r.value }))}
                       isSearchable={true}
                       placeholder="Choose a Region"
+                      onChange={(e) => {
+                        fieldProps.onChange(e);
+                        this.setRegion(form.getValues().region && form.getValues().region.value);
+                      }}
                     />
                     {!error && (
                       <HelperMessage>
@@ -136,10 +163,39 @@ class Editor extends React.Component<any, any> {
                   </React.Fragment>
                 )}
               </Field>
+              <Field name="resourceType" label="Resource Type">
+                {({ fieldProps }: any) => (
+                  <React.Fragment>
+                    <Select {...fieldProps}
+                      options={resourceTypes.map(t =>
+                        ({ label: t.name, value: t.name, list: t.list }))}
+                      isSearchable={true}
+                      placeholder="Choose a Type"
+                      onChange={(e) => {
+                        fieldProps.onChange(e);
+                        this.setResourceType(
+                          form.getValues().resourceType && form.getValues().resourceType.value);
+                      }}
+                    />
+                    <HelperMessage>
+                      The resource type.
+                    </HelperMessage>
+                  </React.Fragment>
+                )}
+              </Field>
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
-                    <TextField {...fieldProps} />
+                    {this.state.region && this.state.resourceType && (
+                      <AsyncSelect {...fieldProps} defaultOptions loadOptions={() =>
+                        form.getValues().resourceType.list(
+                          this.state.region, this.props.settingsStore.awsCredentials)} />
+                    )}
+
+                    {(!this.state.region || !this.state.resourceType) && (
+                      <TextField {...fieldProps} />
+                    )}
+
                     {!error && (
                       <HelperMessage>
                         A resource ID can be an EC2 instance ID or a Lambda function ARN.
@@ -155,7 +211,7 @@ class Editor extends React.Component<any, any> {
               </Field>
 
               <FormFooter>
-                <Button type="submit" appearance="primary" isLoading={submitting}>
+                <Button type="submit" appearance="primary" isLoading={form.submitting}>
                   Describe
                 </Button>
               </FormFooter>
