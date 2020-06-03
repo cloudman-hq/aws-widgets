@@ -7,6 +7,10 @@
     "url": "https://www.zenuml.com/"
   },
   "baseUrl": "https://will.be.replaced.web.app/",
+  "lifecycle": {
+    "installed": "/installed",
+    "uninstalled": "/uninstalled"
+  },
   "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",
