@@ -18,7 +18,7 @@ exports.installedEndpoint = functions.https.onRequest((request, response) => {
 
 exports.uninstalledEndpoint = functions.https.onRequest((request, response) => {
   console.log('request.body.baseUrl:', request.body.baseUrl);
-  store.append('Sheet1', [
+  store.append('AWSWidgets', [
     {
       DateTime: new Date().toLocaleString('en-AU'),
       ClientSite: request.body.baseUrl,
