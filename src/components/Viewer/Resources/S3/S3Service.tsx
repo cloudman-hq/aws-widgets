@@ -45,11 +45,26 @@ export class S3Service {
         value => value.Rules.map(rule => rule.ID),
         () => []);
   }
+
   async s3GetBucketPolicy(bucketName: BucketName): Promise<string> {
     return this.s3.getBucketPolicy({ Bucket: bucketName })
       .promise()
       .then(
         value => value.Policy,
         error => error.message);
+  }
+
+  async s3GetBucketTagging(bucketName: BucketName): Promise<Map<string, string>> {
+    return this.s3.getBucketTagging({ Bucket: bucketName })
+      .promise()
+      .then(
+        (value) => {
+          const map = new Map<string, string>();
+          value.TagSet.map((tag) => {
+            map.set(tag.Key, tag.Value);
+          });
+          return map;
+        },
+        error => new Map<string, string>());
   }
 }
