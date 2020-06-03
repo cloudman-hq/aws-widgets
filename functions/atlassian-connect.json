@@ -1,7 +1,7 @@
 {
   "key": "com.aws.widget.confluence-addon",
   "name": "AWS Widgets",
-  "description": "Live document for your AWS resources.",
+  "description": "AWS Dashboard on Confluence.",
   "vendor": {
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
