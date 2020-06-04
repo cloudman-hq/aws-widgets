@@ -55,7 +55,7 @@ class SettingsStore {
     return new Promise(
       (resolve, reject) => {
         if (!(window as any).AP) {
-          reject('AP is not defined. This method can only run on a Confluence page.');
+          resolve('AP is not defined. This must be a testing page.');
         } else {
           // tslint:disable-next-line: no-console
           console.log('Saving credentials.');
