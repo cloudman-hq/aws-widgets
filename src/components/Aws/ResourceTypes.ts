@@ -36,6 +36,33 @@ export default
       }),
     },
     // { name: 'S3', list: () => new Promise(() => { }) },
-    // { name: 'ECS', list: () => new Promise(() => { }) },
-    // { name: 'Dynamodb', list: () => new Promise(() => { }) },
+    {
+      name: 'ECS', list: (region: string, credentials: any) => new Promise((resolv, reject) => {
+        AWS.config.credentials = credentials;
+        AWS.config.region = region;
+        new AWS.ECS().listClusters({}, (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolv(data.clusterArns.map((c: any) =>
+              ({ label: c, value: c })));
+          }
+        });
+      }),
+    },
+    {
+      name: 'Dynamodb', list: (region: string, credentials: any) =>
+        new Promise((resolv, reject) => {
+          AWS.config.credentials = credentials;
+          AWS.config.region = region;
+          new AWS.DynamoDB().listTables({}, (err: any, data: any) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolv(data.TableNames.map((t: any) =>
+                ({ label: t, value: t })));
+            }
+          });
+        }),
+    },
   ];
