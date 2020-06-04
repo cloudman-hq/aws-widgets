@@ -1,4 +1,5 @@
 import * as React from 'react';
+import EC2 from '../components/Viewer/Resources/EC2'
 import Editor from '../components/Editor'
 import { Provider } from 'mobx-react';
 import RootStore from '../RootStore';
@@ -6,7 +7,8 @@ import Settings from "./Settings";
 
 
 export default {
-  title: 'AWS Widgets',
+  title: 'Demo',
+  component: EC2,
 };
 
 let rootStore = new RootStore();
