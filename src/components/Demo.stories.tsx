@@ -1,13 +1,11 @@
 import * as React from 'react';
-import EC2 from '../components/Viewer/Resources/EC2'
 import Editor from '../components/Editor'
 import { Provider } from 'mobx-react';
 import RootStore from '../RootStore';
 
 
 export default {
-  title: 'Demo',
-  component: EC2,
+  title: 'AWS Widgets',
 };
 
 let rootStore = new RootStore();
@@ -25,7 +23,7 @@ function handleInputChange(event: any) {
   }
 }
 
-export const EditorComponent = () => (
+export const Demo = () => (
   <Provider rootStore={rootStore}>
   <div
     className="bg-white rounded-t-lg overflow-hidden border-t border-l border-r border-gray-400 p-4 px-3 py-10 bg-gray-200 flex justify-center">
