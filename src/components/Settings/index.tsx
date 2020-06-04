@@ -4,15 +4,12 @@ import TextField from '@atlaskit/textfield';
 import Button from '@atlaskit/button';
 import InfoIcon from '@atlaskit/icon/glyph/info';
 
-import { Checkbox } from '@atlaskit/checkbox';
 import Form, {
-  CheckboxField,
   Field,
   FormFooter,
   HelperMessage,
   ErrorMessage,
-  ValidMessage,
-} from '@atlaskit/form';
+  } from '@atlaskit/form';
 
 interface State {
   status: string;
@@ -115,31 +112,12 @@ class Settings extends React.Component<any, State> {
                   value && value.length < 8 ? 'TOO_SHORT' : undefined
                 }
               >
-                {({ fieldProps, error, valid, meta }: any) => (
+                {({ fieldProps }: any) => (
                   <React.Fragment>
                     <TextField {...fieldProps} />
-                    {!error && !valid && (
-                      <HelperMessage>
-                        Use 8 or more characters with a mix of letters, numbers &
-                        symbols.
-                      </HelperMessage>
-                    )}
-                    {error && (
-                      <ErrorMessage>
-                        Password needs to be more than 8 characters.
-                      </ErrorMessage>
-                    )}
-                    {valid && meta.dirty ? (
-                      <ValidMessage>Awesome password!</ValidMessage>
-                    ) : null}
                   </React.Fragment>
                 )}
               </Field>
-              {/*<CheckboxField name="encrypt" label="Encrypt the secret key" defaultIsChecked>*/}
-              {/*  {({ fieldProps }: any) => (*/}
-              {/*    <Checkbox {...fieldProps} label="Encrypt before saving"/>*/}
-              {/*  )}*/}
-              {/*</CheckboxField>*/}
               <HelperMessage>
                 Please keep your access key and secret key safe. We (the vendor of this plugin)
                 do NOT have access those keys.
