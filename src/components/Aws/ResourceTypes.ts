@@ -19,7 +19,22 @@ export default
         });
       }),
     },
-    // { name: 'Lambda', list: () => new Promise(() => { }) },
+    {
+      name: 'Lambda', list: (region: string, credentials: any) => new Promise((resolv, reject) => {
+        AWS.config.credentials = credentials;
+        AWS.config.region = region;
+        const lambda = new AWS.Lambda();
+
+        lambda.listFunctions({}, (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolv(data.Functions.map((f: any) =>
+              ({ label: f.FunctionName, value: f.FunctionArn })));
+          }
+        });
+      }),
+    },
     // { name: 'S3', list: () => new Promise(() => { }) },
     // { name: 'ECS', list: () => new Promise(() => { }) },
     // { name: 'Dynamodb', list: () => new Promise(() => { }) },

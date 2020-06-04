@@ -4,7 +4,7 @@ import ResourceCard from '../../Common/ResourceCard';
 import ResourceStringProperty from '../../Common/ResourceStringProperty';
 import ResourceArrayProperty from '../../Common/ResourceArrayProperty';
 import { S3Service } from './S3Service';
-import ResourceMapProperty from "../../Common/ResourceMapProperty";
+import ResourceMapProperty from '../../Common/ResourceMapProperty';
 
 interface S3State {
   isLoading: boolean;
