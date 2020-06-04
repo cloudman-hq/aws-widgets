@@ -57,16 +57,16 @@ class Editor extends React.Component<any, any> {
     autorun(this.init);
   }
 
-  updateState(diff: any) {
-    let change = diff;
+  updateState(change: any) {
     if (change.region || change.resourceType) {
+      const region = change.region || this.state.region;
       const resourceType = change.resourceType || this.state.resourceType;
-      if (resourceType) {
+      if (region && resourceType) {
         const resourceTypeObj = resourceTypes.find(t => t.name === resourceType);
-        change = Object.assign({}, change, {
-          loadOptions: () =>
-            resourceTypeObj.list(this.state.region, this.props.settingsStore.awsCredentials),
-        });
+        if (resourceTypeObj) {
+          resourceTypeObj.list(region, this.props.settingsStore.awsCredentials)
+            .then(data => this.updateState({ options: data }));
+        }
       }
     }
     this.setState(Object.assign({}, this.state, change));
@@ -198,8 +198,7 @@ class Editor extends React.Component<any, any> {
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
                     {this.state.region && this.state.resourceType && (
-                      <AsyncSelect {...fieldProps}
-                        defaultOptions loadOptions={this.state.loadOptions} />
+                      <Select {...fieldProps} isSearchable={true} options={this.state.options} />
                     )}
 
                     {(!this.state.region || !this.state.resourceType) && (
