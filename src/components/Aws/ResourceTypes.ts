@@ -80,7 +80,18 @@ const resourceTypes =
           }
         });
       }),
-      properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
+      properties: (resourceId: string) => new Promise((resolv, reject) => {
+        new AWS.ECS().describeClusters({ clusters: [resourceId] }, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolv(data.clusters.length && {
+              Name: data.clusters[0].clusterName,
+              Status: data.clusters[0].status,
+            } || {});
+          }
+        });
+      }),
     },
     {
       name: 'Dynamodb',
