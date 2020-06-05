@@ -5,13 +5,22 @@ import { Provider } from 'mobx-react';
 import RootStore from '../RootStore';
 import Settings from "./Settings";
 
-
 export default {
   title: 'Demo',
   component: EC2,
 };
 
-let rootStore = new RootStore();
+const populateFromLocalStorage = (obj: any, key: string) => {
+  const item = localStorage.getItem(key);
+  if (item) {
+    obj[key] = item;
+  }
+}
+
+const rootStore = new RootStore();
+populateFromLocalStorage(rootStore.getSettingsStore(), 'accessKey');
+populateFromLocalStorage(rootStore.getSettingsStore(), 'secretKey');
+
 const containerStyle = {
   display: 'flex'
 };
@@ -19,7 +28,7 @@ export const Demo = () => (
   <Provider rootStore={rootStore}>
     <div style={containerStyle}>
       <Settings />
-      <Editor  />
+      <Editor />
     </div>
   </Provider>
 );
