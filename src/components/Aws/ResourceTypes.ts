@@ -108,7 +108,17 @@ const resourceTypes =
             }
           });
         }),
-      properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
+      properties: (resourceId: string) => new Promise((resolv, reject) => {
+        new AWS.DynamoDB().describeTable({ TableName: resourceId }, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolv(data.Table && {
+              Items: data.Table.ItemCount,
+            } || {});
+          }
+        });
+      }),
     },
   ];
 
