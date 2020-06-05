@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Lambda from './Resources/Lambda';
 import EC2 from './Resources/EC2';
+import Generic from './Resources/Generic';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
@@ -20,6 +21,7 @@ enum ResourceType {
   INITIALISING,
   LAMBDA_FUNCTION,
   EC2,
+  Generic,
 }
 
 interface State {
@@ -60,7 +62,7 @@ class Viewer extends React.Component<any, State> {
       });
     } else {
       this.setState({
-        resourceType: ResourceType.EC2,
+        resourceType: ResourceType.Generic,
       });
     }
   }
@@ -111,6 +113,12 @@ class Viewer extends React.Component<any, State> {
       case ResourceType.EC2:
         resourceCard = (
           <EC2 instanceId={this.props.appStore.resourceId} />
+        );
+        break;
+      case ResourceType.Generic:
+        resourceCard = (
+          <Generic resourceId={this.props.appStore.resourceId}
+            resourceType={this.props.appStore.resourceType} />
         );
         break;
     }

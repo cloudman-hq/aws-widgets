@@ -86,6 +86,7 @@ class Editor extends React.Component<any, any> {
 
     const resourceId = data.resourceId.value || data.resourceId;
     this.props.appStore.setResourceId(resourceId);
+    this.props.appStore.setResourceType(this.state.resourceType);
     this.state.macroBodyProperty.value.resourceId = resourceId;
 
     this.updateState({ macroBodyProperty: this.state.macroBodyProperty });

@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
-export default
+
+const resourceTypes =
   [
     {
       name: 'EC2',
@@ -18,9 +19,37 @@ export default
           }
         });
       }),
+      properties: (resourceId: string) => new Promise((resolv, reject) => {
+        const params = { InstanceIds: [resourceId] };
+        new AWS.EC2().describeInstances(params, (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            const instance: any = data.Reservations[0].Instances[0];
+            const instanceState = instance.State.Name;
+            const availabilityZone = instance.Placement.AvailabilityZone;
+            const securityGroups = instance.SecurityGroups
+              && instance.SecurityGroups.map((g: any) => g.GroupName) || [];
+            resolv({
+              Name: resourceId,
+              State: instanceState,
+              Type: instance.InstanceType,
+              Storage: instance.RootDeviceType,
+              AZ: availabilityZone,
+              Key: instance.KeyName,
+              IAM: instance.IamInstanceProfile && instance.IamInstanceProfile.Arn,
+              SGs: securityGroups,
+              PrivateIp: instance.PrivateIpAddress,
+              PublicDns: instance.PublicDnsName,
+              Tags: instance.Tags && instance.Tags.map((t: any) => `${t.Key}: ${t.Value}`),
+            });
+          }
+        });
+      }),
     },
     {
-      name: 'Lambda', list: (region: string, credentials: any) => new Promise((resolv, reject) => {
+      name: 'Lambda',
+      list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
         const lambda = new AWS.Lambda();
@@ -34,10 +63,12 @@ export default
           }
         });
       }),
+      properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
     },
     // { name: 'S3', list: () => new Promise(() => { }) },
     {
-      name: 'ECS', list: (region: string, credentials: any) => new Promise((resolv, reject) => {
+      name: 'ECS',
+      list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
         new AWS.ECS().listClusters({}, (err: any, data: any) => {
@@ -49,9 +80,11 @@ export default
           }
         });
       }),
+      properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
     },
     {
-      name: 'Dynamodb', list: (region: string, credentials: any) =>
+      name: 'Dynamodb',
+      list: (region: string, credentials: any) =>
         new Promise((resolv, reject) => {
           AWS.config.credentials = credentials;
           AWS.config.region = region;
@@ -64,5 +97,10 @@ export default
             }
           });
         }),
+      properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
     },
   ];
+
+export const findByName = (name: string) => resourceTypes.find(t => t.name === name);
+
+export default resourceTypes;
