@@ -1,4 +1,5 @@
-import { observable, action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
+import { ResourceType } from '../Viewer/Resources';
 
 class AppStore {
   @observable appName = '';
@@ -15,6 +16,11 @@ class AppStore {
 
   @computed get isLambda() {
     return this.resourceId.indexOf('arn:aws:lambda') === 0;
+  }
+
+  @computed get getResourceType() {
+    if (this.isLambda) return ResourceType.LAMBDA_FUNCTION;
+    return ResourceType.Generic;
   }
 
   @action public setAppName(name: string) {

@@ -7,22 +7,7 @@ import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import * as AWS from 'aws-sdk';
-
-/**
- * Include the following scenarios:
- * 1. Access not setup - ACCESS_NOT_SETUP
- * 2. Access keys not valid - ACCESS_NOT_VALID
- * 3. Resource ID not provided - RESOURCE_ID_NOT_PROVIDED
- * 4. Resource does not exist - RESOURCE_DOES_NOT_EXIST
- * then all resources
- */
-enum ResourceType {
-  UNKNOWN,
-  INITIALISING,
-  LAMBDA_FUNCTION,
-  EC2,
-  Generic,
-}
+import { ResourceType } from './Resources';
 
 interface State {
   resourceType: ResourceType;
@@ -56,15 +41,9 @@ class Viewer extends React.Component<any, State> {
     AWS.config.credentials = this.props.settingsStore.awsCredentials;
     AWS.config.region = this.props.appStore.region;
 
-    if (this.props.appStore.isLambda) {
-      this.setState({
-        resourceType: ResourceType.LAMBDA_FUNCTION,
-      });
-    } else {
-      this.setState({
-        resourceType: ResourceType.Generic,
-      });
-    }
+    this.setState({
+      resourceType: this.props.appStore.getResourceType,
+    });
   }
 
   render() {
