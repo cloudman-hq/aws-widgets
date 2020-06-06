@@ -3,7 +3,7 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceStringProperty from '../../Common/ResourceStringProperty';
-import { findByName } from '../../../Aws/ResourceTypes';
+import resourceTypes, { findByName } from '../../../Aws/ResourceTypes';
 
 // props: resourceType: string, resourceId: string
 @observer
@@ -23,9 +23,11 @@ class GenericComponent extends React.Component<any, any> {
 
   async describe() {
     const resourceType = findByName(this.props.resourceType);
-    this.setState({ isLoading: true });
-    const properties = await resourceType.properties(this.props.resourceId);
-    this.setState({ properties, isLoading: false });
+    if (resourceType) {
+      this.setState({ isLoading: true });
+      const properties = await resourceType.properties(this.props.resourceId);
+      this.setState({ properties, isLoading: false });
+    }
   }
 
   render() {

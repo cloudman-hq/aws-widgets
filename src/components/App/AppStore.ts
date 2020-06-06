@@ -1,4 +1,5 @@
 import { observable, action, computed } from 'mobx';
+import { findByResourceId } from '../Aws/ResourceTypes';
 
 class AppStore {
   @observable appName = '';
@@ -23,6 +24,10 @@ class AppStore {
 
   @action public setResourceId(id: string) {
     this.resourceId = id;
+    const type = findByResourceId(id);
+    if (type) {
+      this.setResourceType(type.name);
+    }
   }
 
   @action public setResourceType(type: string) {

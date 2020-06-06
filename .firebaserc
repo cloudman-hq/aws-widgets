@@ -1,6 +1,7 @@
 {
   "projects": {
     "prod": "awswidgets",
-    "stage": "awswidgets-stg"
+    "stage": "awswidgets-stg",
+    "yanhui": "aws-widget"
   }
 }

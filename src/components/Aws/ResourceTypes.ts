@@ -4,6 +4,7 @@ const resourceTypes =
   [
     {
       name: 'EC2',
+      keywordInResourceId: 'i-',
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
@@ -25,30 +26,33 @@ const resourceTypes =
           if (err) {
             reject(err);
           } else {
-            const instance: any = data.Reservations[0].Instances[0];
-            const instanceState = instance.State.Name;
-            const availabilityZone = instance.Placement.AvailabilityZone;
-            const securityGroups = instance.SecurityGroups
-              && instance.SecurityGroups.map((g: any) => g.GroupName) || [];
-            resolv({
-              Name: resourceId,
-              State: instanceState,
-              Type: instance.InstanceType,
-              Storage: instance.RootDeviceType,
-              AZ: availabilityZone,
-              Key: instance.KeyName,
-              IAM: instance.IamInstanceProfile && instance.IamInstanceProfile.Arn,
-              SGs: securityGroups,
-              PrivateIp: instance.PrivateIpAddress,
-              PublicDns: instance.PublicDnsName,
-              Tags: instance.Tags && instance.Tags.map((t: any) => `${t.Key}: ${t.Value}`),
-            });
+            const convert = (instance: any) => {
+              const instanceState = instance.State.Name;
+              const availabilityZone = instance.Placement.AvailabilityZone;
+              const securityGroups = instance.SecurityGroups
+                && instance.SecurityGroups.map((g: any) => g.GroupName) || [];
+              return {
+                Name: resourceId,
+                State: instanceState,
+                Type: instance.InstanceType,
+                Storage: instance.RootDeviceType,
+                AZ: availabilityZone,
+                Key: instance.KeyName,
+                IAM: instance.IamInstanceProfile && instance.IamInstanceProfile.Arn,
+                SGs: securityGroups,
+                PrivateIp: instance.PrivateIpAddress,
+                PublicDns: instance.PublicDnsName,
+              };
+            };
+            resolv(data.Reservations.length &&
+              convert(data.Reservations[0].Instances[0]) || {});
           }
         });
       }),
     },
     {
       name: 'Lambda',
+      keywordInResourceId: 'arn:aws:lambda',
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
@@ -68,6 +72,7 @@ const resourceTypes =
     // { name: 'S3', list: () => new Promise(() => { }) },
     {
       name: 'ECS',
+      keywordInResourceId: 'arn:aws:',
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
@@ -95,6 +100,7 @@ const resourceTypes =
     },
     {
       name: 'Dynamodb',
+      keywordInResourceId: 'arn:aws:dynamodb',
       list: (region: string, credentials: any) =>
         new Promise((resolv, reject) => {
           AWS.config.credentials = credentials;
@@ -123,5 +129,7 @@ const resourceTypes =
   ];
 
 export const findByName = (name: string) => resourceTypes.find(t => t.name === name);
+export const findByResourceId = (resourceId: string) =>
+  resourceTypes.find(t => resourceId.includes(t.keywordInResourceId));
 
 export default resourceTypes;
