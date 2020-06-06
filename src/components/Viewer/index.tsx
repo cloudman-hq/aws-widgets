@@ -8,7 +8,7 @@ import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import * as AWS from 'aws-sdk';
 import { ResourceType } from './Resources';
-import S3Component from "./Resources/S3";
+import S3Component from './Resources/S3';
 
 interface State {
   resourceType: ResourceType;
