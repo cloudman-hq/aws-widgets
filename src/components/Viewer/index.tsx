@@ -41,15 +41,9 @@ class Viewer extends React.Component<any, State> {
     AWS.config.credentials = this.props.settingsStore.awsCredentials;
     AWS.config.region = this.props.appStore.region;
 
-    if (this.props.appStore.isLambda) {
-      this.setState({
-        resourceType: ResourceType.LAMBDA_FUNCTION,
-      });
-    } else {
-      this.setState({
-        resourceType: ResourceType.Generic,
-      });
-    }
+    this.setState({
+      resourceType: this.props.appStore.getResourceType,
+    });
   }
 
   render() {
