@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx';
-import { ResourceType } from "../Viewer/Resources";
+import { ResourceType } from '../Viewer/Resources';
 
 class AppStore {
   @observable appName = '';
