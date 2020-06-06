@@ -5,6 +5,7 @@ import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
 import { decrypt } from './shared';
 import { loadMacro } from '../Macro';
+import { findByResourceId } from '../Aws/ResourceTypes';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -29,9 +30,11 @@ class App extends React.Component<any, any> {
 
     if (body) {
       const resourceId = body.resourceId || '';
+      const resourceType = body.resourceType || findByResourceId(resourceId)?.name || '';
       const region = body.region || '';
       this.props.appStore.setRegion(region);
       this.props.appStore.setResourceId(resourceId);
+      this.props.appStore.setResourceType(resourceType);
     }
   }
 
