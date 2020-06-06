@@ -11,6 +11,7 @@ import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
 import regions from '../Aws/Regions';
 import resourceTypes from '../Aws/ResourceTypes';
+import Spinner from '@atlaskit/spinner';
 
 const saveMacroToAP = saveMacro(AP);
 
@@ -64,8 +65,9 @@ class Editor extends React.Component<any, any> {
       if (region && resourceType) {
         const resourceTypeObj = resourceTypes.find(t => t.name === resourceType);
         if (resourceTypeObj) {
+          change.isLoading = true;
           resourceTypeObj.list(region, this.props.settingsStore.awsCredentials)
-            .then(data => this.updateState({ options: data }));
+            .then(data => this.updateState({ options: data, isLoading: false }));
         }
       }
     }
@@ -199,9 +201,11 @@ class Editor extends React.Component<any, any> {
               <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
+
                     {this.state.region && this.state.resourceType && (
                       <Select {...fieldProps} isSearchable={true} options={this.state.options} />
                     )}
+                    {this.state.isLoading ? <Spinner size="medium" /> : ''}
 
                     {(!this.state.region || !this.state.resourceType) && (
                       <TextField {...fieldProps} />
