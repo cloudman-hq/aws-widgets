@@ -20,6 +20,7 @@ class AppStore {
 
   @computed get getResourceType() {
     if (this.isLambda) return ResourceType.LAMBDA_FUNCTION;
+    if (this.resourceId.indexOf('arn:aws:s3') === 0) return ResourceType.S3;
     return ResourceType.Generic;
   }
 
