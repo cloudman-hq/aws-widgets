@@ -16,7 +16,7 @@ interface S3State {
   tags: Map<string, string>;
 }
 
-class S3Component extends React.Component<any, S3State> {
+class S3Viewer extends React.Component<any, S3State> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -78,4 +78,4 @@ class S3Component extends React.Component<any, S3State> {
   }
 }
 
-export default S3Component;
+export default S3Viewer;
