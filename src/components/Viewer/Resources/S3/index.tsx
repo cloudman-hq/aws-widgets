@@ -70,9 +70,9 @@ class S3Viewer extends React.Component<any, S3State> {
         <ResourceStringProperty name="Name" value={this.props.resourceId}/>
         <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
         <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
-        <ResourceArrayProperty name="IsEncrypted" array={this.state.lifecycleRuleIds}/>
+        <ResourceArrayProperty name="LifecycleRules" array={this.state.lifecycleRuleIds}/>
         <ResourceStringProperty name="Policy" value={this.state.policy}/>
-        <ResourceMapProperty name="Policy" map={this.state.tags}/>
+        <ResourceMapProperty name="Tags" map={this.state.tags}/>
       </ResourceCard>
     );
   }
