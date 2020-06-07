@@ -24,6 +24,13 @@ class AppStore {
     return ResourceType.Generic;
   }
 
+  @computed get getS3BucketName() {
+    if (this.resourceId.startsWith('arn:aws:s3')) {
+      return this.resourceId.replace('arn:aws:s3:::', '');
+    }
+    return '';
+  }
+
   @action public setAppName(name: string) {
     this.appName = name;
   }

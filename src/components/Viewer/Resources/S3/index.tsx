@@ -44,11 +44,11 @@ class S3Viewer extends React.Component<any, S3State> {
   private async loadProperties() {
     const s3Service = new S3Service();
     this.setState({
-      isPublic: await s3Service.s3GetIsPublic(this.props.resourceId),
-      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.resourceId),
-      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.resourceId),
-      policy: await s3Service.s3GetBucketPolicy(this.props.resourceId),
-      tags: await s3Service.s3GetBucketTagging(this.props.resourceId),
+      isPublic: await s3Service.s3GetIsPublic(this.props.bucketName),
+      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.bucketName),
+      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.bucketName),
+      policy: await s3Service.s3GetBucketPolicy(this.props.bucketName),
+      tags: await s3Service.s3GetBucketTagging(this.props.bucketName),
     });
   }
 

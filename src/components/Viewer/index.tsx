@@ -103,7 +103,7 @@ class Viewer extends React.Component<any, State> {
         break;
       case ResourceType.S3:
         resourceCard = (
-          <S3Viewer resourceId={this.props.appStore.resourceId} />
+          <S3Viewer bucketName={this.props.appStore.getS3BucketName} />
         );
         break;
     }
