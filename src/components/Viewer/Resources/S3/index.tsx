@@ -67,7 +67,7 @@ class S3Viewer extends React.Component<any, S3State> {
   render() {
     return (
       <ResourceCard title="S3" isLoading={this.state.isLoading}>
-        <ResourceStringProperty name="Name" value={this.props.resourceId}/>
+        <ResourceStringProperty name="Name" value={this.props.bucketName}/>
         <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
         <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
         <ResourceArrayProperty name="LifecycleRules" array={this.state.lifecycleRuleIds}/>
