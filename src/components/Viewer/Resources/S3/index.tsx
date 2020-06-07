@@ -44,11 +44,11 @@ class S3Viewer extends React.Component<any, S3State> {
   private async loadProperties() {
     const s3Service = new S3Service();
     this.setState({
-      isPublic: await s3Service.s3GetIsPublic(this.props.instanceId),
-      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.instanceId),
-      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.instanceId),
-      policy: await s3Service.s3GetBucketPolicy(this.props.instanceId),
-      tags: await s3Service.s3GetBucketTagging(this.props.instanceId),
+      isPublic: await s3Service.s3GetIsPublic(this.props.resourceId),
+      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.resourceId),
+      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.resourceId),
+      policy: await s3Service.s3GetBucketPolicy(this.props.resourceId),
+      tags: await s3Service.s3GetBucketTagging(this.props.resourceId),
     });
   }
 
@@ -67,7 +67,7 @@ class S3Viewer extends React.Component<any, S3State> {
   render() {
     return (
       <ResourceCard title="S3" isLoading={this.state.isLoading}>
-        <ResourceStringProperty name="Name" value={this.props.instanceId}/>
+        <ResourceStringProperty name="Name" value={this.props.resourceId}/>
         <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
         <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
         <ResourceArrayProperty name="IsEncrypted" array={this.state.lifecycleRuleIds}/>
