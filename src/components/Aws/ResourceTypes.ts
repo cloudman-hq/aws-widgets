@@ -69,7 +69,20 @@ const resourceTypes =
       }),
       properties: (resourceId: string) => new Promise((resolv, reject) => resolv({})),
     },
-    // { name: 'S3', list: () => new Promise(() => { }) },
+    {
+      name: 'S3',
+      properties: (resourceId: string) => new Promise((resolv, reject) => {
+        new AWS.S3().listObjects({ Bucket: resourceId }, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolv({
+              Files: data.Contents?.map(f => f.Key).join(', '),
+            });
+          }
+        });
+      }),
+    },
     {
       name: 'ECS',
       keywordInResourceId: 'arn:aws:',

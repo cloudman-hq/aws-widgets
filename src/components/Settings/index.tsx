@@ -95,11 +95,6 @@ class Settings extends React.Component<any, State> {
                         We recommend that you give READONLY permission to it.
                       </HelperMessage>
                     )}
-                    {error && (
-                      <ErrorMessage>
-                        This user name is already in use, try another one.
-                      </ErrorMessage>
-                    )}
                   </React.Fragment>
                 )}
               </Field>

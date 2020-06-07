@@ -64,7 +64,7 @@ class Editor extends React.Component<any, any> {
       const resourceType = change.resourceType || this.state.resourceType;
       if (region && resourceType) {
         const resourceTypeObj = resourceTypes.find(t => t.name === resourceType);
-        if (resourceTypeObj) {
+        if (resourceTypeObj && resourceTypeObj.list) {
           change.isLoading = true;
           resourceTypeObj.list(region, this.props.settingsStore.awsCredentials)
             .then(data => this.updateState({ options: data, isLoading: false }));
@@ -202,14 +202,16 @@ class Editor extends React.Component<any, any> {
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
 
-                    {this.state.region && this.state.resourceType && (
-                      <Select {...fieldProps} isSearchable={true} options={this.state.options} />
-                    )}
+                    {this.state.region && form.getValues().resourceType &&
+                      form.getValues().resourceType.list && (
+                        <Select {...fieldProps} isSearchable={true} options={this.state.options} />
+                      )}
                     {this.state.isLoading ? <Spinner size="medium" /> : ''}
 
-                    {(!this.state.region || !this.state.resourceType) && (
-                      <TextField {...fieldProps} />
-                    )}
+                    {(!this.state.region || !form.getValues().resourceType ||
+                      !form.getValues().resourceType.list) && (
+                        <TextField {...fieldProps} />
+                      )}
 
                     {!error && (
                       <HelperMessage>
