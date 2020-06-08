@@ -2,6 +2,7 @@
   "projects": {
     "prod": "awswidgets",
     "stage": "awswidgets-stg",
-    "yanhui": "aws-widget"
+    "yanhui": "aws-widget",
+    "default": "awswidgets"
   }
 }
