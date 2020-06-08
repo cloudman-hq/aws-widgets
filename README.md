@@ -2,6 +2,8 @@
 
 # Deployment
 ##Staging
+
+### From your local
 * Command: `yarn deploy:stage`
 * [Staging Test Page](https://awswidgets-stg.atlassian.net/wiki/spaces/AWS/pages/65686/Test+AWS+Widgets).
 

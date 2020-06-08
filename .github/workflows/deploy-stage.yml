@@ -25,4 +25,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install && yarn build
-      - run: yarn deploy:staging --token ${{ secrets.FIREBASE_TOKEN }}
+      - run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}
