@@ -9,7 +9,7 @@ interface Props {
 const ResourceListProperty: React.FunctionComponent<Props> = (props) => {
   return <PropertyListWrapper>
     <h5>{props.name}:</h5>
-    {props.value?.map((t: any) => (<span key={t.Key}>{t.Key}: {t.Value}</span>))}
+    {props.value?.map((t: any) => (<span key={t} title={t}>{t}</span>))}
   </PropertyListWrapper>;
 };
 

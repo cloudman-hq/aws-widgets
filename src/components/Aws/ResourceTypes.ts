@@ -42,7 +42,7 @@ const resourceTypes =
                 SGs: securityGroups.join(', '),
                 PrivateIp: instance.PrivateIpAddress,
                 PublicDns: instance.PublicDnsName,
-                Tags: instance.Tags,
+                Tags: instance.Tags && instance.Tags.map((t: any) => `${t.Key}: ${t.Value}`),
               };
             };
             resolv(data.Reservations.length &&
