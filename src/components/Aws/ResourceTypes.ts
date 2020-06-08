@@ -39,9 +39,10 @@ const resourceTypes =
                 AZ: availabilityZone,
                 Key: instance.KeyName,
                 IAM: instance.IamInstanceProfile && instance.IamInstanceProfile.Arn,
-                SGs: securityGroups,
+                SGs: securityGroups.join(', '),
                 PrivateIp: instance.PrivateIpAddress,
                 PublicDns: instance.PublicDnsName,
+                Tags: instance.Tags,
               };
             };
             resolv(data.Reservations.length &&

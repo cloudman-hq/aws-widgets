@@ -52,10 +52,30 @@ const PropertyWrapper = styled.div`
   }
 `;
 
+const PropertyListWrapper = styled.div`
+  width: 100%;
+  & h5{
+    display: inline-block;
+    width: 6em;
+  }
+  & span{
+    font-size: 0.9em;
+    display: inline-block;
+    width: 290px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+  }
+  & span:nth-of-type(n+2) {
+    margin-left: 72px;
+  }
+`;
+
 export {
   CardWrapper,
   CardTitle,
   CardIcon,
   CardContent,
   PropertyWrapper,
+  PropertyListWrapper,
 };

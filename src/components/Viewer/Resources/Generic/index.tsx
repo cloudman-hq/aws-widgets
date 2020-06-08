@@ -3,6 +3,7 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceStringProperty from '../../Common/ResourceStringProperty';
+import ResourceListProperty from '../../Common/ResourceListProperty';
 import resourceTypes, { findByName } from '../../../Aws/ResourceTypes';
 
 // props: resourceType: string, resourceId: string
@@ -30,12 +31,19 @@ class GenericComponent extends React.Component<any, any> {
     }
   }
 
+  renderProperty(key: string, value: any) {
+    const isArray = value instanceof Array;
+    if (isArray) {
+      return (<ResourceListProperty name={key} value={value} />);
+    }
+    return (<ResourceStringProperty name={key} value={value} />);
+  }
+
   render() {
     return (
       <ResourceCard title={this.props.resourceType} isLoading={this.state.isLoading}>
         {Object.keys(this.state.properties).map(p =>
-          <ResourceStringProperty name={p} value={this.state.properties[p]} key={p} />,
-        )}
+          this.renderProperty(p, this.state.properties[p]))}
       </ResourceCard>
     );
   }
