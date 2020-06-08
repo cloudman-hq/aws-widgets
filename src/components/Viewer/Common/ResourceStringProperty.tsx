@@ -9,7 +9,7 @@ interface Props {
 const ResourceStringProperty: React.FunctionComponent<Props> = (props) => {
   return <PropertyWrapper>
     <h5>{props.name}:</h5>
-    <span>{props.value}</span>
+    <span title={props.value}>{props.value}</span>
   </PropertyWrapper>;
 };
 

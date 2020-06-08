@@ -43,7 +43,12 @@ const PropertyWrapper = styled.div`
     width: 6em;
   }
   & span{
-    font-size: 0.9em
+    font-size: 0.9em;
+    display: inline-block;
+    width: 290px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
   }
 `;
 
