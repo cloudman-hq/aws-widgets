@@ -98,6 +98,7 @@
     "react-router-dom": "^5.1.2",
     "rxjs": "^6.5.5",
     "styled-components": "^5.0.1",
+    "stein-js-client": "^0.0.2",
     "uuid": "^7.0.3"
   },
   "browserslist": {
