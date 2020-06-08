@@ -88,6 +88,7 @@
     "@types/uuid": "^7.0.3",
     "aws-sdk": "^2.654.0",
     "crypto-js": "^4.0.0",
+    "firebase-functions": "^3.3.0",
     "jest-svg-transformer": "^1.0.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
