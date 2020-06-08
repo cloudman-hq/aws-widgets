@@ -67,7 +67,7 @@ const PropertyListWrapper = styled.div`
     text-overflow: ellipsis
   }
   & span:nth-of-type(n+2) {
-    margin-left: 72px;
+    margin-left: 6em;
   }
 `;
 
