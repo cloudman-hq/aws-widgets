@@ -1,5 +1,9 @@
 import * as AWS from 'aws-sdk';
 import ec2logo from './icons/aws-ec2.svg';
+import ecslogo from './icons/ecs.svg';
+import dynamodblogo from './icons/dynamodb.svg';
+import s3logo from './icons/s3.svg';
+import lambdalogo from '../Viewer/Resources/Lambda/AWS-Lambda_Lambda-Function_light-bg_4x.svg';
 
 const resourceTypes =
   [
@@ -56,6 +60,7 @@ const resourceTypes =
     {
       name: 'Lambda',
       keywordInResourceId: 'arn:aws:lambda',
+      icon: lambdalogo,
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
@@ -74,6 +79,7 @@ const resourceTypes =
     },
     {
       name: 'S3',
+      icon: s3logo,
       properties: (resourceId: string) => new Promise((resolv, reject) => {
         new AWS.S3().listObjects({ Bucket: resourceId }, (err, data) => {
           if (err) {
@@ -89,6 +95,7 @@ const resourceTypes =
     {
       name: 'ECS',
       keywordInResourceId: 'arn:aws:',
+      icon: ecslogo,
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
@@ -117,6 +124,7 @@ const resourceTypes =
     {
       name: 'Dynamodb',
       keywordInResourceId: 'arn:aws:dynamodb',
+      icon: dynamodblogo,
       list: (region: string, credentials: any) =>
         new Promise((resolv, reject) => {
           AWS.config.credentials = credentials;
