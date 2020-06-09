@@ -40,7 +40,7 @@ const PropertyWrapper = styled.div`
   width: 100%;
   & h5{
     display: inline-block;
-    width: 6em;
+    width: 80px;
   }
   & span{
     font-size: 0.9em;
@@ -56,7 +56,7 @@ const PropertyListWrapper = styled.div`
   width: 100%;
   & h5{
     display: inline-block;
-    width: 6em;
+    width: 80px;
   }
   & span{
     font-size: 0.9em;
@@ -67,7 +67,7 @@ const PropertyListWrapper = styled.div`
     text-overflow: ellipsis
   }
   & span:nth-of-type(n+2) {
-    margin-left: 6em;
+    margin-left: 80px;
   }
 `;
 
