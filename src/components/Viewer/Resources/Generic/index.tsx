@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import ResourceCard from '../../Common/ResourceCard';
 import ResourceStringProperty from '../../Common/ResourceStringProperty';
 import ResourceListProperty from '../../Common/ResourceListProperty';
-import resourceTypes, { findByName } from '../../../Aws/ResourceTypes';
+import { findByName } from '../../../Aws/ResourceTypes';
 
 // props: resourceType: string, resourceId: string
 @observer
@@ -27,7 +27,7 @@ class GenericComponent extends React.Component<any, any> {
     if (resourceType) {
       this.setState({ isLoading: true });
       const properties = await resourceType.properties(this.props.resourceId);
-      this.setState({ properties, isLoading: false });
+      this.setState({ properties, icon: resourceType.icon, isLoading: false });
     }
   }
 
@@ -41,7 +41,8 @@ class GenericComponent extends React.Component<any, any> {
 
   render() {
     return (
-      <ResourceCard title={this.props.resourceType} isLoading={this.state.isLoading}>
+      <ResourceCard title={this.props.resourceType}
+        icon={this.state.icon} isLoading={this.state.isLoading}>
         {Object.keys(this.state.properties).map(p =>
           this.renderProperty(p, this.state.properties[p]))}
       </ResourceCard>

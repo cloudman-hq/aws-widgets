@@ -1,10 +1,12 @@
 import * as AWS from 'aws-sdk';
+import ec2logo from './icons/aws-ec2.svg';
 
 const resourceTypes =
   [
     {
       name: 'EC2',
       keywordInResourceId: 'i-',
+      icon: ec2logo,
       list: (region: string, credentials: any) => new Promise((resolv, reject) => {
         AWS.config.credentials = credentials;
         AWS.config.region = region;
