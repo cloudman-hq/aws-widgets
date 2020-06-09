@@ -14,4 +14,5 @@ export enum ResourceType {
   LAMBDA_FUNCTION,
   EC2,
   Generic,
+  S3,
 }

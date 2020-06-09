@@ -20,7 +20,15 @@ class AppStore {
 
   @computed get getResourceType() {
     if (this.isLambda) return ResourceType.LAMBDA_FUNCTION;
+    if (this.resourceId.indexOf('arn:aws:s3') === 0) return ResourceType.S3;
     return ResourceType.Generic;
+  }
+
+  @computed get getS3BucketName() {
+    if (this.resourceId.startsWith('arn:aws:s3')) {
+      return this.resourceId.replace('arn:aws:s3:::', '');
+    }
+    return '';
   }
 
   @action public setAppName(name: string) {

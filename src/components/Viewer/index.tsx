@@ -8,6 +8,7 @@ import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
 import * as AWS from 'aws-sdk';
 import { ResourceType } from './Resources';
+import S3Viewer from './Resources/S3';
 
 interface State {
   resourceType: ResourceType;
@@ -98,6 +99,11 @@ class Viewer extends React.Component<any, State> {
         resourceCard = (
           <Generic resourceId={this.props.appStore.resourceId}
             resourceType={this.props.appStore.resourceType} />
+        );
+        break;
+      case ResourceType.S3:
+        resourceCard = (
+          <S3Viewer bucketName={this.props.appStore.getS3BucketName} />
         );
         break;
     }

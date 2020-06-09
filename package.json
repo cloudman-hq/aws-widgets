@@ -45,6 +45,8 @@
     "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
     "file-loader": "^6.0.0",
+    "firebase": "^5.5.8",
+    "firebase-tools": "^8.0.3",
     "fork-ts-checker-webpack-plugin": "^4.1.2",
     "git-revision-webpack-plugin": "^3.0.6",
     "html-webpack-plugin": "^4.0.4",
@@ -86,6 +88,8 @@
     "@types/uuid": "^7.0.3",
     "aws-sdk": "^2.654.0",
     "crypto-js": "^4.0.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.3.0",
     "jest-svg-transformer": "^1.0.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
@@ -94,6 +98,7 @@
     "react-router-dom": "^5.1.2",
     "rxjs": "^6.5.5",
     "styled-components": "^5.0.1",
+    "stein-js-client": "^0.0.2",
     "uuid": "^7.0.3"
   },
   "browserslist": {

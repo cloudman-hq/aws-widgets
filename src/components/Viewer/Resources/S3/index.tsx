@@ -16,7 +16,7 @@ interface S3State {
   tags: Map<string, string>;
 }
 
-class S3Component extends React.Component<any, S3State> {
+class S3Viewer extends React.Component<any, S3State> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -44,11 +44,11 @@ class S3Component extends React.Component<any, S3State> {
   private async loadProperties() {
     const s3Service = new S3Service();
     this.setState({
-      isPublic: await s3Service.s3GetIsPublic(this.props.instanceId),
-      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.instanceId),
-      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.instanceId),
-      policy: await s3Service.s3GetBucketPolicy(this.props.instanceId),
-      tags: await s3Service.s3GetBucketTagging(this.props.instanceId),
+      isPublic: await s3Service.s3GetIsPublic(this.props.bucketName),
+      isEncrypted: await s3Service.s3GetIsEncrypted(this.props.bucketName),
+      lifecycleRuleIds: await s3Service.s3GetBucketLifecycleConfiguration(this.props.bucketName),
+      policy: await s3Service.s3GetBucketPolicy(this.props.bucketName),
+      tags: await s3Service.s3GetBucketTagging(this.props.bucketName),
     });
   }
 
@@ -67,15 +67,15 @@ class S3Component extends React.Component<any, S3State> {
   render() {
     return (
       <ResourceCard title="S3" isLoading={this.state.isLoading}>
-        <ResourceStringProperty name="Name" value={this.props.instanceId}/>
+        <ResourceStringProperty name="Name" value={this.props.bucketName}/>
         <ResourceStringProperty name="IsPublic" value={this.state.isPublic}/>
         <ResourceStringProperty name="IsEncrypted" value={this.state.isEncrypted}/>
-        <ResourceArrayProperty name="IsEncrypted" array={this.state.lifecycleRuleIds}/>
+        <ResourceArrayProperty name="LifecycleRules" array={this.state.lifecycleRuleIds}/>
         <ResourceStringProperty name="Policy" value={this.state.policy}/>
-        <ResourceMapProperty name="Policy" map={this.state.tags}/>
+        <ResourceMapProperty name="Tags" map={this.state.tags}/>
       </ResourceCard>
     );
   }
 }
 
-export default S3Component;
+export default S3Viewer;
