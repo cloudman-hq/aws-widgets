@@ -5,6 +5,10 @@ import dynamodblogo from './icons/dynamodb.svg';
 import s3logo from './icons/s3.svg';
 import lambdalogo from '../Viewer/Resources/Lambda/AWS-Lambda_Lambda-Function_light-bg_4x.svg';
 
+function emptyIfRejected<T>(p: Promise<T>) {
+  return new Promise<T>(resolv => p.then(d => resolv(d), e => resolv(null)));
+}
+
 const resourceTypes =
   [
     {
@@ -80,7 +84,28 @@ const resourceTypes =
     {
       name: 'S3',
       icon: s3logo,
-      properties: (resourceId: string) => new Promise((resolv, reject) => {
+      properties: (resourceId: string) => new Promise(async (resolv, reject) => {
+        const s3 = new AWS.S3();
+        const param = { Bucket: resourceId };
+        try {
+          const [policy, encryption, tagging] = await Promise.all([
+            emptyIfRejected(s3.getBucketPolicyStatus(param).promise()),
+            emptyIfRejected(s3.getBucketEncryption(param).promise()),
+            emptyIfRejected(s3.getBucketTagging(param).promise()),
+          ]);
+          resolv({
+            IsPublic: policy && policy.PolicyStatus?.IsPublic.toString(),
+            Encrypted: encryption && encryption
+              .ServerSideEncryptionConfiguration
+              .Rules[0]
+              .ApplyServerSideEncryptionByDefault
+              .SSEAlgorithm,
+            Tags: tagging && tagging.TagSet.map(t => `${t.Key}: ${t.Value}`),
+          });
+        } catch (err) {
+          reject(err);
+        }
+
         new AWS.S3().listObjects({ Bucket: resourceId }, (err, data) => {
           if (err) {
             reject(err);
