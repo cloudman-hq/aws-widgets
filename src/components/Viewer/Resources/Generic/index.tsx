@@ -34,9 +34,9 @@ class GenericComponent extends React.Component<any, any> {
   renderProperty(key: string, value: any) {
     const isArray = value instanceof Array;
     if (isArray) {
-      return (<ResourceListProperty name={key} value={value} />);
+      return (<ResourceListProperty name={key} value={value} key={key} />);
     }
-    return (<ResourceStringProperty name={key} value={value} />);
+    return (<ResourceStringProperty name={key} value={value} key={key} />);
   }
 
   render() {
