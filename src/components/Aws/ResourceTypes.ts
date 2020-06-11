@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import ec2logo from './icons/aws-ec2.svg';
+import ec2logo from './icons/ec2.svg';
 import ecslogo from './icons/ecs.svg';
 import dynamodblogo from './icons/dynamodb.svg';
 import s3logo from './icons/s3.svg';
