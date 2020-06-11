@@ -1,5 +1,5 @@
 import * as React from 'react';
-import lambdaLogo from './AWS-Lambda_Lambda-Function_light-bg_4x.svg';
+import lambdaLogo from '../../../Aws/icons/lambda.svg';
 import { autorun } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as AWS from 'aws-sdk';

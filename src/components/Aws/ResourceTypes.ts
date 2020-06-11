@@ -3,7 +3,7 @@ import ec2logo from './icons/ec2.svg';
 import ecslogo from './icons/ecs.svg';
 import dynamodblogo from './icons/dynamodb.svg';
 import s3logo from './icons/s3.svg';
-import lambdalogo from '../Viewer/Resources/Lambda/AWS-Lambda_Lambda-Function_light-bg_4x.svg';
+import lambdalogo from './icons/lambda.svg';
 
 const s3CorsLink = 'https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html';
 
