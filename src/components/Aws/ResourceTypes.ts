@@ -94,12 +94,13 @@ const resourceTypes =
             emptyIfRejected(s3.getBucketTagging(param).promise()),
           ]);
           resolv({
-            IsPublic: policy && policy.PolicyStatus?.IsPublic.toString(),
+            Bucket: resourceId,
+            IsPublic: policy && policy.PolicyStatus?.IsPublic.toString() || 'false',
             Encrypted: encryption && encryption
               .ServerSideEncryptionConfiguration
               .Rules[0]
               .ApplyServerSideEncryptionByDefault
-              .SSEAlgorithm,
+              .SSEAlgorithm || 'false',
             Tags: tagging && tagging.TagSet.map(t => `${t.Key}: ${t.Value}`),
           });
         } catch (err) {
@@ -169,6 +170,7 @@ const resourceTypes =
             reject(err);
           } else {
             resolv(data.Table && {
+              Table: resourceId,
               Items: data.Table.ItemCount,
             } || {});
           }
