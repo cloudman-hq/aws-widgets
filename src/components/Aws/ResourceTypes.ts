@@ -5,8 +5,17 @@ import dynamodblogo from './icons/dynamodb.svg';
 import s3logo from './icons/s3.svg';
 import lambdalogo from '../Viewer/Resources/Lambda/AWS-Lambda_Lambda-Function_light-bg_4x.svg';
 
+const s3CorsLink = 'https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html';
+
 function emptyIfRejected<T>(p: Promise<T>) {
-  return new Promise<T>(resolv => p.then(d => resolv(d), e => resolv(null)));
+  return new Promise<T>((resolv, reject) =>
+    p.then(d => resolv(d), (e) => {
+      if (e.toString().includes('NetworkingError')) {
+        reject(e);
+      } else {
+        resolv(null);
+      }
+    }));
 }
 
 const resourceTypes =
@@ -104,18 +113,11 @@ const resourceTypes =
             Tags: tagging && tagging.TagSet.map(t => `${t.Key}: ${t.Value}`),
           });
         } catch (err) {
-          reject(err);
+          resolv({
+            html: `Bucket "${resourceId}" not exist or
+              <a target="_blank" href="${s3CorsLink}">CORS not enabled</a>`,
+          });
         }
-
-        new AWS.S3().listObjects({ Bucket: resourceId }, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolv({
-              Files: data.Contents?.map(f => f.Key).join(', '),
-            });
-          }
-        });
       }),
     },
     {

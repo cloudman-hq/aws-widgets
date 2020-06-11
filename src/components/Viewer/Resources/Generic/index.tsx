@@ -39,12 +39,19 @@ class GenericComponent extends React.Component<any, any> {
     return (<ResourceStringProperty name={key} value={value} key={key} />);
   }
 
+  renderProperties(properties: any) {
+    if (properties.html) {
+      return (<span dangerouslySetInnerHTML={{ __html: properties.html }} />);
+    }
+    return Object.keys(properties).map(p =>
+      this.renderProperty(p, properties[p]));
+  }
+
   render() {
     return (
       <ResourceCard title={this.props.resourceType}
         icon={this.state.icon} isLoading={this.state.isLoading}>
-        {Object.keys(this.state.properties).map(p =>
-          this.renderProperty(p, this.state.properties[p]))}
+        {this.renderProperties(this.state.properties)}
       </ResourceCard>
     );
   }
