@@ -1,5 +1,7 @@
 import * as React from 'react';
-import EC2 from '../components/Viewer/Resources/EC2'
+import ResourceCard from './Viewer/Common/ResourceCard'
+import ec2logo from './Aws/icons/ec2.svg';
+
 import Editor from '../components/Editor'
 import { Provider } from 'mobx-react';
 import RootStore from '../RootStore';
@@ -7,7 +9,7 @@ import Settings from "./Settings";
 
 export default {
   title: 'Demo',
-  component: EC2,
+  component: ResourceCard,
 };
 
 const populateFromLocalStorage = (obj: any, key: string) => {
@@ -33,3 +35,16 @@ export const Demo = () => (
   </Provider>
 );
 
+const isLoading = () => { return true; };
+const isNotLoading = () => { return false; };
+export const ResourceCardLoading = () => (
+  <ResourceCard title="EC2"
+                icon={ec2logo} isLoading= {isLoading()}>
+  </ResourceCard>
+)
+
+export const ResourceCardLoaded = () => (
+  <ResourceCard title="EC2"
+                icon={ec2logo} isLoading={isNotLoading()}>
+  </ResourceCard>
+)
