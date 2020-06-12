@@ -178,7 +178,7 @@ class Editor extends React.Component<any, any> {
                   </React.Fragment>
                 )}
               </Field>
-              <Field name="resourceType" label="Resource Type">
+              <Field name="resourceType" label="Resource Type" isRequired>
                 {({ fieldProps }: any) => (
                   <React.Fragment>
                     <Select {...fieldProps}
@@ -192,9 +192,6 @@ class Editor extends React.Component<any, any> {
                           form.getValues().resourceType && form.getValues().resourceType.value);
                       }}
                     />
-                    <HelperMessage>
-                      The resource type.
-                    </HelperMessage>
                   </React.Fragment>
                 )}
               </Field>
@@ -212,17 +209,6 @@ class Editor extends React.Component<any, any> {
                       !form.getValues().resourceType.list) && (
                         <TextField {...fieldProps} />
                       )}
-
-                    {!error && (
-                      <HelperMessage>
-                        A resource ID can be an EC2 instance ID or a Lambda function ARN.
-                      </HelperMessage>
-                    )}
-                    {error && (
-                      <ErrorMessage>
-                        The above resource cannot be found.
-                      </ErrorMessage>
-                    )}
                   </React.Fragment>
                 )}
               </Field>
