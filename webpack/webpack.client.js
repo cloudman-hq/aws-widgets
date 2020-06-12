@@ -24,7 +24,6 @@ const config = webpackMerge(baseConfig, {
     new CleanWebpackPlugin(),
     new ForkTsCheckerWebpackPlugin(),
     new CopyPlugin([
-      path.join(__dirname, '../public/atlassian-connect.json'),
       path.join(__dirname, '../public/logo192.png'),
       path.join(__dirname, '../public/_redirects'),
     ]),

@@ -3,7 +3,9 @@ import Route from '../Route';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { Switch, withRouter } from 'react-router-dom';
-import { getUrlParam, AP, propertyKey } from './shared';
+import { decrypt } from './shared';
+import { loadMacro } from '../Macro';
+import { findByResourceId } from '../Aws/ResourceTypes';
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -24,20 +26,15 @@ class App extends React.Component<any, any> {
   }
 
   async init() {
-    const uuid = getUrlParam('uuid') || '';
-    // tslint:disable-next-line: no-console
-    console.log('init uuid:', uuid);
+    const body = await loadMacro();
 
-    if (uuid) {
-      const key = propertyKey(uuid);
-      AP.confluence.getContentProperty(key, (property: any) => {
-        // tslint:disable-next-line: no-console
-        console.log(`loaded macro body property: ${JSON.stringify(property)}`);
-        const resourceId = property && property.value && property.value.resourceId || '';
-        const region = property && property.value && property.value.region || '';
-        this.props.appStore.setRegion(region);
-        this.props.appStore.setResourceId(resourceId);
-      });
+    if (body) {
+      const resourceId = body.resourceId || '';
+      const resourceType = body.resourceType || findByResourceId(resourceId)?.name || '';
+      const region = body.region || '';
+      this.props.appStore.setRegion(region);
+      this.props.appStore.setResourceId(resourceId);
+      this.props.appStore.setResourceType(resourceType);
     }
   }
 
@@ -48,8 +45,9 @@ class App extends React.Component<any, any> {
       (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials?jsonValue=true', {
         success: (response: any) => {
           const jsonResponse = JSON.parse(response);
-          this.props.settingsStore.accessKey = jsonResponse.value.accessKey;
-          this.props.settingsStore.secretKey = jsonResponse.value.secretKey;
+          const credential = decrypt(jsonResponse.value);
+          this.props.settingsStore.accessKey = credential.accessKey;
+          this.props.settingsStore.secretKey = credential.secretKey;
         },
         error: (error: any) => {
           // tslint:disable-next-line: no-console

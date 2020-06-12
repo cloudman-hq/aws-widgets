@@ -10,9 +10,13 @@ import Form, {
   HelperMessage,
 } from '@atlaskit/form';
 import TextField from '@atlaskit/textfield/dist/cjs/components/Textfield';
+import Select, { AsyncSelect } from '@atlaskit/select';
 import Button from '@atlaskit/button/dist/cjs/components/Button';
 import { saveMacro } from '../Macro';
 import { AP, propertyKey } from '../App/shared';
+import regions from '../Aws/Regions';
+import resourceTypes from '../Aws/ResourceTypes';
+import Spinner from '@atlaskit/spinner';
 
 const saveMacroToAP = saveMacro(AP);
 
@@ -31,6 +35,16 @@ const registerOnSubmit = (macroData: any, macroBodyProperty: any) => {
     return true;
   });
 };
+
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface FormData {
+  region: Option;
+  resourceId: any;
+}
 
 @inject(({ rootStore }) => ({
   appStore: rootStore.getAppStore(),
@@ -53,11 +67,41 @@ class Editor extends React.Component<any, any> {
     autorun(this.init);
   }
 
-  setRegionAndResourceId(data: any) {
-    this.props.appStore.setRegion(data.region);
-    this.state.macroBodyProperty.value.region = data.region;
-    this.props.appStore.setResourceId(data.resourceId);
-    this.state.macroBodyProperty.value.resourceId = data.resourceId;
+  updateState(change: any) {
+    if (change.region || change.resourceType) {
+      const region = change.region || this.state.region;
+      const resourceType = change.resourceType || this.state.resourceType;
+      if (region && resourceType) {
+        const resourceTypeObj = resourceTypes.find(t => t.name === resourceType);
+        if (resourceTypeObj && resourceTypeObj.list) {
+          change.isLoading = true;
+          resourceTypeObj.list(region, this.props.settingsStore.awsCredentials)
+            .then(data => this.updateState({ options: data, isLoading: false }));
+        }
+      }
+    }
+    this.setState(Object.assign({}, this.state, change));
+  }
+
+  setRegion(region: string) {
+    this.updateState({ region });
+  }
+
+  setResourceType(resourceType: string) {
+    this.updateState({ resourceType });
+  }
+
+  setRegionAndResourceId(data: FormData) {
+    this.props.appStore.setRegion(data.region.value);
+    this.state.macroBodyProperty.value.region = data.region.value;
+
+    const resourceId = data.resourceId.value || data.resourceId;
+    this.props.appStore.setResourceId(resourceId);
+    this.props.appStore.setResourceType(this.state.resourceType);
+    this.state.macroBodyProperty.value.resourceId = resourceId;
+    this.state.macroBodyProperty.value.resourceType = this.state.resourceType;
+
+    this.updateState({ macroBodyProperty: this.state.macroBodyProperty });
   }
 
   async init() {
@@ -111,24 +155,29 @@ class Editor extends React.Component<any, any> {
 
   render() {
     return (
-      <div
-        style={{
-          display: 'flex',
-          width: '400px',
-          maxWidth: '100%',
-          margin: '0 auto',
-          flexDirection: 'column',
-        }}
-      >
-        <Form<{ region: string; resourceId: string }>
-          onSubmit={this.setRegionAndResourceId}
-        >
-          {({ formProps, submitting }: any) => (
-            <form {...formProps}>
-              <Field name="region" label="Region" isRequired defaultValue="">
+      <div style={{
+        display: 'flex',
+        width: '400px',
+        maxWidth: '100%',
+        margin: '0 auto',
+        flexDirection: 'column',
+      }}>
+        <Form<FormData> onSubmit={this.setRegionAndResourceId}>
+          {(form: any) => (
+            <form {...form.formProps}>
+              <Field name="region" label="Region" isRequired>
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
-                    <TextField {...fieldProps} />
+                    <Select {...fieldProps}
+                      options={regions.map(r =>
+                        ({ label: `${r.label} (${r.value})`, value: r.value }))}
+                      isSearchable={true}
+                      placeholder="Choose a Region"
+                      onChange={(e) => {
+                        fieldProps.onChange(e);
+                        this.setRegion(form.getValues().region && form.getValues().region.value);
+                      }}
+                    />
                     {!error && (
                       <HelperMessage>
                         The region where your resource are tied to.
@@ -142,36 +191,43 @@ class Editor extends React.Component<any, any> {
                   </React.Fragment>
                 )}
               </Field>
-              <Field
-                name="resourceId"
-                label="Resource ID"
-                isRequired
-                defaultValue=""
-              >
+              <Field name="resourceType" label="Resource Type" isRequired>
+                {({ fieldProps }: any) => (
+                  <React.Fragment>
+                    <Select {...fieldProps}
+                      options={resourceTypes.map(t =>
+                        ({ label: t.name, value: t.name, list: t.list }))}
+                      isSearchable={true}
+                      placeholder="Choose a Type"
+                      onChange={(e) => {
+                        fieldProps.onChange(e);
+                        this.setResourceType(
+                          form.getValues().resourceType && form.getValues().resourceType.value);
+                      }}
+                    />
+                  </React.Fragment>
+                )}
+              </Field>
+              <Field name="resourceId" label="Resource ID" isRequired defaultValue="">
                 {({ fieldProps, error }: any) => (
                   <React.Fragment>
-                    <TextField {...fieldProps} />
-                    {!error && (
-                      <HelperMessage>
-                        A resource ID can be an EC2 instance ID or a Lambda
-                        function ARN.
-                      </HelperMessage>
-                    )}
-                    {error && (
-                      <ErrorMessage>
-                        The above resource cannot be found.
-                      </ErrorMessage>
-                    )}
+
+                    {this.state.region && form.getValues().resourceType &&
+                      form.getValues().resourceType.list && (
+                        <Select {...fieldProps} isSearchable={true} options={this.state.options} />
+                      )}
+                    {this.state.isLoading ? <Spinner size="medium" /> : ''}
+
+                    {(!this.state.region || !form.getValues().resourceType ||
+                      !form.getValues().resourceType.list) && (
+                        <TextField {...fieldProps} />
+                      )}
                   </React.Fragment>
                 )}
               </Field>
 
               <FormFooter>
-                <Button
-                  type="submit"
-                  appearance="primary"
-                  isLoading={submitting}
-                >
+                <Button type="submit" appearance="primary" isLoading={form.submitting}>
                   Describe
                 </Button>
               </FormFooter>

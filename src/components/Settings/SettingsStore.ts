@@ -1,6 +1,7 @@
 import { observable, computed, action } from 'mobx';
 import { BehaviorSubject } from 'rxjs';
 import * as AWS from 'aws-sdk';
+import { encrypt } from '../App/shared';
 
 const subscribers: any = {
   accessKey$: new BehaviorSubject(''),
@@ -54,7 +55,7 @@ class SettingsStore {
     return new Promise(
       (resolve, reject) => {
         if (!(window as any).AP) {
-          reject('AP is not defined. This method can only run on a Confluence page.');
+          resolve('AP is not defined. This must be a testing page.');
         } else {
           // tslint:disable-next-line: no-console
           console.log('Saving credentials.');
@@ -62,7 +63,7 @@ class SettingsStore {
           (window as any).AP.request('/rest/atlassian-connect/1/addons/com.aws.widget.confluence-addon/properties/aws-credentials', {
             type: 'PUT',
             contentType: 'application/json',
-            data: JSON.stringify({ accessKey: this.accessKey, secretKey: this.secretKey }),
+            data: encrypt({ accessKey: this.accessKey, secretKey: this.secretKey }),
             success: (response: any) => {
               // tslint:disable-next-line: no-console
               console.log(response);

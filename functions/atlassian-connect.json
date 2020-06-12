@@ -1,12 +1,16 @@
 {
   "key": "com.aws.widget.confluence-addon",
   "name": "AWS Widgets",
-  "description": "Live document for your AWS resources.",
+  "description": "AWS Dashboard on Confluence.",
   "vendor": {
     "name": "ZenUML",
     "url": "https://www.zenuml.com/"
   },
-  "baseUrl": "https://awswidgets.zenuml.com/",
+  "baseUrl": "https://will.be.replaced.web.app/",
+  "lifecycle": {
+    "installed": "/installed",
+    "uninstalled": "/uninstalled"
+  },
   "enableLicensing": false,
   "links": {
     "self": "/atlassian-connect.json",
@@ -26,12 +30,12 @@
         "name": {
           "value": "AWS Widget"
         },
-        "url": "/index.html?pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}",
+        "url": "/index.html?pageId={page.id}&pageVersion={page.version}&macroId={macro.id}&uuid={uuid}&outputType={output.type}",
         "description": {
           "value": "Put the live status of your resource on the page."
         },
         "outputType": "block",
-        "bodyType": "none",
+        "bodyType": "plain-text",
         "editor": {
           "url": "/editor",
           "editTitle": {

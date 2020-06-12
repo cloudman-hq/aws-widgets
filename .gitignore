@@ -1,5 +1,7 @@
+.firebase
 node_modules
 dist
 .idea
 .DS_Store
 build
+firebase-debug.log

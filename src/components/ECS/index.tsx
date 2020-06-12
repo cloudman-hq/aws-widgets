@@ -1,9 +1,9 @@
-import * as React from 'react';
-import ECSCard from './ECSCard';
-import ECSProperty from './ECSProperty';
-import ECSLogo from './amazon_ecs-icon.svg';
-import { autorun } from 'mobx';
-import * as AWS from 'aws-sdk';
+import * as React from "react";
+import ECSCard from "./ECSCard";
+import ECSProperty from "./ECSProperty";
+import ECSLogo from "./amazon_ecs-icon.svg";
+import { autorun } from "mobx";
+import * as AWS from "aws-sdk";
 
 interface State {
   isLoading: boolean;
@@ -18,10 +18,10 @@ class ECS extends React.Component<any, State> {
     super(props);
     this.state = {
       isLoading: false,
-      clusterName: '',
-      services: '',
-      tasks: '',
-      az: '',
+      clusterName: "",
+      services: "",
+      tasks: "",
+      az: "",
     };
     this.describe = this.describe.bind(this);
   }
@@ -41,7 +41,7 @@ class ECS extends React.Component<any, State> {
     ecs.listClusters(params, (err, data) => {
       if (!err) {
         this.setState({
-          clusterName: data.clusterArns[0],
+          clusterName: data.clusterArns[0].split("/")[1],
           isLoading: false,
         });
       }
@@ -72,7 +72,7 @@ class ECS extends React.Component<any, State> {
     });
 
     const params1 = {
-      cluster: 'test',
+      cluster: "test",
     };
     ecs.listTasks(params1, (err, data) => {
       if (!err) {
@@ -93,9 +93,9 @@ class ECS extends React.Component<any, State> {
   render() {
     return (
       <ECSCard title="ECS" icon={ECSLogo}>
-        <ECSProperty name={'clusterName'} value={this.state.clusterName} />
-        <ECSProperty name={'Serices'} value={this.state.services} />
-        <ECSProperty name={'Tasks'} value={this.state.tasks} />
+        <ECSProperty name={"clusterName"} value={this.state.clusterName} />
+        <ECSProperty name={"Serices"} value={this.state.services} />
+        <ECSProperty name={"Tasks"} value={this.state.tasks} />
       </ECSCard>
     );
   }

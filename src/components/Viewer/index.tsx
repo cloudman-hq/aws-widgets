@@ -1,27 +1,14 @@
 import * as React from 'react';
-import Lambda from '../../components/Lambda';
-import EC2 from '../../components/EC2';
+import Lambda from './Resources/Lambda';
+import EC2 from './Resources/EC2';
+import Generic from './Resources/Generic';
 import { inject, observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import { ErrorMessage, HelperMessage } from '@atlaskit/form';
 import DefaultCard from './DefaultCard';
-import ECS from '../../components/ECS';
-
-/**
- * Include the following scenarios:
- * 1. Access not setup - ACCESS_NOT_SETUP
- * 2. Access keys not valid - ACCESS_NOT_VALID
- * 3. Resource ID not provided - RESOURCE_ID_NOT_PROVIDED
- * 4. Resource does not exist - RESOURCE_DOES_NOT_EXIST
- * then all resources
- */
-enum ResourceType {
-  UNKNOWN,
-  INITIALISING,
-  LAMBDA_FUNCTION,
-  EC2,
-  ECS,
-}
+import * as AWS from 'aws-sdk';
+import { ResourceType } from './Resources';
+import S3Viewer from './Resources/S3';
 
 interface State {
   resourceType: ResourceType;
@@ -53,15 +40,13 @@ class Viewer extends React.Component<any, State> {
     ) {
       return;
     }
-    if (this.props.appStore.isLambda) {
-      this.setState({
-        resourceType: ResourceType.LAMBDA_FUNCTION,
-      });
-    } else {
-      this.setState({
-        resourceType: ResourceType.ECS,
-      });
-    }
+
+    AWS.config.credentials = this.props.settingsStore.awsCredentials;
+    AWS.config.region = this.props.appStore.region;
+
+    this.setState({
+      resourceType: this.props.appStore.getResourceType,
+    });
   }
 
   render() {
@@ -103,10 +88,25 @@ class Viewer extends React.Component<any, State> {
         );
         break;
       case ResourceType.LAMBDA_FUNCTION:
-        resourceCard = <Lambda arn={this.props.appStore.resourceId} />;
+        resourceCard = (
+          <Lambda arn={this.props.appStore.resourceId} />
+        );
         break;
-      case ResourceType.ECS:
-        resourceCard = <ECS />;
+      case ResourceType.EC2:
+        resourceCard = (
+          <EC2 instanceId={this.props.appStore.resourceId} />
+        );
+        break;
+      case ResourceType.Generic:
+        resourceCard = (
+          <Generic resourceId={this.props.appStore.resourceId}
+            resourceType={this.props.appStore.resourceType} />
+        );
+        break;
+      case ResourceType.S3:
+        resourceCard = (
+          <S3Viewer bucketName={this.props.appStore.getS3BucketName} />
+        );
         break;
     }
     return resourceCard;

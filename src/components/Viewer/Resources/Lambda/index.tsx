@@ -1,13 +1,13 @@
 import * as React from 'react';
-import lambdaLogo from './AWS-Lambda_Lambda-Function_light-bg_4x.svg';
-import LambdaCard from './LambdaCard';
-import LambdaProperty from './LambdaProperty';
+import lambdaLogo from '../../../Aws/icons/lambda.svg';
 import { autorun } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as AWS from 'aws-sdk';
 import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import ResourceCard from '../../Common/ResourceCard';
+import ResourceStringProperty from '../../Common/ResourceStringProperty';
 
-interface State {
+interface LambdaState {
   isLoading: boolean;
   name: string;
   role: string;
@@ -22,7 +22,7 @@ interface State {
   settingsStore: rootStore.getSettingsStore(),
 }))
 @observer
-class Lambda extends React.Component<any, State> {
+class Lambda extends React.Component<any, LambdaState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -47,9 +47,6 @@ class Lambda extends React.Component<any, State> {
       return;
     }
 
-    AWS.config.region = this.props.appStore.region;
-
-    AWS.config.credentials = this.props.settingsStore.awsCredentials;
     const tags = { tags: '' };
     const resourceId = this.props.arn;
 
@@ -89,12 +86,12 @@ class Lambda extends React.Component<any, State> {
 
   render() {
     return (
-      <LambdaCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
-        <LambdaProperty name={'Name'} value={this.state.name} />
-        <LambdaProperty name={'Role'} value={this.state.role} />
-        <LambdaProperty name={'Tags'} value={this.state.tags} />
-        <LambdaProperty name={'Runtime'} value={this.state.runtime} />
-      </LambdaCard>
+      <ResourceCard title="Lambda" icon={lambdaLogo} isLoading={this.state.isLoading}>
+        <ResourceStringProperty name={'Name'} value={this.state.name} />
+        <ResourceStringProperty name={'Role'} value={this.state.role} />
+        <ResourceStringProperty name={'Tags'} value={this.state.tags} />
+        <ResourceStringProperty name={'Runtime'} value={this.state.runtime} />
+      </ResourceCard>
     );
   }
 }

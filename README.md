@@ -1,4 +1,11 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# [Requirements Analyst](https://zenuml.atlassian.net/wiki/spaces/ZEN/pages/475300085/Requirements+Analyst)
+
+# Deployment
+##Staging
+
+### From your local
+* Command: `yarn deploy:stage`
+* [Staging Test Page](https://awswidgets-stg.atlassian.net/wiki/spaces/AWS/pages/65686/Test+AWS+Widgets).
 
 ## Local development environment
 

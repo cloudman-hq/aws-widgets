@@ -1,4 +1,5 @@
-import { observable, action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
+import { ResourceType } from '../Viewer/Resources';
 
 class AppStore {
   @observable appName = '';
@@ -10,11 +11,24 @@ class AppStore {
   @observable resourceDescription = {};
 
   @computed get isRegionAndResourceSetup() {
-    return this.region.length > 0 && this.resourceId.length > 0;
+    return this.region && this.region.length > 0 && this.resourceId && this.resourceId.length > 0;
   }
 
   @computed get isLambda() {
     return this.resourceId.indexOf('arn:aws:lambda') === 0;
+  }
+
+  @computed get getResourceType() {
+    if (this.isLambda) return ResourceType.LAMBDA_FUNCTION;
+    if (this.resourceId.indexOf('arn:aws:s3') === 0) return ResourceType.S3;
+    return ResourceType.Generic;
+  }
+
+  @computed get getS3BucketName() {
+    if (this.resourceId.startsWith('arn:aws:s3')) {
+      return this.resourceId.replace('arn:aws:s3:::', '');
+    }
+    return '';
   }
 
   @action public setAppName(name: string) {
