@@ -131,8 +131,15 @@ const resourceTypes =
           if (err) {
             reject(err);
           } else {
+            const parseName = (arn: string) => {
+              const pos = arn.indexOf('/');
+              if (pos + 1 < arn.length) {
+                return arn.substring(pos + 1);
+              }
+              return arn;
+            };
             resolv(data.clusterArns.map((c: any) =>
-              ({ label: c, value: c })));
+              ({ label: parseName(c), value: c })));
           }
         });
       }),
