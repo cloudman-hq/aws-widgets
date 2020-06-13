@@ -187,6 +187,7 @@ class Editor extends React.Component<any, any> {
                       isSearchable={true}
                       placeholder="Choose a Type"
                       onChange={(e) => {
+                        form.getValues().resourceId = '';
                         fieldProps.onChange(e);
                         this.setResourceType(
                           form.getValues().resourceType && form.getValues().resourceType.value);
