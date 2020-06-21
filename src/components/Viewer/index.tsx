@@ -85,16 +85,12 @@ class Viewer extends React.Component<any, State> {
             </HelperMessage>
           </DefaultCard>);
         break;
-      case ResourceType.LAMBDA_FUNCTION:
-        resourceCard = (
-          <Lambda arn={this.props.appStore.resourceId} />
-        );
-        break;
       case ResourceType.EC2:
         resourceCard = (
           <EC2 instanceId={this.props.appStore.resourceId} />
         );
         break;
+      case ResourceType.LAMBDA_FUNCTION:
       case ResourceType.Generic:
         resourceCard = (
           <Generic resourceId={this.props.appStore.resourceId}

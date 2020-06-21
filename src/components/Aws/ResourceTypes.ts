@@ -112,7 +112,31 @@ const resourceTypes = [
         });
       }),
     properties: (resourceId: string) =>
-      new Promise((resolv, reject) => resolv({})),
+      new Promise(async (resolv, reject) => {
+        try {
+          const lambda = new AWS.Lambda();
+          let configuration: any;
+          let tags: any;
+          await Promise.all([
+            lambda
+              .getFunction({ FunctionName: resourceId })
+              .promise()
+              .then((d) => (configuration = d.Configuration)),
+            lambda
+              .listTags({ Resource: resourceId })
+              .promise()
+              .then((d) => (tags = d.Tags)),
+          ]);
+          resolv({
+            Name: configuration.FunctionName,
+            Role: configuration.Role,
+            Runtime: configuration.Runtime,
+            Tags: Object.keys(tags).map((key) => `${key}: ${tags[key]}`),
+          });
+        } catch (e) {
+          reject(e);
+        }
+      }),
   },
   {
     name: "S3",

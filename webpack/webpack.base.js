@@ -2,7 +2,9 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const isDev = process.env.NODE_ENV !== 'production';
+const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 
+const styledComponentsTransformer = createStyledComponentsTransformer();
 module.exports = {
   output: {
     path: path.join(__dirname, '../build'),
@@ -64,6 +66,13 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]?[hash]'
+        }
+      },
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        options: {
+          getCustomTransformers: () => ({ before: [styledComponentsTransformer] })
         }
       }
     ]
