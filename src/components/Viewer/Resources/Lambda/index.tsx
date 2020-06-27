@@ -1,11 +1,11 @@
-import * as React from "react";
-import lambdaLogo from "../../../Aws/icons/lambda.svg";
-import { autorun } from "mobx";
-import { inject, observer } from "mobx-react";
-import * as AWS from "aws-sdk";
-import { ListTagsRequest } from "aws-sdk/clients/lambda";
-import ResourceCard from "../../Common/ResourceCard";
-import ResourceStringProperty from "../../Common/ResourceStringProperty";
+import * as React from 'react';
+import lambdaLogo from '../../../Aws/icons/lambda.svg';
+import { autorun } from 'mobx';
+import { inject, observer } from 'mobx-react';
+import * as AWS from 'aws-sdk';
+import { ListTagsRequest } from 'aws-sdk/clients/lambda';
+import ResourceCard from '../../Common/ResourceCard';
+import ResourceStringProperty from '../../Common/ResourceStringProperty';
 
 interface LambdaState {
   isLoading: boolean;
@@ -27,12 +27,12 @@ class Lambda extends React.Component<any, LambdaState> {
     super(props);
     this.state = {
       isLoading: true,
-      name: "",
-      role: "",
-      runtime: "",
-      lastUpdateStatus: "",
-      az: "",
-      tags: "",
+      name: '',
+      role: '',
+      runtime: '',
+      lastUpdateStatus: '',
+      az: '',
+      tags: '',
     };
     this.describe = this.describe.bind(this);
   }
@@ -49,7 +49,7 @@ class Lambda extends React.Component<any, LambdaState> {
       return;
     }
 
-    const tags = { tags: "" };
+    const tags = { tags: '' };
     const resourceId = this.props.arn;
 
     const lambda = new AWS.Lambda();
@@ -76,7 +76,7 @@ class Lambda extends React.Component<any, LambdaState> {
           runtime: data.Configuration.Runtime,
           role: data.Configuration.Role,
           lastUpdateStatus: data.Configuration.LastUpdateStatus,
-          az: "",
+          az: '',
         });
       }
       this.setState({
@@ -92,10 +92,10 @@ class Lambda extends React.Component<any, LambdaState> {
         icon={lambdaLogo}
         isLoading={this.state.isLoading}
       >
-        <ResourceStringProperty name={"Name"} value={this.state.name} />
-        <ResourceStringProperty name={"Role"} value={this.state.role} />
-        <ResourceStringProperty name={"Tags"} value={this.state.tags} />
-        <ResourceStringProperty name={"Runtime"} value={this.state.runtime} />
+        <ResourceStringProperty name={'Name'} value={this.state.name} />
+        <ResourceStringProperty name={'Role'} value={this.state.role} />
+        <ResourceStringProperty name={'Tags'} value={this.state.tags} />
+        <ResourceStringProperty name={'Runtime'} value={this.state.runtime} />
       </ResourceCard>
     );
   }

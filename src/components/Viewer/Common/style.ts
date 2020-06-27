@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const CardWrapper = styled.div`
   background-color: #f2f3f6;
