@@ -244,29 +244,6 @@ const resourceTypes = [
           if (err) {
             reject(err);
           } else {
-            resolv(
-              (data.clusters.length && {
-                Name: data.clusters[0].clusterName,
-                Status: data.clusters[0].status,
-              }) ||
-                {}
-            );
-          }
-        });
-      }),
-  },
-  {
-    name: "Dynamodb",
-    keywordInResourceId: "arn:aws:dynamodb",
-    icon: dynamodblogo,
-    list: (region: string, credentials: any) =>
-      new Promise((resolv, reject) => {
-        AWS.config.credentials = credentials;
-        AWS.config.region = region;
-        new AWS.DynamoDB().listTables({}, (err: any, data: any) => {
-          if (err) {
-            reject(err);
-          } else {
             resolv(data.TableNames.map((t: any) => ({ label: t, value: t })));
           }
         });
