@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const CardWrapper = styled.div`
   background-color: #f2f3f6;
@@ -56,7 +56,6 @@ const PropertyWrapper = styled.div`
 `;
 
 const PropertyListWrapper = styled.div`
-  width: 100%;
   display: flex;
   & h5 {
     display: inline-block;
@@ -79,6 +78,9 @@ const PropertyListWrapper = styled.div`
 const PropertyContent = styled.div`
   display: flex;
   flex-direction: column;
+  & span {
+    margin-left: 80px;
+  }
 `;
 
 export {

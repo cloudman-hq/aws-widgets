@@ -214,7 +214,6 @@ const resourceTypes = [
             emptyIfRejected(ecs.listTasks(params).promise()),
             emptyIfRejected(ecs.listServices(params).promise()),
           ]);
-          console.log(JSON.stringify(clusters));
           resolv({
             Name: clusters.length && clusters[0].clusterName,
             Status: clusters.length && clusters[0].status,
@@ -222,45 +221,17 @@ const resourceTypes = [
             PendingTasksCount: clusters.length && clusters[0].pendingTasksCount,
             ActiveServicesCount:
               clusters.length && clusters[0].activeServicesCount,
-            TaskArns: taskArns.length && taskArns.map((task) => task),
+            Tasks:
+              taskArns.length && taskArns.map((task) => task.split("/")[1]),
             Services:
-              serviceArns.length && serviceArns.map((service) => service),
+              serviceArns.length &&
+              serviceArns.map((service) => service.split("/")[1]),
           });
         } catch (error) {
           console.log(error);
         }
       }),
   },
-  // ecs.describeClusters(, (err, data) => {
-  //   if (err) {
-  //     reject(err);
-  //   } else {
-  //     resolv(
-  //       (data.clusters.length && {
-  //         Name: data.clusters[0].clusterName,
-  //         Status: data.clusters[0].status,
-  //         RunningTasksCount: data.clusters[0].runningTasksCount,
-  //         PendingTasksCount: data.clusters[0].pendingTasksCount,
-  //         ActiveServicesCount: data.clusters[0].activeServicesCount,
-  //       }) ||
-  //         {}
-  //     );
-  //   }
-  // });
-  // ecs.listClusters({}, (err, data) => {
-  //   if (err) {
-  //     reject(err);
-  //   } else {
-  //     resolv(
-  //       (data.clusterArns.length && {
-  //         Name: "ds",
-  //       }) ||
-  //         {}
-  //     );
-  //   }
-  // });
-  // }),
-
   {
     name: "Dynamodb",
     keywordInResourceId: "arn:aws:dynamodb",

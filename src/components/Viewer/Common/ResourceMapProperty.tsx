@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { PropertyListWrapper, PropertyContent } from './style';
+import * as React from "react";
+import { PropertyListWrapper, PropertyContent } from "./style";
 
 interface Props {
   name: string;
@@ -11,7 +11,7 @@ const ResourceMapProperty: React.FunctionComponent<Props> = (props) => {
     <PropertyListWrapper>
       <h5>{props.name}:</h5>
       <PropertyContent>
-        {props.map.forEach((value, key) => (
+        {props.map?.forEach((value, key) => (
           <span>
             {key}={value}
           </span>
