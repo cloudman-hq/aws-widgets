@@ -1,14 +1,14 @@
-import * as React from 'react';
-import Lambda from './Resources/Lambda';
-import EC2 from './Resources/EC2';
-import Generic from './Resources/Generic';
-import { inject, observer } from 'mobx-react';
-import { autorun } from 'mobx';
-import { ErrorMessage, HelperMessage } from '@atlaskit/form';
-import DefaultCard from './DefaultCard';
-import * as AWS from 'aws-sdk';
-import { ResourceType } from './Resources';
-import S3Viewer from './Resources/S3';
+import * as React from "react";
+import Lambda from "./Resources/Lambda";
+import EC2 from "./Resources/EC2";
+import Generic from "./Resources/Generic";
+import { inject, observer } from "mobx-react";
+import { autorun } from "mobx";
+import { ErrorMessage, HelperMessage } from "@atlaskit/form";
+import DefaultCard from "./DefaultCard";
+import * as AWS from "aws-sdk";
+import { ResourceType } from "./Resources";
+import S3Viewer from "./Resources/S3";
 
 interface State {
   resourceType: ResourceType;
@@ -34,8 +34,10 @@ class Viewer extends React.Component<any, State> {
   }
 
   async describe() {
-    if (!this.props.settingsStore.isAccessSetup
-      || !this.props.appStore.isRegionAndResourceSetup) {
+    if (
+      !this.props.settingsStore.isAccessSetup ||
+      !this.props.appStore.isRegionAndResourceSetup
+    ) {
       return;
     }
 
@@ -50,7 +52,7 @@ class Viewer extends React.Component<any, State> {
   render() {
     if (!this.props.settingsStore.isAccessSetup) {
       return (
-        <DefaultCard title={'Access not setup'}>
+        <DefaultCard title={"Access not setup"}>
           <ErrorMessage>
             The access has not been setup. Ask your administrator to set up.
           </ErrorMessage>
@@ -59,10 +61,10 @@ class Viewer extends React.Component<any, State> {
     }
     if (!this.props.appStore.isRegionAndResourceSetup) {
       return (
-        <DefaultCard title={'Region or resource ID not provided'}>
+        <DefaultCard title={"Region or resource ID not provided"}>
           <HelperMessage>
-            Edit this page.
-            Click the PEN icon under this macro to provide a resource ID in the macro editor.
+            Edit this page. Click the PEN icon under this macro to provide a
+            resource ID in the macro editor.
           </HelperMessage>
         </DefaultCard>
       );
@@ -71,30 +73,37 @@ class Viewer extends React.Component<any, State> {
     switch (this.state.resourceType) {
       case ResourceType.UNKNOWN:
         resourceCard = (
-          <DefaultCard title={'Unknown Error'}>
+          <DefaultCard title={"Unknown Error"}>
             <ErrorMessage>
               Unknown error happens. Please contact support.
             </ErrorMessage>
-          </DefaultCard>);
+          </DefaultCard>
+        );
         break;
       case ResourceType.INITIALISING:
         resourceCard = (
-          <DefaultCard title={'Initialising'}>
-            <HelperMessage>
-              We are retrieving data for you...
-            </HelperMessage>
-          </DefaultCard>);
-        break;
-      case ResourceType.EC2:
-        resourceCard = (
-          <EC2 instanceId={this.props.appStore.resourceId} />
+          <DefaultCard title={"Initialising"}>
+            <HelperMessage>We are retrieving data for you...</HelperMessage>
+          </DefaultCard>
         );
         break;
+      case ResourceType.EC2:
+        resourceCard = <EC2 instanceId={this.props.appStore.resourceId} />;
+        break;
       case ResourceType.LAMBDA_FUNCTION:
+        resourceCard = (
+          <Generic
+            resourceId={this.props.appStore.resourceId}
+            resourceType={this.props.appStore.resourceType}
+          />
+        );
+        break;
       case ResourceType.Generic:
         resourceCard = (
-          <Generic resourceId={this.props.appStore.resourceId}
-            resourceType={this.props.appStore.resourceType} />
+          <Generic
+            resourceId={this.props.appStore.resourceId}
+            resourceType={this.props.appStore.resourceType}
+          />
         );
         break;
       case ResourceType.S3:
@@ -103,9 +112,7 @@ class Viewer extends React.Component<any, State> {
         );
         break;
     }
-    return (
-      resourceCard
-    );
+    return resourceCard;
   }
 }
 

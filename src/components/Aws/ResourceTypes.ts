@@ -1,3 +1,4 @@
+/* tslint:disable*/
 import * as AWS from "aws-sdk";
 import ec2logo from "./icons/ec2.svg";
 import ecslogo from "./icons/ecs.svg";

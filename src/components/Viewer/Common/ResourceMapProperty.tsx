@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { PropertyWrapper } from './style';
+import * as React from "react";
+import { PropertyListWrapper, PropertyContent } from "./style";
 
 interface Props {
   name: string;
@@ -7,10 +7,18 @@ interface Props {
 }
 
 const ResourceMapProperty: React.FunctionComponent<Props> = (props) => {
-  return <PropertyWrapper>
-    <h5>{props.name}:</h5>
-    {props.map.forEach((value, key) => <span>{key}={value}</span>)}
-  </PropertyWrapper>;
+  return (
+    <PropertyListWrapper>
+      <h5>{props.name}:</h5>
+      <PropertyContent>
+        {props.map.forEach((value, key) => (
+          <span>
+            {key}={value}
+          </span>
+        ))}
+      </PropertyContent>
+    </PropertyListWrapper>
+  );
 };
 
 export default ResourceMapProperty;

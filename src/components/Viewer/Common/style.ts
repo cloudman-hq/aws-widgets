@@ -42,7 +42,7 @@ const PropertyWrapper = styled.div`
   display: flex;
   & h5 {
     display: inline-block;
-    width: 80px;
+    width: 160px;
   }
   & span {
     font-size: 0.9em;
@@ -57,6 +57,7 @@ const PropertyWrapper = styled.div`
 
 const PropertyListWrapper = styled.div`
   width: 100%;
+  display: flex;
   & h5 {
     display: inline-block;
     width: 80px;
@@ -68,10 +69,16 @@ const PropertyListWrapper = styled.div`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 20px;
   }
   & span:nth-of-type(n + 2) {
     margin-left: 80px;
   }
+`;
+
+const PropertyContent = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 export {
@@ -80,5 +87,6 @@ export {
   CardIcon,
   CardContent,
   PropertyWrapper,
+  PropertyContent,
   PropertyListWrapper,
 };
