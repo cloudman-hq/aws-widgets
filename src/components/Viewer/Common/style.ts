@@ -57,30 +57,27 @@ const PropertyWrapper = styled.div`
 
 const PropertyListWrapper = styled.div`
   display: flex;
+  overflow hidden;
+  width: 100%;
+  box-sizing: border-box;
   & h5 {
     display: inline-block;
-    width: 80px;
+    width: 20%;
   }
   & span {
     font-size: 0.9em;
     display: inline-block;
-    width: 290px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 20px;
-  }
-  & span:nth-of-type(n + 2) {
-    margin-left: 80px;
   }
 `;
 
 const PropertyContent = styled.div`
   display: flex;
   flex-direction: column;
-  & span {
-    margin-left: 80px;
-  }
+  width: 80%;
 `;
 
 export {
