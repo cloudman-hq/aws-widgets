@@ -89,7 +89,7 @@
     "@atlaskit/tooltip": "^15.2.5",
     "@types/crypto-js": "^3.1.45",
     "@types/uuid": "^7.0.3",
-    "aws-sdk": "^2.654.0",
+    "aws-sdk": "^2.814.0",
     "crypto-js": "^4.0.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.3.0",
