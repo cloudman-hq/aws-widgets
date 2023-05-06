@@ -5,9 +5,9 @@ name: Deploy to Stage
 
 on:
   push:
-    branches: [ master ]
+    branches: [ prod-release ]  # master has code that is not ready for prod
   pull_request:
-    branches: [ master ]
+    branches: [ prod-release ]
 
 jobs:
   build:
