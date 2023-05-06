@@ -17,7 +17,7 @@
     "homepage": "https://www.zenuml.com"
   },
   "authentication": {
-    "type": "none"
+    "type": "jwt"
   },
   "scopes": [
     "READ",
