@@ -17,6 +17,7 @@ const ResourceCard: React.FunctionComponent<Props> = (props) => {
     </CardTitle>
     <CardContent>
       {props.children}
+      <div style={{ display: 'none' }}>2023-05-06</div>
     </CardContent>
   </CardWrapper>;
 };
