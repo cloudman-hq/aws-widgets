@@ -1,9 +1,12 @@
 import type { Request } from '@forge/resolver';
 import type { CredentialRepository } from './credentials/repository.js';
 import { createCredentialOperations } from './credentials/operations.js';
-import { authorizeModule, SETTINGS_MODULE_KEY } from './authorization.js';
+import { authorizeModule, MACRO_MODULE_KEY, SETTINGS_MODULE_KEY } from './authorization.js';
 import type { CredentialInput } from './schemas.js';
 import { toSafeEnvelope, type SafeLogEvent } from './safety.js';
+import { createResourceOperations } from './resources/operations.js';
+import type { ResourceAdapterFactory } from './resources/types.js';
+import { PublicResolverError } from './errors.js';
 
 type ResolverDependencies = {
   repository: CredentialRepository;
@@ -11,10 +14,17 @@ type ResolverDependencies = {
   now: () => Date;
   createRequestId: () => string;
   log: (event: SafeLogEvent) => void;
+  createResourceAdapter?: ResourceAdapterFactory;
 };
 
 export const createResolverHandlers = (dependencies: ResolverDependencies) => {
   const operations = createCredentialOperations(dependencies);
+  const resourceOperations = createResourceOperations({
+    repository: dependencies.repository,
+    createAdapter: dependencies.createResourceAdapter ?? (() => {
+      throw new PublicResolverError('INTERNAL_ERROR', true);
+    }),
+  });
   const credentialHandler =
     <T>(
       operation: 'credentials.status' | 'credentials.validate' | 'credentials.save' | 'credentials.delete',
@@ -33,10 +43,30 @@ export const createResolverHandlers = (dependencies: ResolverDependencies) => {
       );
     };
 
+  const resourceHandler =
+    <T>(
+      operation: 'resource.list' | 'resource.describe',
+      execute: (payload: unknown) => Promise<T>,
+    ) =>
+    ({ payload, context }: Request<unknown>) => {
+      const requestId = dependencies.createRequestId();
+      return toSafeEnvelope(
+        requestId,
+        operation,
+        async () => {
+          authorizeModule(context, MACRO_MODULE_KEY);
+          return execute(payload);
+        },
+        dependencies.log,
+      );
+    };
+
   return {
     'credentials.status': credentialHandler('credentials.status', operations.status),
     'credentials.validate': credentialHandler('credentials.validate', operations.validate),
     'credentials.save': credentialHandler('credentials.save', operations.save),
     'credentials.delete': credentialHandler('credentials.delete', operations.delete),
+    'resource.list': resourceHandler('resource.list', resourceOperations.list),
+    'resource.describe': resourceHandler('resource.describe', resourceOperations.describe),
   };
 };

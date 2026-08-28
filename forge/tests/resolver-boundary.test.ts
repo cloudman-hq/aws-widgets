@@ -52,7 +52,7 @@ describe('public resolver boundary', () => {
 
     const result = await handlers['credentials.status']({
       payload: {},
-      context: { accountId: 'account-1', moduleKey: 'aws-widgets-resource' },
+      context: { accountId: 'account-1', moduleKey: 'aws-widget-macro' },
     });
 
     expect(result).toEqual({

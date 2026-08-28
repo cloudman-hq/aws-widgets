@@ -15,18 +15,53 @@ const THROTTLE_ERROR_NAMES = new Set([
   'TooManyRequestsException',
 ]);
 
+const NOT_FOUND_ERROR_NAMES = new Set([
+  'NoSuchBucket',
+  'ResourceNotFoundException',
+  'InvalidInstanceID.NotFound',
+  'ClusterNotFoundException',
+]);
+
+const PERMISSION_ERROR_NAMES = new Set([
+  'AccessDenied',
+  'AccessDeniedException',
+  'UnauthorizedOperation',
+]);
+
+const NETWORK_ERROR_NAMES = new Set([
+  'AbortError',
+  'TimeoutError',
+  'NetworkingError',
+  'RequestTimeout',
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ENOTFOUND',
+  'EAI_AGAIN',
+]);
+
 export const mapAwsError = (error: unknown): PublicResolverError => {
   const name =
     typeof error === 'object' && error !== null && typeof Reflect.get(error, 'name') === 'string'
       ? (Reflect.get(error, 'name') as string)
       : '';
 
-  if (AUTH_ERROR_NAMES.has(name)) return new PublicResolverError('INVALID_AUTH');
+  const code =
+    typeof error === 'object' && error !== null && typeof Reflect.get(error, 'code') === 'string'
+      ? (Reflect.get(error, 'code') as string)
+      : '';
+
+  if (AUTH_ERROR_NAMES.has(name) || AUTH_ERROR_NAMES.has(code)) {
+    return new PublicResolverError('INVALID_AUTH');
+  }
+  if (NOT_FOUND_ERROR_NAMES.has(name) || NOT_FOUND_ERROR_NAMES.has(code)) {
+    return new PublicResolverError('NOT_FOUND');
+  }
   if (THROTTLE_ERROR_NAMES.has(name)) return new PublicResolverError('THROTTLED', true);
-  if (name === 'AbortError' || name === 'TimeoutError') {
+  if (THROTTLE_ERROR_NAMES.has(code)) return new PublicResolverError('THROTTLED', true);
+  if (NETWORK_ERROR_NAMES.has(name) || NETWORK_ERROR_NAMES.has(code)) {
     return new PublicResolverError('NETWORK_ERROR', true);
   }
-  if (name === 'AccessDenied' || name === 'AccessDeniedException') {
+  if (PERMISSION_ERROR_NAMES.has(name) || PERMISSION_ERROR_NAMES.has(code)) {
     return new PublicResolverError('PERMISSION_DENIED');
   }
   return new PublicResolverError('INTERNAL_ERROR', true);

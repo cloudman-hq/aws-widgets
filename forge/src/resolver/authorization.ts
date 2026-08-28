@@ -1,7 +1,7 @@
 import { PublicResolverError } from './errors.js';
 
 export const SETTINGS_MODULE_KEY = 'aws-widgets-settings';
-export const MACRO_MODULE_KEY = 'aws-widgets-resource';
+export const MACRO_MODULE_KEY = 'aws-widget-macro';
 
 export type ResolverContext = {
   accountId?: unknown;

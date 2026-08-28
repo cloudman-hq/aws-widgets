@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AwsWidgetsReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "s3:GetBucketPolicyStatus",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetLifecycleConfiguration",
+        "s3:GetBucketTagging",
+        "lambda:ListFunctions",
+        "lambda:GetFunction",
+        "lambda:ListTags",
+        "ecs:ListClusters",
+        "ecs:DescribeClusters",
+        "dynamodb:ListTables",
+        "dynamodb:DescribeTable"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
