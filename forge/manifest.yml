@@ -18,7 +18,7 @@ modules:
       title: AWS Widgets settings
   function:
     - key: resolver
-      handler: src/resolver/index.handler
+      handler: resolver/index.handler
 
 resources:
   - key: macro-view
@@ -34,16 +34,10 @@ permissions:
   external:
     fetch:
       backend:
-        - address: '*.amazonaws.com'
-          category: other
-          inScopeEUD: true
-        - address: '*.amazonaws.com.cn'
-          category: other
-          inScopeEUD: true
+        - '*.amazonaws.com'
+        - '*.amazonaws.com.cn'
 
 app:
-  # Replace this syntactically valid placeholder with the single ID returned by
-  # `forge register` only after registration is separately authorized.
-  id: ari:cloud:ecosystem::app/00000000-0000-4000-8000-000000000000
+  id: ari:cloud:ecosystem::app/bd4e3a18-d223-45bf-a301-b2b4eab5beed
   runtime:
     name: nodejs24.x

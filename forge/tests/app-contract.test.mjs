@@ -13,10 +13,11 @@ test('Forge workspace exposes the isolated app contract', async () => {
 
   assert.match(manifest, /^ {2}macro:/m);
   assert.match(manifest, /confluence:globalSettings:/);
+  assert.match(manifest, /handler: resolver\/index\.handler/);
   assert.match(manifest, /name: nodejs24\.x/);
   assert.match(manifest, /- storage:app/);
-  assert.match(manifest, /address: '\*\.amazonaws\.com'/);
-  assert.match(manifest, /address: '\*\.amazonaws\.com\.cn'/);
+  assert.match(manifest, /- '\*\.amazonaws\.com'/);
+  assert.match(manifest, /- '\*\.amazonaws\.com\.cn'/);
   assert.doesNotMatch(manifest, /^remotes:/m);
   assert.doesNotMatch(manifest, /^\s+client:/m);
 
