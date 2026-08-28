@@ -50,3 +50,13 @@ test('Forge backend imports are compatible with the deployment bundler', async (
     );
   }
 });
+
+test('legacy TypeScript build excludes the independent Forge workspace', async () => {
+  const rootTsconfig = await read('../tsconfig.json').then(JSON.parse);
+  const excluded = rootTsconfig.exclude ?? [];
+
+  assert.ok(
+    excluded.some((entry) => entry === 'forge' || entry.startsWith('forge/')),
+    'root tsconfig must exclude forge or the legacy build type-checks Forge without its dependencies',
+  );
+});
