@@ -7,6 +7,10 @@ import { toSafeEnvelope, type SafeLogEvent } from './safety';
 import { createResourceOperations } from './resources/operations';
 import type { ResourceAdapterFactory } from './resources/types';
 import { PublicResolverError } from './errors';
+import { parseMacroConfig } from './resource-schemas';
+import type { MacroConfigV1, MacroConfigResolution } from '../shared/contracts';
+
+type LegacyMacroReference = { contentId: string; uuid: string };
 
 type ResolverDependencies = {
   repository: CredentialRepository;
@@ -15,6 +19,41 @@ type ResolverDependencies = {
   createRequestId: () => string;
   log: (event: SafeLogEvent) => void;
   createResourceAdapter?: ResourceAdapterFactory;
+  resolveLegacyMacroConfig?: (reference: LegacyMacroReference) => Promise<MacroConfigV1 | undefined>;
+};
+
+const resolveMacroConfig = async (
+  context: Request<unknown>['context'],
+  resolveLegacy?: ResolverDependencies['resolveLegacyMacroConfig'],
+): Promise<MacroConfigResolution> => {
+  const extension = Reflect.get(context, 'extension');
+  if (typeof extension !== 'object' || extension === null) {
+    throw new PublicResolverError('INVALID_INPUT');
+  }
+  const rawConfig = Reflect.get(extension, 'config');
+  try {
+    return { config: parseMacroConfig(rawConfig), source: 'forge' };
+  } catch {
+    // Existing Connect macros expose their original parameters in config.
+  }
+  const uuid = typeof rawConfig === 'object' && rawConfig !== null
+    ? Reflect.get(rawConfig, 'uuid')
+    : undefined;
+  const content = Reflect.get(extension, 'content');
+  const contentId = typeof content === 'object' && content !== null
+    ? Reflect.get(content, 'id')
+    : undefined;
+  if (
+    !resolveLegacy ||
+    typeof uuid !== 'string' ||
+    !/^[A-Za-z0-9-]{1,64}$/.test(uuid) ||
+    typeof contentId !== 'string' ||
+    !/^\d+$/.test(contentId)
+  ) {
+    return { source: 'none' };
+  }
+  const config = await resolveLegacy({ contentId, uuid });
+  return config ? { config, source: 'connect' } : { source: 'none' };
 };
 
 export const createResolverHandlers = (dependencies: ResolverDependencies) => {
@@ -62,6 +101,18 @@ export const createResolverHandlers = (dependencies: ResolverDependencies) => {
     };
 
   return {
+    'macro.config.resolve': ({ context }: Request<unknown>) => {
+      const requestId = dependencies.createRequestId();
+      return toSafeEnvelope(
+        requestId,
+        'macro.config.resolve',
+        async () => {
+          authorizeModule(context, MACRO_MODULE_KEY);
+          return resolveMacroConfig(context, dependencies.resolveLegacyMacroConfig);
+        },
+        dependencies.log,
+      );
+    },
     'credentials.status': credentialHandler('credentials.status', operations.status),
     'credentials.validate': credentialHandler('credentials.validate', operations.validate),
     'credentials.save': credentialHandler('credentials.save', operations.save),

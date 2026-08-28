@@ -18,6 +18,10 @@ test('Forge workspace exposes the isolated app contract', async () => {
   assert.match(manifest, /handler: resolver\/index\.handler/);
   assert.match(manifest, /name: nodejs24\.x/);
   assert.match(manifest, /- storage:app/);
+  assert.match(manifest, /- read:confluence-content\.all/);
+  assert.match(manifest, /- read:app-data:confluence/);
+  assert.match(manifest, /key: CONNECT_KEY\n\s+default: com\.aws\.widget\.confluence-addon/);
+  assert.match(manifest, /connect:\n\s+key: \$\{CONNECT_KEY\}/);
   assert.match(manifest, /- '\*\.amazonaws\.com'/);
   assert.match(manifest, /- '\*\.amazonaws\.com\.cn'/);
   assert.doesNotMatch(manifest, /^remotes:/m);

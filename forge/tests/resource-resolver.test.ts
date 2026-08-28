@@ -15,6 +15,53 @@ const request = (payload: unknown, moduleKey = 'aws-widget-macro') => ({
 });
 
 describe('resource resolver operations', () => {
+  it('resolves an existing Connect macro configuration from its preserved uuid and page', async () => {
+    const resolveLegacyMacroConfig = vi.fn(async () => ({
+      schemaVersion: 1 as const,
+      region: 'us-east-1' as const,
+      resourceType: 'ec2' as const,
+      resourceId: 'i-0123456789abcdef0',
+    }));
+    const handlers = createResolverHandlers({
+      repository: { read: vi.fn(), write: vi.fn(), delete: vi.fn() },
+      validateWithAws: vi.fn(),
+      now: () => new Date(),
+      createRequestId: () => 'legacy-config-request',
+      log: vi.fn(),
+      resolveLegacyMacroConfig,
+    });
+
+    const result = await handlers['macro.config.resolve']({
+      payload: {},
+      context: {
+        accountId: 'account-1',
+        moduleKey: 'aws-widget-macro',
+        extension: {
+          config: { uuid: 'saved-connect-uuid' },
+          content: { id: '12345' },
+        },
+      },
+    });
+
+    expect(resolveLegacyMacroConfig).toHaveBeenCalledWith({
+      contentId: '12345',
+      uuid: 'saved-connect-uuid',
+    });
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        config: {
+          schemaVersion: 1,
+          region: 'us-east-1',
+          resourceType: 'ec2',
+          resourceId: 'i-0123456789abcdef0',
+        },
+        source: 'connect',
+      },
+      requestId: 'legacy-config-request',
+    });
+  });
+
   it('reads the credential backend-side and returns a safe normalized list envelope', async () => {
     const dispose = vi.fn();
     const handlers = createResolverHandlers({

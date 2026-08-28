@@ -14,7 +14,8 @@ describe('shared browser/resolver contract', () => {
   });
 
   it('publishes only the approved resolver operations and public errors', () => {
-    expect(RESOLVER_OPERATIONS).toHaveLength(6);
+    expect(RESOLVER_OPERATIONS).toHaveLength(7);
+    expect(RESOLVER_OPERATIONS).toContain('macro.config.resolve');
     expect(RESOLVER_OPERATIONS).toContain('resource.describe');
     expect(PUBLIC_ERROR_CODES).toContain('INTERNAL_ERROR');
     expect(PUBLIC_ERROR_CODES).not.toContain('NOT_IMPLEMENTED');

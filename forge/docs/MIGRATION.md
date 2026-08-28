@@ -6,7 +6,7 @@ This runbook describes the approved staged path from the existing AWS Widgets
 Atlassian Connect app to the Forge successor. The current branch is for an
 independently registered, unlisted development app. It does not authorize a
 production deploy, a Marketplace submission, customer communication, Connect
-retirement, or an attempt to copy secrets.
+retirement, or exporting legacy secrets outside the Forge runtime.
 
 The production goal is to adopt the existing AWS Widgets Marketplace listing,
 not to create a second customer-facing listing. Keep the production Connect
@@ -20,8 +20,8 @@ production:
 
 | Environment | Registration/listing | Required identity |
 | --- | --- | --- |
-| Development | New, unlisted Forge registration in an approved developer space | The independent Forge app identity in the development manifest; no Connect adoption fields |
-| Production adoption | Existing AWS Widgets Connect Marketplace listing | `app.connect.key: com.aws.widget.confluence-addon` and the reviewed Connect adoption remote, set before the first production deployment |
+| Development | New, unlisted Forge registration in an approved developer space | Separate Forge app ID with `app.connect.key: com.aws.widget.confluence-addon` so migration is testable |
+| Production adoption | Existing AWS Widgets Connect Marketplace listing | The same Connect key before the first production deployment; a remote only if Connect modules remain |
 
 The production `app.connect.key` is immutable after the first production
 deployment. Treat it as a release-blocking preflight, not a field to add later:
@@ -47,10 +47,9 @@ app:
     remote: connect-app-server
 ```
 
-Do not add this production-only identity or an invented remote to the
-independent development manifest merely to make CI pass. A remote required by
-Atlassian's adoption mechanism does not authorize Forge code to read Connect
-app properties or transfer Connect credentials.
+Do not add an invented remote. This successor removes the legacy Connect
+modules, so the current manifest does not require one. The unchanged Connect
+key authorizes Atlassian's documented app-property migration API.
 
 The Forge macro module key must remain exactly `aws-widget-macro`, matching the
 legacy Connect dynamic-content macro key. A changed key would prevent existing
@@ -65,34 +64,28 @@ parameters. It addressed a Connect content property with a generated UUID; the
 legacy key pattern is `aws-widget-macro-<uuid>-body`, and the value contains the
 resource selection/body used by the Connect UI.
 
-Forge intentionally does not read this content property, derive the legacy
-encryption context, or request Confluence content-property scopes. Forge macro
-configuration is a validated `MacroConfigV1` containing:
+Forge reads this property as the app using only the page ID and preserved
+`uuid` from trusted macro context. The raw value stays server-side and is
+normalized to a validated `MacroConfigV1` containing:
 
 ```text
 schemaVersion, region, resourceType, resourceId
 ```
 
-Existing Connect macro nodes therefore do not silently acquire a guessed
-configuration. They enter a safe “configuration required” state. The author
-must edit each affected macro and explicitly choose the region, resource type,
-and resource identifier in the Forge editor. This is an intentional data
-boundary, not a failed secret migration.
+Existing Connect macro nodes render without an author edit when the legacy
+property is valid. Editing prepopulates the same values and saving converts
+them to native Forge configuration. Missing or invalid legacy data fails
+closed to the configuration-required state.
 
 ### Connect credentials
 
-The legacy app stored credentials in the Connect app property for
-`com.aws.widget.confluence-addon`, with browser-side encryption/decryption and
-the old Connect context. Forge never reads, decrypts, exports, re-encrypts, or
-accepts that value. It also never uses a Connect `clientKey` or `sharedSecret`
-as a Forge credential.
-
-An administrator must enter a new AWS access key, secret access key, and
-optional session token in Forge global settings. Forge validates the new value
-with STS before saving it under the installation-scoped secret key
-`aws.credentials.v1`. A failed validation leaves any existing Forge credential
-unchanged. No credential is included in macro configuration, page data, logs,
-URLs, analytics, or migration payloads.
+If Forge secret storage is empty, the successor reads the old
+`aws-credentials` app property, derives the original site-bound
+CryptoJS/OpenSSL key server-side, decrypts the value, validates it with STS,
+then writes it under `aws.credentials.v1`. Nothing is returned to the browser.
+A failed lookup, decrypt, or validation writes nothing. Explicit deletion
+stores a non-secret `disabled` marker first so the old property cannot be
+imported again. Administrators may still replace credentials explicitly.
 
 ## Staged production sequence
 
@@ -116,7 +109,7 @@ Before requesting migration, the owner confirms that the Forge app has passed
 the development gates and that the production adoption manifest has been
 reviewed. Freeze the production identity, preserve the exact macro key, record
 the approved Connect remote, and prepare customer/admin instructions for
-credential re-entry and macro reconfiguration.
+automatic continuity, fallback re-entry, and rollback.
 
 Submit the staged migration request through the Atlassian adoption process.
 Do not deploy the development identity as a substitute for this request.
@@ -163,13 +156,12 @@ the old Connect path available until the owner signs off.
 - [ ] The Forge Marketplace listing is the existing AWS Widgets listing, not a
       duplicate customer-facing listing.
 - [ ] Forge macro module key is exactly `aws-widget-macro`.
-- [ ] Existing Connect macro nodes show an explicit configuration-required
-      state when no Forge `MacroConfigV1` exists; they do not show a guessed or
-      stale resource.
-- [ ] Authors can explicitly reconfigure region, resource type, and resource
-      ID and save the Forge macro configuration.
-- [ ] Forge settings starts unconfigured unless an administrator explicitly
-      enters a new credential; no Connect credential was copied.
+- [ ] Existing Connect macro nodes load a valid legacy resource selection and
+      render without an author edit; missing/invalid data fails closed.
+- [ ] Editing an existing macro prepopulates the migrated region, resource type,
+      and resource ID and saves native Forge configuration.
+- [ ] A valid legacy credential is decrypted only in Forge, STS-validated, and
+      stored as a Forge secret; no credential crosses the bridge or enters logs.
 - [ ] Credential save validates first, stores only the installation-scoped
       Forge secret, clears the form, and exposes only status metadata.
 - [ ] Resource views use only the approved read-only IAM actions and return
@@ -185,23 +177,20 @@ the old Connect path available until the owner signs off.
 
 ## Rollback and prohibited actions
 
-Rollback is a release decision, not a data-copy operation. If validation fails,
+Rollback is a release decision. If validation fails,
 hold the Forge promotion and keep the existing Connect service available while
 the owner follows the platform-supported adoption/rollback procedure. Do not
-delete Connect data, invent a credential bridge, or silently rewrite macro
-configuration. Because this conversion deliberately does not migrate secrets,
-there is no secret-transfer rollback: administrators continue using the old
-Connect installation or explicitly enter a new Forge credential.
+delete Connect data or silently rewrite page content. Migration reads legacy
+values but leaves the original properties intact for platform-supported
+rollback.
 
 The following actions are out of scope for this runbook:
 
 - `forge deploy --environment production` or production `forge install` before
   every approval and identity preflight is recorded;
 - creating a second Marketplace listing for the same customer-facing app;
-- reading or exporting the old Connect credential app property or content
-  properties;
-- adding Confluence content-property scopes solely to make legacy values appear
-  to migrate;
+- exporting any old credential or content-property value outside the Forge
+  runtime;
 - changing `aws-widget-macro` to a new Forge macro key;
 - running the root Node 10/legacy Connect install or Firebase deployment while
   working on `forge/`; and

@@ -1,6 +1,7 @@
 import {
   RESOURCE_TYPES,
   SUPPORTED_REGIONS,
+  type MacroConfigResolution,
   type MacroConfigV1,
   type PublicErrorCode,
   type ResolverEnvelope,
@@ -125,11 +126,21 @@ export async function mountMacroView(
   setStatus(liveStatus, 'Loading AWS resource…', 'busy');
   root.append(header, liveStatus);
 
-  const config = readConfig(await dependencies.getContext());
+  let config = readConfig(await dependencies.getContext());
+  if (!config) {
+    try {
+      const resolution = await dependencies.invoke('macro.config.resolve', {});
+      if (resolution.ok) {
+        config = (resolution.data as MacroConfigResolution).config;
+      }
+    } catch {
+      // The normal safe unconfigured state below also covers migration lookup failures.
+    }
+  }
   if (!config) {
     setStatus(
       liveStatus,
-      'Configure this macro to choose an AWS resource. Existing Connect settings are not copied; edit the macro to reconfigure it.',
+      'Configure this macro to choose an AWS resource. If this is an existing Connect macro, its saved configuration could not be recovered safely.',
       'warning',
     );
     return;

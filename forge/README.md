@@ -119,6 +119,8 @@ may send a credential entered during the current save operation, but it cannot
 read a stored credential. AWS responses are reduced to allow-listed resource
 fields before crossing the bridge. Resolver operations are:
 
+* `macro.config.resolve` from the macro surface for server-only Connect
+  configuration continuity;
 * `credentials.status`, `credentials.validate`, `credentials.save`, and
   `credentials.delete` from global settings;
 * `resource.list` and `resource.describe` from the macro surface.
@@ -143,18 +145,17 @@ Installation lifecycle is deliberately simple:
   days), and reinstall uses a new installation partition; and
 * a page copy or macro copy carries only non-secret macro configuration.
 
-Existing Connect credentials are never migrated. The Forge app does not read
-the Connect app property, derive the old browser encryption context, accept an
-exported credential blob, or use a Connect `clientKey`/`sharedSecret`. An
-administrator must enter a new credential in Forge global settings.
+Existing Connect macros are resolved without author reconfiguration. Forge
+uses the preserved `uuid` parameter and trusted page ID to read
+`aws-widget-macro-<uuid>-body` as the app, validates and normalizes the legacy
+resource selection, and never returns the raw property to the browser.
 
-The old Connect macro stored resource configuration in a content property
-addressed by a generated UUID (the legacy key pattern is
-`aws-widget-macro-<uuid>-body`), rather than in ordinary macro parameters.
-Forge does not read that content property and does not request Confluence
-content-property scopes. Existing Connect macro nodes therefore show a safe
-configuration-required state until an author explicitly chooses the region,
-resource type, and resource identifier in the Forge editor. See
+When Forge secret storage is empty, the resolver reads the legacy
+`aws-credentials` app property under the unchanged Connect key. It decrypts
+the CryptoJS/OpenSSL envelope only in the Forge runtime, validates it with STS,
+and writes it to installation-scoped secret storage before an AWS resource
+call. Failed migration writes nothing. Explicit deletion records a migration
+tombstone so the old property cannot silently resurrect the credential. See
 [`docs/MIGRATION.md`](docs/MIGRATION.md) for the staged production path.
 
 ## Identity and production adoption guard
@@ -162,10 +163,10 @@ resource type, and resource identifier in the Forge editor. See
 The Forge macro key is intentionally `aws-widget-macro`, exactly matching the
 legacy Connect dynamic-content macro key. Do not rename it.
 
-The development manifest is intentionally free of `app.connect` and Connect
-remotes so it can be registered and tested independently. Before the first
-production deployment of the adoption version, the reviewed production
-manifest must contain this immutable identity:
+The registration remains unlisted during development, but the manifest
+declares the existing Connect key so migration behavior can be exercised on
+the approved development tenant and the production identity is frozen before
+its first deployment:
 
 ```yaml
 app:
@@ -193,22 +194,23 @@ app:
 
 The example is not deployable until the owner has reviewed the URL, remote
 usage, and adoption manifest. A Connect remote required for Marketplace
-identity/adoption is not permission to transfer Connect credentials or call
-legacy app-property APIs from the Forge runtime.
+identity/adoption is not permission to export Connect credentials outside the
+Forge runtime.
 
 ## Scopes and network egress
 
-The current development manifest requests only:
+The current development manifest requests:
 
 * `storage:app` for installation-scoped Forge secrets;
+* `read:confluence-content.all` to recover existing macro resource selections;
+* `read:app-data:confluence` for one-time server-side credential migration;
 * backend fetch egress to `*.amazonaws.com` and `*.amazonaws.com.cn`, because
   the supported region list includes commercial AWS regions plus Beijing and
   Ningxia; and
 * no client fetch egress.
 
-The development manifest has no Confluence REST/content-property scope, custom
-remote, web trigger, scheduled trigger, lifecycle trigger, analytics endpoint,
-or Connect module. The server accepts only the explicit region and resource
+The development manifest has no custom remote, web trigger, scheduled trigger,
+lifecycle trigger, analytics endpoint, or Connect module. The server accepts only the explicit region and resource
 allow-lists. It does not accept a caller-provided AWS endpoint, partition,
 command name, or arbitrary URL. AWS GovCloud and custom endpoints are outside
 this conversion's supported region set.
@@ -280,4 +282,5 @@ findings before exposing development tooling beyond the approved environment.
 
 No successful AWS call or production migration is implied by a green local
 build. Production listing approval, automatic migration, customer credential
-re-entry, validation, and any Connect retirement remain separate gates.
+continuity validation, fallback re-entry, and Connect retirement remain
+separate gates.

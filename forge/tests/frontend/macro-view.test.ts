@@ -59,19 +59,36 @@ describe('macro view', () => {
     expect(root.querySelector('[aria-live="polite"]')).not.toBeNull();
   });
 
-  it('directs legacy or unconfigured macros to explicit reconfiguration without calling AWS', async () => {
-    const invoke = vi.fn<Invoke>();
+  it('renders an existing Connect macro without requiring an author to reconfigure it', async () => {
+    const legacyConfig = {
+      schemaVersion: 1 as const,
+      region: 'ap-southeast-2' as const,
+      resourceType: 'ec2' as const,
+      resourceId: 'i-0123456789abcdef0',
+    };
+    const invoke = vi.fn<Invoke>()
+      .mockResolvedValueOnce(success({ config: legacyConfig, source: 'connect' }))
+      .mockResolvedValueOnce(success({
+        schemaVersion: 1,
+        resourceType: 'ec2',
+        resourceId: legacyConfig.resourceId,
+        region: legacyConfig.region,
+        title: 'Existing Connect instance',
+        fields: [{ key: 'state', label: 'State', value: 'running' }],
+        observedAt: '2026-08-28T08:45:00.000Z',
+      }));
     const root = document.querySelector<HTMLElement>('#app');
     if (!root) throw new Error('test root missing');
 
     await mountMacroView(root, {
       invoke,
-      getContext: async () => ({ extension: { config: {} } }),
+      getContext: async () => ({ extension: { config: { uuid: 'legacy-uuid' } } }),
     });
 
-    expect(root.textContent).toContain('Configure this macro');
-    expect(root.textContent).toContain('Existing Connect settings are not copied');
-    expect(invoke).not.toHaveBeenCalled();
+    expect(invoke).toHaveBeenNthCalledWith(1, 'macro.config.resolve', {});
+    expect(invoke).toHaveBeenNthCalledWith(2, 'resource.describe', legacyConfig);
+    expect(root.textContent).toContain('Existing Connect instance');
+    expect(root.textContent).not.toContain('Configure this macro');
   });
 
   it.each([

@@ -1,6 +1,7 @@
 import {
   RESOURCE_TYPES,
   SUPPORTED_REGIONS,
+  type MacroConfigResolution,
   type MacroConfigV1,
   type ResolverEnvelope,
   type ResolverOperation,
@@ -49,7 +50,22 @@ export async function mountMacroConfig(
   root: HTMLElement,
   dependencies: MacroConfigDependencies,
 ): Promise<void> {
-  const current = existingConfig(await dependencies.getContext());
+  const context = await dependencies.getContext();
+  let current = existingConfig(context);
+  if (
+    current.schemaVersion !== 1 &&
+    typeof Reflect.get(current, 'uuid') === 'string'
+  ) {
+    try {
+      const resolution = await dependencies.invoke('macro.config.resolve', {});
+      if (resolution.ok) {
+        const migrated = (resolution.data as MacroConfigResolution).config;
+        if (migrated) current = migrated;
+      }
+    } catch {
+      // Leave the fields empty so the author can still repair the macro manually.
+    }
+  }
   installTheme();
   root.replaceChildren();
   root.className = 'aws-shell aws-shell--config';

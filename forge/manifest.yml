@@ -1,3 +1,8 @@
+environment:
+  variables:
+    - key: CONNECT_KEY
+      default: com.aws.widget.confluence-addon
+
 modules:
   # Forge CLI 13 uses the product-scoped `macro` module key for Confluence.
   macro:
@@ -31,6 +36,8 @@ resources:
 permissions:
   scopes:
     - storage:app
+    - read:confluence-content.all
+    - read:app-data:confluence
   external:
     fetch:
       backend:
@@ -39,5 +46,7 @@ permissions:
 
 app:
   id: ari:cloud:ecosystem::app/bd4e3a18-d223-45bf-a301-b2b4eab5beed
+  connect:
+    key: ${CONNECT_KEY}
   runtime:
     name: nodejs24.x

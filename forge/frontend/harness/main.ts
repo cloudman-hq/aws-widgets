@@ -26,6 +26,8 @@ const invoke = async (
 ): Promise<ResolverEnvelope<unknown>> => {
   void payload;
   switch (operation) {
+    case 'macro.config.resolve':
+      return success({ config, source: 'forge' });
     case 'credentials.status':
       return success({ configured: true, updatedAt: '2026-08-28T08:45:00.000Z' });
     case 'credentials.validate':

@@ -47,6 +47,34 @@ describe('macro configuration', () => {
     expect(root.querySelector('[aria-live="polite"]')).not.toBeNull();
   });
 
+  it('prepopulates the editor from an existing Connect macro so saving preserves its behavior', async () => {
+    const invoke = vi.fn<Invoke>(async (operation: ResolverOperation) => operation === 'macro.config.resolve'
+      ? success({
+          source: 'connect',
+          config: {
+            schemaVersion: 1,
+            region: 'us-east-1',
+            resourceType: 'lambda',
+            resourceId: 'arn:aws:lambda:us-east-1:123456789012:function:orders',
+          },
+        })
+      : success({ items: [], truncated: false }));
+    const root = document.querySelector<HTMLElement>('#app');
+    if (!root) throw new Error('test root missing');
+
+    await mountMacroConfig(root, {
+      invoke,
+      getContext: async () => ({ extension: { config: { uuid: 'legacy-uuid' } } }),
+      submit: async () => undefined,
+    });
+
+    expect(invoke).toHaveBeenCalledWith('macro.config.resolve', {});
+    expect(root.querySelector<HTMLSelectElement>('#region')?.value).toBe('us-east-1');
+    expect(root.querySelector<HTMLSelectElement>('#resource-type')?.value).toBe('lambda');
+    expect(root.querySelector<HTMLInputElement>('#resource-id')?.value)
+      .toBe('arn:aws:lambda:us-east-1:123456789012:function:orders');
+  });
+
   it('requires an explicit region and resource type for a new macro', async () => {
     const invoke = vi.fn<Invoke>();
     const root = document.querySelector<HTMLElement>('#app');
