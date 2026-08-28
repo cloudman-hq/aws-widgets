@@ -1,0 +1,49 @@
+modules:
+  # Forge CLI 13 uses the product-scoped `macro` module key for Confluence.
+  macro:
+    - key: aws-widgets-resource
+      resource: macro-view
+      resolver:
+        function: resolver
+      title: AWS Widgets Resource
+      description: Display a read-only view of an AWS resource.
+      config:
+        resource: macro-config
+        viewportSize: medium
+  confluence:globalSettings:
+    - key: aws-widgets-settings
+      resource: global-settings
+      resolver:
+        function: resolver
+      title: AWS Widgets settings
+  function:
+    - key: resolver
+      handler: src/resolver/index.handler
+
+resources:
+  - key: macro-view
+    path: dist/macro-view
+  - key: macro-config
+    path: dist/macro-config
+  - key: global-settings
+    path: dist/global-settings
+
+permissions:
+  scopes:
+    - storage:app
+  external:
+    fetch:
+      backend:
+        - address: '*.amazonaws.com'
+          category: other
+          inScopeEUD: true
+        - address: '*.amazonaws.com.cn'
+          category: other
+          inScopeEUD: true
+
+app:
+  # Replace this syntactically valid placeholder with the single ID returned by
+  # `forge register` only after registration is separately authorized.
+  id: ari:cloud:ecosystem::app/00000000-0000-4000-8000-000000000000
+  runtime:
+    name: nodejs24.x

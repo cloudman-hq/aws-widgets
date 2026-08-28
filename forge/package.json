@@ -1,0 +1,40 @@
+{
+  "name": "aws-widgets-forge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "npm@11.19.0",
+  "volta": {
+    "node": "24.20.0",
+    "npm": "11.19.0"
+  },
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "unit": "node --test tests/app-contract.test.mjs && vitest run --config vitest.config.ts tests/contracts.test.ts",
+    "build:frontend": "npm run clean && vite build --mode macro-view && vite build --mode macro-config && vite build --mode global-settings",
+    "build:resolver": "tsc --project tsconfig.resolver.json",
+    "build": "npm run build:frontend && npm run build:resolver",
+    "forge:lint": "node scripts/forge-lint.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run unit && npm run build && npm run forge:lint"
+  },
+  "dependencies": {
+    "@forge/bridge": "6.3.0",
+    "@forge/resolver": "2.0.0"
+  },
+  "devDependencies": {
+    "@colors/colors": "1.5.0",
+    "@eslint/js": "9.39.1",
+    "@forge/cli": "13.4.0",
+    "@types/node": "24.10.1",
+    "eslint": "9.39.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.68.0",
+    "vite": "7.3.6",
+    "vitest": "3.2.7"
+  }
+}
