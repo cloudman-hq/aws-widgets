@@ -3,22 +3,32 @@ import type { CredentialInput } from '../schemas.js';
 import { mapAwsError } from './errors.js';
 
 type CredentialValidatorDependencies = {
-  getCallerIdentity: (credential: CredentialInput) => Promise<unknown>;
+  getCallerIdentity: (
+    credential: CredentialInput,
+    region: 'us-east-1' | 'cn-north-1',
+  ) => Promise<unknown>;
 };
 
 export const createCredentialValidator = ({
   getCallerIdentity,
 }: CredentialValidatorDependencies) => async (credential: CredentialInput): Promise<void> => {
-  try {
-    await getCallerIdentity(credential);
-  } catch (error: unknown) {
-    throw mapAwsError(error);
+  for (const region of ['us-east-1', 'cn-north-1'] as const) {
+    try {
+      await getCallerIdentity(credential, region);
+      return;
+    } catch (error: unknown) {
+      const mapped = mapAwsError(error);
+      if (mapped.code !== 'INVALID_AUTH' || region === 'cn-north-1') throw mapped;
+    }
   }
 };
 
-const getCallerIdentity = async (credential: CredentialInput): Promise<unknown> => {
+const getCallerIdentity = async (
+  credential: CredentialInput,
+  region: 'us-east-1' | 'cn-north-1',
+): Promise<unknown> => {
   const client = new STSClient({
-    region: 'us-east-1',
+    region,
     credentials: credential,
     maxAttempts: 2,
   });
