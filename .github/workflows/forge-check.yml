@@ -1,0 +1,56 @@
+name: Forge checks
+
+on:
+  pull_request:
+    paths:
+      - 'forge/**'
+      - '.github/workflows/forge-check.yml'
+  push:
+    branches:
+      - prod-release
+    paths:
+      - 'forge/**'
+      - '.github/workflows/forge-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: forge
+
+jobs:
+  check:
+    name: Validate Forge subtree
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+          cache-dependency-path: forge/package-lock.json
+
+      - name: Install Forge dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run unit
+
+      - name: Build
+        run: npm run build
