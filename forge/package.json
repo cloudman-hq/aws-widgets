@@ -15,7 +15,7 @@
     "clean": "node scripts/clean.mjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "unit": "node --test tests/app-contract.test.mjs && vitest run --config vitest.config.ts tests/contracts.test.ts",
+    "unit": "node --test tests/app-contract.test.mjs && vitest run --config vitest.config.ts tests/contracts.test.ts tests/credentials.test.ts tests/credential-repository.test.ts tests/credential-validator.test.ts tests/resolver-boundary.test.ts tests/resource-schemas.test.ts",
     "build:frontend": "npm run clean && vite build --mode macro-view && vite build --mode macro-config && vite build --mode global-settings",
     "build:resolver": "tsc --project tsconfig.resolver.json",
     "build": "npm run build:frontend && npm run build:resolver",
@@ -23,7 +23,9 @@
     "verify": "npm run lint && npm run typecheck && npm run unit && npm run build && npm run forge:lint"
   },
   "dependencies": {
+    "@aws-sdk/client-sts": "3.1120.0",
     "@forge/bridge": "6.3.0",
+    "@forge/kvs": "2.0.4",
     "@forge/resolver": "2.0.0"
   },
   "devDependencies": {
