@@ -280,7 +280,11 @@ unattended: it can make breaking dependency changes. Track the production
 moderate findings and contain or upgrade the development tunnel/toolchain
 findings before exposing development tooling beyond the approved environment.
 
-No successful AWS call or production migration is implied by a green local
-build. Production listing approval, automatic migration, customer credential
-continuity validation, fallback re-entry, and Connect retirement remain
-separate gates.
+The development-site Connect-to-Forge rehearsal is recorded in
+[`evidence/connect-to-forge-continuity-2026-08-28.md`](evidence/connect-to-forge-continuity-2026-08-28.md).
+It proves that Atlassian replaced the public same-key Connect app with Forge
+while retaining the fixture macro node, UUID, content property, CQL identity,
+and rendered macro placeholder. It does not prove browser Custom UI execution,
+legacy credential import, a successful AWS call, or production migration.
+Production listing approval, customer credential continuity validation,
+fallback re-entry, and Connect retirement remain separate gates.

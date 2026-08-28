@@ -18,7 +18,7 @@
 <body><main>
   <p><code>codex/forge-conversion</code> → <code>prod-release</code> · Draft PR only</p>
   <h1>AWS Widgets Forge migration review</h1>
-  <div class="status"><strong>Development outcome:</strong> the new unlisted Forge app is registered, deployed to <code>development</code>, and installed only on <code>lite-dev.atlassian.net</code>. Production, Marketplace, the old Connect runtime, and customer sites are unchanged.</div>
+  <div class="status"><strong>Development outcome:</strong> the new unlisted Forge app is registered, deployed to <code>development</code>, and installed only on <code>lite-dev.atlassian.net</code>. A controlled same-key rehearsal replaced public Connect <code>1.1.11-AC</code> while preserving an old-format macro fixture. Production, Marketplace, the old production Connect runtime, and customer sites are unchanged.</div>
 
   <h2>What changed</h2>
   <div class="grid">
@@ -35,6 +35,7 @@
     <li>Authenticated Forge lint: 0 errors, one documented direct-egress deprecation warning.</li>
     <li>Local browser harness: no console warnings/errors/secrets.</li>
     <li>Development deployment version 3.1.0 and installation status Up-to-date.</li>
+    <li>Real-site Connect-to-Forge replacement retained page <code>74383361</code>, macro key/UUID, content-property value/version, CQL identity, and the rendered <code>AWS Widgets Resource</code> placeholder.</li>
   </ul>
 
   <h2>Deviations and open gates</h2>
@@ -42,8 +43,8 @@
     <li>The approved implementation uses installation-held Forge secrets, with an adapter boundary for future federation.</li>
     <li>Forge rejected <code>--personal</code> registration in developer spaces; the app is instead a normal unlisted app in a dedicated <code>AWS Widgets</code> developer space.</li>
     <li>PR CI omits authenticated Forge lint so no long-lived Forge credential is stored in GitHub.</li>
-    <li>Project-scoped Playwright failed closed because the repository has no profile declaration. Live UI/dummy-credential evidence remains open; no browser-profile fallback was used.</li>
-    <li>A read-only CQL check found no existing <code>aws-widget-macro</code> on <code>lite-dev</code>, so real legacy-page continuity remains a production preflight gate.</li>
+    <li>Project-scoped Playwright failed closed because the repository has no profile declaration. Browser Custom UI/editor evidence remains open; no browser-profile fallback was used.</li>
+    <li>The real-site rehearsal proves platform identity and data continuity, but not browser execution, credential import, or a successful AWS resource result.</li>
     <li>No real AWS success, production adoption, Marketplace submission, merge, or Connect retirement is included.</li>
   </ul>
 

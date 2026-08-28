@@ -148,6 +148,11 @@ the old Connect path available until the owner signs off.
 
 ## Validation checklist
 
+Development rehearsal evidence from 28 August 2026 is recorded in
+[`../evidence/connect-to-forge-continuity-2026-08-28.md`](../evidence/connect-to-forge-continuity-2026-08-28.md).
+It exercises the official same-key replacement path against the public Connect
+version on `lite-dev.atlassian.net`; it is not a production approval.
+
 - [ ] Production manifest had `app.connect.key: com.aws.widget.confluence-addon`
       before its first production deployment; no later identity mutation is
       required.
@@ -156,8 +161,11 @@ the old Connect path available until the owner signs off.
 - [ ] The Forge Marketplace listing is the existing AWS Widgets listing, not a
       duplicate customer-facing listing.
 - [ ] Forge macro module key is exactly `aws-widget-macro`.
-- [ ] Existing Connect macro nodes load a valid legacy resource selection and
-      render without an author edit; missing/invalid data fails closed.
+- [x] A development-site Connect macro node retained its page ID, macro key,
+      UUID, content-property value/version, CQL identity, and rendered macro
+      placeholder after same-key Forge replacement.
+- [ ] Browser Custom UI loads that retained resource selection without an
+      author edit; missing/invalid data fails closed.
 - [ ] Editing an existing macro prepopulates the migrated region, resource type,
       and resource ID and saves native Forge configuration.
 - [ ] A valid legacy credential is decrypted only in Forge, STS-validated, and
