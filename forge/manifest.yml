@@ -1,7 +1,7 @@
 modules:
   # Forge CLI 13 uses the product-scoped `macro` module key for Confluence.
   macro:
-    - key: aws-widgets-resource
+    - key: aws-widget-macro
       resource: macro-view
       resolver:
         function: resolver

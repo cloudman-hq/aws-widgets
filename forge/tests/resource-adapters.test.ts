@@ -1,11 +1,20 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createDynamoDbAdapter } from '../src/resolver/aws/dynamodb.js';
+import { safeString } from '../src/resolver/aws/common.js';
 import { createEcsAdapter } from '../src/resolver/aws/ecs.js';
 import { mapAwsError } from '../src/resolver/aws/errors.js';
 import { createLambdaAdapter } from '../src/resolver/aws/lambda.js';
 import { createS3Adapter } from '../src/resolver/aws/s3.js';
 
 const NOW = () => new Date('2026-08-28T00:00:00.000Z');
+
+describe('normalized field safety', () => {
+  it('rejects C0 and DEL control characters', () => {
+    expect(safeString('safe value')).toBe('safe value');
+    expect(safeString('line\nbreak')).toBeUndefined();
+    expect(safeString(`delete${String.fromCodePoint(127)}`)).toBeUndefined();
+  });
+});
 
 describe('Lambda adapter', () => {
   it('paginates lists and normalizes describe output', async () => {

@@ -11,7 +11,10 @@ export type ViewField = ResourceView['fields'][number];
 
 export const safeString = (value: unknown, maxLength = 512): string | undefined => {
   if (typeof value !== 'string' || value.length === 0 || value.length > maxLength) return undefined;
-  if ([...value].some((character) => (character.codePointAt(0) ?? 0) < 32)) return undefined;
+  if ([...value].some((character) => {
+    const codePoint = character.codePointAt(0) ?? 0;
+    return codePoint < 32 || codePoint === 127;
+  })) return undefined;
   return value;
 };
 

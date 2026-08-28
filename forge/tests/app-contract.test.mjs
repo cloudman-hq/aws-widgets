@@ -12,6 +12,7 @@ test('Forge workspace exposes the isolated app contract', async () => {
   ]);
 
   assert.match(manifest, /^ {2}macro:/m);
+  assert.match(manifest, /- key: aws-widget-macro/);
   assert.match(manifest, /confluence:globalSettings:/);
   assert.match(manifest, /handler: resolver\/index\.handler/);
   assert.match(manifest, /name: nodejs24\.x/);

@@ -10,7 +10,13 @@
 
 ## 1. Purpose and success boundary
 
-This design converts the useful AWS Widgets resource-card experience into a standalone Confluence Forge app. The app lets a Confluence administrator configure one installation-wide AWS credential, then lets authors configure a macro for an AWS region, resource type, and resource identifier. All AWS operations execute in Forge backend code. Neither the macro, macro configuration UI, nor global settings UI receives a stored AWS credential or imports an AWS SDK.
+This design converts the useful AWS Widgets resource-card experience into a Confluence Forge app. Development uses an isolated, unlisted Forge registration. The production release target adopts the existing Connect Marketplace identity rather than creating a second customer-facing listing. The app lets a Confluence administrator configure one installation-wide AWS credential, then lets authors configure a macro for an AWS region, resource type, and resource identifier. All AWS operations execute in Forge backend code. Neither the macro, macro configuration UI, nor global settings UI receives a stored AWS credential or imports an AWS SDK.
+
+### Release identity addendum
+
+The implementation manifest stays independently deployable in development, but the production adoption manifest must be prepared before its first production deployment with `app.connect.key: com.aws.widget.confluence-addon`. Atlassian documents that this value cannot be added, removed, or changed after the first production deployment. The Forge macro key must be `aws-widget-macro`, matching the existing Connect dynamic-content macro key, so existing macro nodes resolve to the Forge module after adoption.
+
+The Connect application stored resource configuration in a content property addressed by a generated `uuid`, not as ordinary macro parameters. This implementation does not read that property or request Confluence content-property scopes. Existing macro nodes therefore enter a safe configuration-required state until an author explicitly selects region, resource type, and resource ID in the Forge editor. Existing Connect credentials are likewise never transferred; an administrator must enter a new credential through Forge settings.
 
 The implementation is successful when it:
 
@@ -56,8 +62,8 @@ The browser can send macro configuration and new credential values entered durin
 
 | Alternative | Decision | Rationale |
 | --- | --- | --- |
-| Standalone Forge app with installation-scoped encrypted secret and backend AWS SDK v3 | **Chosen** | It satisfies the owner-approved scope, removes browser credential exposure, needs no new vendor infrastructure, and leaves Connect independently operable. |
-| Incremental Connect-to-Forge app with a Connect bridge | Rejected | It would preserve legacy runtime coupling and create pressure to read or transfer Connect app properties. This conversion has no authorized secret migration or coexistence bridge. |
+| Forge rebuild with installation-scoped encrypted secret and backend AWS SDK v3; isolated development identity followed by existing-listing adoption | **Chosen** | It removes browser credential exposure, needs no new vendor compute path, supports safe development, and preserves the customer-facing Connect identity at production adoption. |
+| Runtime Connect bridge for credential/configuration transfer | Rejected | It would preserve legacy runtime coupling and create pressure to read or transfer Connect app properties. This conversion has no authorized secret migration or data bridge. The production manifest may retain the minimum Connect identity remote required by Atlassian's adoption mechanism, but Forge runtime requests do not use it. |
 | Forge resolver calling a new vendor-managed AWS gateway | Rejected for this implementation | A gateway adds hosting, tenant mapping, lifecycle, incident-response, and data-residency obligations that are unnecessary for a narrow read-only card. No external vendor backend is needed. |
 | Customer-owned role federation with short-lived credentials | Deferred, not rejected as a product direction | It gives stronger credential lifecycle properties, but needs an approved trust exchange, customer onboarding, and a non-production AWS account. The present implementation is explicitly scoped to installation-held credentials. The adapter and credential-provider boundaries must allow federation to replace static credentials later without changing UI contracts. |
 
