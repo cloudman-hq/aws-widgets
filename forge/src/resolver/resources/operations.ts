@@ -1,7 +1,7 @@
-import { PublicResolverError } from '../errors.js';
-import { parseMacroConfig, parseResourceListInput } from '../resource-schemas.js';
-import type { CredentialRepository } from '../credentials/repository.js';
-import type { ResourceAdapterFactory, ResourceOperations } from './types.js';
+import { PublicResolverError } from '../errors';
+import { parseMacroConfig, parseResourceListInput } from '../resource-schemas';
+import type { CredentialRepository } from '../credentials/repository';
+import type { ResourceAdapterFactory, ResourceOperations } from './types';
 
 type ResourceDependencies = {
   repository: CredentialRepository;

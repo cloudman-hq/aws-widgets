@@ -1,5 +1,5 @@
-import type { ResourceOptions, ResourceView } from '../../shared/contracts.js';
-import { PublicResolverError } from '../errors.js';
+import type { ResourceOptions, ResourceView } from '../../shared/contracts';
+import { PublicResolverError } from '../errors';
 
 export const MAX_RESOURCE_ITEMS = 500;
 export const MAX_AWS_PAGES = 50;

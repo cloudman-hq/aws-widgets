@@ -1,6 +1,6 @@
 import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
-import type { CredentialInput } from '../schemas.js';
-import { mapAwsError } from './errors.js';
+import type { CredentialInput } from '../schemas';
+import { mapAwsError } from './errors';
 
 type CredentialValidatorDependencies = {
   getCallerIdentity: (

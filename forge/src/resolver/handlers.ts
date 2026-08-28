@@ -1,12 +1,12 @@
 import type { Request } from '@forge/resolver';
-import type { CredentialRepository } from './credentials/repository.js';
-import { createCredentialOperations } from './credentials/operations.js';
-import { authorizeModule, MACRO_MODULE_KEY, SETTINGS_MODULE_KEY } from './authorization.js';
-import type { CredentialInput } from './schemas.js';
-import { toSafeEnvelope, type SafeLogEvent } from './safety.js';
-import { createResourceOperations } from './resources/operations.js';
-import type { ResourceAdapterFactory } from './resources/types.js';
-import { PublicResolverError } from './errors.js';
+import type { CredentialRepository } from './credentials/repository';
+import { createCredentialOperations } from './credentials/operations';
+import { authorizeModule, MACRO_MODULE_KEY, SETTINGS_MODULE_KEY } from './authorization';
+import type { CredentialInput } from './schemas';
+import { toSafeEnvelope, type SafeLogEvent } from './safety';
+import { createResourceOperations } from './resources/operations';
+import type { ResourceAdapterFactory } from './resources/types';
+import { PublicResolverError } from './errors';
 
 type ResolverDependencies = {
   repository: CredentialRepository;

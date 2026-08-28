@@ -37,14 +37,14 @@ import {
   type DescribeTableCommandOutput,
   type ListTablesCommandOutput,
 } from '@aws-sdk/client-dynamodb';
-import type { ResourceType, SupportedRegion } from '../../shared/contracts.js';
-import type { StoredCredentialV1 } from '../credentials/repository.js';
-import type { ResourceAdapter } from '../resources/types.js';
-import { createDynamoDbAdapter } from './dynamodb.js';
-import { createEc2Adapter } from './ec2.js';
-import { createEcsAdapter } from './ecs.js';
-import { createLambdaAdapter } from './lambda.js';
-import { createS3Adapter } from './s3.js';
+import type { ResourceType, SupportedRegion } from '../../shared/contracts';
+import type { StoredCredentialV1 } from '../credentials/repository';
+import type { ResourceAdapter } from '../resources/types';
+import { createDynamoDbAdapter } from './dynamodb';
+import { createEc2Adapter } from './ec2';
+import { createEcsAdapter } from './ecs';
+import { createLambdaAdapter } from './lambda';
+import { createS3Adapter } from './s3';
 
 type SendClient = {
   send(command: object, options: { abortSignal: AbortSignal }): Promise<unknown>;

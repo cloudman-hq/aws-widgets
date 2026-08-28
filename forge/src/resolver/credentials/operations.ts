@@ -1,6 +1,6 @@
-import type { CredentialStatus } from '../../shared/contracts.js';
-import { parseCredentialInput, parseEmptyPayload, type CredentialInput } from '../schemas.js';
-import type { CredentialRepository } from './repository.js';
+import type { CredentialStatus } from '../../shared/contracts';
+import { parseCredentialInput, parseEmptyPayload, type CredentialInput } from '../schemas';
+import type { CredentialRepository } from './repository';
 
 type CredentialOperationsDependencies = {
   repository: CredentialRepository;

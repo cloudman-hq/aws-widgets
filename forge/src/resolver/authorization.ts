@@ -1,4 +1,4 @@
-import { PublicResolverError } from './errors.js';
+import { PublicResolverError } from './errors';
 
 export const SETTINGS_MODULE_KEY = 'aws-widgets-settings';
 export const MACRO_MODULE_KEY = 'aws-widget-macro';

@@ -4,8 +4,8 @@ import {
   type MacroConfigV1,
   type ResourceType,
   type SupportedRegion,
-} from '../shared/contracts.js';
-import { PublicResolverError } from './errors.js';
+} from '../shared/contracts';
+import { PublicResolverError } from './errors';
 
 type ResourceListInput = {
   region: SupportedRegion;

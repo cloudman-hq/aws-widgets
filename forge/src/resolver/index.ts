@@ -1,10 +1,10 @@
 import Resolver from '@forge/resolver';
 import { randomUUID } from 'node:crypto';
-import { validateCredentialWithAws } from './aws/credential-validator.js';
-import { createAwsResourceAdapter } from './aws/factory.js';
-import { forgeCredentialRepository } from './credentials/forge-repository.js';
-import { createResolverHandlers } from './handlers.js';
-import type { SafeLogEvent } from './safety.js';
+import { validateCredentialWithAws } from './aws/credential-validator';
+import { createAwsResourceAdapter } from './aws/factory';
+import { forgeCredentialRepository } from './credentials/forge-repository';
+import { createResolverHandlers } from './handlers';
+import type { SafeLogEvent } from './safety';
 
 const resolver = new Resolver();
 

@@ -1,4 +1,4 @@
-import { PublicResolverError } from '../errors.js';
+import { PublicResolverError } from '../errors';
 
 const AUTH_ERROR_NAMES = new Set([
   'ExpiredToken',

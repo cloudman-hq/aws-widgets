@@ -1,7 +1,7 @@
-import type { ResourceAdapter } from '../resources/types.js';
-import type { SupportedRegion } from '../../shared/contracts.js';
-import { PublicResolverError } from '../errors.js';
-import { mapAwsError } from './errors.js';
+import type { ResourceAdapter } from '../resources/types';
+import type { SupportedRegion } from '../../shared/contracts';
+import { PublicResolverError } from '../errors';
+import { mapAwsError } from './errors';
 import {
   assertPageWithinLimit,
   definedFields,
@@ -10,7 +10,7 @@ import {
   makeField,
   resultLimitIfNeeded,
   safeString,
-} from './common.js';
+} from './common';
 
 export type Ec2Instance = {
   instanceId?: unknown | undefined;

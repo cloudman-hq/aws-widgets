@@ -1,4 +1,4 @@
-import type { PublicErrorCode } from '../shared/contracts.js';
+import type { PublicErrorCode } from '../shared/contracts';
 
 export class PublicResolverError extends Error {
   readonly code: PublicErrorCode;

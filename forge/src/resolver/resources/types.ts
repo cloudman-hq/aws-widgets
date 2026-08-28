@@ -4,8 +4,8 @@ import type {
   ResourceType,
   ResourceView,
   SupportedRegion,
-} from '../../shared/contracts.js';
-import type { StoredCredentialV1 } from '../credentials/repository.js';
+} from '../../shared/contracts';
+import type { StoredCredentialV1 } from '../credentials/repository';
 
 export type ResourceAdapter = {
   list?: () => Promise<ResourceOptions>;

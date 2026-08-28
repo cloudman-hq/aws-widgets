@@ -1,3 +1,6 @@
+import { PublicResolverError } from '../errors';
+import { parseCredentialInput } from '../schemas';
+
 export type StoredCredentialV1 = {
   schemaVersion: 1;
   accessKeyId: string;
@@ -69,5 +72,3 @@ export const createKvsCredentialRepository = (
   write: (credential) => secretStore.setSecret(CREDENTIAL_SECRET_KEY, credential),
   delete: () => secretStore.deleteSecret(CREDENTIAL_SECRET_KEY),
 });
-import { PublicResolverError } from '../errors.js';
-import { parseCredentialInput } from '../schemas.js';

@@ -1,6 +1,6 @@
-import type { SupportedRegion } from '../../shared/contracts.js';
-import { PublicResolverError } from '../errors.js';
-import type { ResourceAdapter } from '../resources/types.js';
+import type { SupportedRegion } from '../../shared/contracts';
+import { PublicResolverError } from '../errors';
+import type { ResourceAdapter } from '../resources/types';
 import {
   assertPageWithinLimit,
   definedFields,
@@ -9,8 +9,8 @@ import {
   resultLimitIfNeeded,
   safeNumber,
   safeString,
-} from './common.js';
-import { mapAwsError } from './errors.js';
+} from './common';
+import { mapAwsError } from './errors';
 
 export type DynamoDbApi = {
   listTables(input: { exclusiveStartTableName?: string }): Promise<{

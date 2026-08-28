@@ -2,8 +2,8 @@ import type {
   PublicErrorCode,
   ResolverEnvelope,
   ResolverOperation,
-} from '../shared/contracts.js';
-import { PublicResolverError } from './errors.js';
+} from '../shared/contracts';
+import { PublicResolverError } from './errors';
 
 export type SafeLogEvent = {
   requestId: string;
