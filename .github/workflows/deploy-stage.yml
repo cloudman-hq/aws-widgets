@@ -25,4 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn install
-      - run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}
+      - name: Build legacy Connect app
+        if: github.event_name == 'pull_request'
+        run: yarn build
+      - name: Deploy legacy Connect app to stage
+        if: github.event_name == 'push'
+        run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}
