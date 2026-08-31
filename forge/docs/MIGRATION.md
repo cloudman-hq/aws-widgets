@@ -21,7 +21,7 @@ production:
 | Environment | Registration/listing | Required identity |
 | --- | --- | --- |
 | Development | New, unlisted Forge registration in an approved developer space | Separate Forge app ID with `app.connect.key: com.aws.widget.confluence-addon` so migration is testable |
-| Production adoption | Existing AWS Widgets Connect Marketplace listing | The same Connect key before the first production deployment; a remote only if Connect modules remain |
+| Production adoption | Existing AWS Widgets Connect Marketplace listing | The same Connect key before the first production deployment; no Connect remote because this successor retains no Connect modules |
 
 The production `app.connect.key` is immutable after the first production
 deployment. Treat it as a release-blocking preflight, not a field to add later:
@@ -32,28 +32,35 @@ app:
     key: com.aws.widget.confluence-addon
 ```
 
-The production adoption manifest must also declare the necessary Connect remote
-when the retained Connect modules require it. The exact URL and remote key are
-not specified by this development branch and must come from the production
-release review. The shape is illustrative only:
-
-```yaml
-remotes:
-  - key: connect-app-server
-    baseUrl: <reviewed-legacy-connect-backend-url>
-app:
-  connect:
-    key: com.aws.widget.confluence-addon
-    remote: connect-app-server
-```
-
-Do not add an invented remote. This successor removes the legacy Connect
-modules, so the current manifest does not require one. The unchanged Connect
-key authorizes Atlassian's documented app-property migration API.
+Do not add an invented Connect remote. Atlassian requires one only while a
+Forge adoption manifest retains Connect modules. This successor has no
+`connectModules`, so the current manifest correctly has no `remotes` block.
+The unchanged Connect key authorizes Atlassian's documented app-property
+migration API.
 
 The Forge macro module key must remain exactly `aws-widget-macro`, matching the
 legacy Connect dynamic-content macro key. A changed key would prevent existing
 macro nodes from resolving to the successor module during adoption.
+
+The manifest also declares `connectToForgeMigration` with a `YES` commitment
+and the public [customer migration guide](./FORGE-MIGRATION-GUIDE.md). This
+replaces Atlassian's generic Connect end-of-support warning with an AWS
+Widgets-specific status link. The production-branch URL must be publicly
+reachable before the manifest is deployed to production.
+
+## App-account persistence decision
+
+App-account persistence is not required for the current AWS Widgets behavior.
+The legacy descriptor exposes only a macro and configuration page, and the
+legacy implementation stores app and content properties; it does not depend on
+customer-managed permissions for the Connect app account or on modifying pages
+or comments created by that account. Atlassian states that migrated apps retain
+entity-property access without persisting the Connect app account.
+
+Recheck this evidence before the first production deployment. If production
+evidence shows customer-managed app-account permissions or app-authored content
+that must later be modified, stop: Atlassian requires the persistence request
+to be completed before that first deployment.
 
 ## What does and does not migrate
 
@@ -108,8 +115,8 @@ site/macro/credential validation
 Before requesting migration, the owner confirms that the Forge app has passed
 the development gates and that the production adoption manifest has been
 reviewed. Freeze the production identity, preserve the exact macro key, record
-the approved Connect remote, and prepare customer/admin instructions for
-automatic continuity, fallback re-entry, and rollback.
+the no-Connect-module/no-remote decision, and prepare customer/admin
+instructions for automatic continuity, fallback re-entry, and rollback.
 
 Submit the staged migration request through the Atlassian adoption process.
 Do not deploy the development identity as a substitute for this request.
@@ -125,8 +132,8 @@ environments, timing, support owner, and rollback contact.
 
 Submit the Forge successor for approval against the existing AWS Widgets
 listing. Verify that Marketplace metadata, the production app identity, the
-macro key, scopes, egress, privacy/security text, and the required Connect
-remote are the reviewed versions. Do not submit the independent development
+macro key, scopes, egress, privacy/security text, and migration declaration are
+the reviewed versions. Do not submit the independent development
 listing as a second customer-facing product.
 
 ### 4. Automatic migration
@@ -156,11 +163,17 @@ version on `lite-dev.atlassian.net`; it is not a production approval.
 - [ ] Production manifest had `app.connect.key: com.aws.widget.confluence-addon`
       before its first production deployment; no later identity mutation is
       required.
-- [ ] The required Connect remote has the reviewed key, URL, and module usage;
-      no development placeholder was deployed.
+- [x] No Connect remote is declared: the successor retains no `connectModules`,
+      and the contract test prevents an accidental `remotes` block.
 - [ ] The Forge Marketplace listing is the existing AWS Widgets listing, not a
       duplicate customer-facing listing.
-- [ ] Forge macro module key is exactly `aws-widget-macro`.
+- [x] Forge macro module key is exactly `aws-widget-macro`.
+- [x] The manifest declares `connectToForgeMigration`, links the public guide,
+      and records `willMigrateToForgeBeforeEOS: YES`.
+- [x] App-account persistence is recorded as not required based on current code
+      and descriptor evidence; recheck before first production deployment.
+- [ ] The production-branch migration-guide URL is publicly reachable before
+      the migration declaration is deployed to production.
 - [x] A development-site Connect macro node retained its page ID, macro key,
       UUID, content-property value/version, CQL identity, and rendered macro
       placeholder after same-key Forge replacement.

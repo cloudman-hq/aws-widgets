@@ -176,26 +176,21 @@ app:
 
 Atlassian treats this value as a one-time production identity decision: it must
 be correct before the first production deployment and cannot subsequently be
-added, removed, or changed. The production adoption manifest must also contain
-the necessary reviewed Connect remote when the retained Connect modules require
-one. The exact remote key, URL, and retained modules are production release
-inputs and must not be invented in the development manifest. An illustrative
-shape is:
+added, removed, or changed. This successor retains no Connect modules, so it
+does not need a Connect remote and the manifest deliberately has no `remotes`
+block. Do not invent one as a production placeholder.
 
 ```yaml
-remotes:
-  - key: connect-app-server
-    baseUrl: <reviewed-legacy-connect-backend-url>
-app:
-  connect:
-    key: com.aws.widget.confluence-addon
-    remote: connect-app-server
+modules:
+  connectToForgeMigration:
+    - key: aws-widgets-forge-migration
+      migrationGuideUrl: https://github.com/cloudman-hq/aws-widgets/blob/prod-release/forge/docs/FORGE-MIGRATION-GUIDE.md
+      willMigrateToForgeBeforeEOS: YES
 ```
 
-The example is not deployable until the owner has reviewed the URL, remote
-usage, and adoption manifest. A Connect remote required for Marketplace
-identity/adoption is not permission to export Connect credentials outside the
-Forge runtime.
+The declaration links admins to the public customer migration guide instead of
+Atlassian's generic Connect end-of-support warning. Its production-branch URL
+must be publicly reachable before production deployment.
 
 ## Scopes and network egress
 
@@ -215,10 +210,10 @@ allow-lists. It does not accept a caller-provided AWS endpoint, partition,
 command name, or arbitrary URL. AWS GovCloud and custom endpoints are outside
 this conversion's supported region set.
 
-Production adoption is a separately reviewed manifest change. Its immutable
-Connect identity and any necessary Connect remote must be reviewed before the
-first production deploy; those production-only fields are not a reason to
-weaken the independent development boundary.
+Production adoption is a separately reviewed release action. Its immutable
+Connect identity, migration declaration, and no-Connect-module/no-remote
+decision must be reviewed before the first production deploy; that review is
+not a reason to weaken the independent development boundary.
 
 ## AWS IAM policy
 

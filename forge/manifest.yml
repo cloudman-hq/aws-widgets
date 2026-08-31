@@ -4,6 +4,10 @@ environment:
       default: com.aws.widget.confluence-addon
 
 modules:
+  connectToForgeMigration:
+    - key: aws-widgets-forge-migration
+      migrationGuideUrl: https://github.com/cloudman-hq/aws-widgets/blob/prod-release/forge/docs/FORGE-MIGRATION-GUIDE.md
+      willMigrateToForgeBeforeEOS: YES
   # Forge CLI 13 uses the product-scoped `macro` module key for Confluence.
   macro:
     - key: aws-widget-macro

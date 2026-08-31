@@ -6,10 +6,11 @@ import { URL } from 'node:url';
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
 test('Forge workspace exposes the isolated app contract', async () => {
-  const [manifest, packageJson, tsconfig] = await Promise.all([
+  const [manifest, packageJson, tsconfig, migrationGuide] = await Promise.all([
     read('manifest.yml'),
     read('package.json').then(JSON.parse),
     read('tsconfig.json').then(JSON.parse),
+    read('docs/FORGE-MIGRATION-GUIDE.md'),
   ]);
 
   assert.match(manifest, /^ {2}macro:/m);
@@ -22,10 +23,21 @@ test('Forge workspace exposes the isolated app contract', async () => {
   assert.match(manifest, /- read:app-data:confluence/);
   assert.match(manifest, /key: CONNECT_KEY\n\s+default: com\.aws\.widget\.confluence-addon/);
   assert.match(manifest, /connect:\n\s+key: \$\{CONNECT_KEY\}/);
+  assert.match(manifest, /^ {2}connectToForgeMigration:/m);
+  assert.match(manifest, /- key: aws-widgets-forge-migration/);
+  assert.match(
+    manifest,
+    /migrationGuideUrl: https:\/\/github\.com\/cloudman-hq\/aws-widgets\/blob\/prod-release\/forge\/docs\/FORGE-MIGRATION-GUIDE\.md/,
+  );
+  assert.match(manifest, /willMigrateToForgeBeforeEOS: YES/);
   assert.match(manifest, /- '\*\.amazonaws\.com'/);
   assert.match(manifest, /- '\*\.amazonaws\.com\.cn'/);
   assert.doesNotMatch(manifest, /^remotes:/m);
+  assert.doesNotMatch(manifest, /^ {2}connectModules:/m);
   assert.doesNotMatch(manifest, /^\s+client:/m);
+  assert.match(migrationGuide, /same Marketplace app/i);
+  assert.match(migrationGuide, /existing AWS Widgets macros/i);
+  assert.match(migrationGuide, /Forge secret storage/i);
 
   for (const script of ['lint', 'typecheck', 'unit', 'build', 'forge:lint', 'verify']) {
     assert.equal(typeof packageJson.scripts[script], 'string', `missing ${script} script`);
