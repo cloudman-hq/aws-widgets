@@ -14,11 +14,14 @@ Run the repository's authoritative local validation contract and report UI evide
 
     yarn validate
 
-- It expands to `yarn lint:check && yarn test && yarn build`. It is the
+- It expands to `yarn lint:check && yarn test --ci && yarn build`. It is the
   secretless/offline contract used by pull-request CI. It must not require Firebase,
   Atlassian, or AWS credentials.
 - Use `lint:check`, not `lint`. The `lint` script passes `--fix` and rewrites source
-  files; a validation command must not mutate the tree.
+  files; a validation command must not mutate the tree. The husky pre-commit hook runs
+  `lint:check` for the same reason.
+- Keep `--ci` when running jest by hand. Without it jest writes new snapshots instead
+  of failing on missing ones, which reports PASS where CI reports FAIL.
 - Do not replace the contract with a hand-picked subset of checks.
 - Do not weaken tests, lint rules, or validation scripts to manufacture a pass.
 - There is no E2E suite in this repository. Do not report one.

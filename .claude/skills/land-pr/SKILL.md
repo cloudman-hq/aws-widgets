@@ -10,8 +10,8 @@ Production promotion is always separate.
 
 ## Merging to `prod-release` deploys to stage
 
-`deploy-stage.yml` runs `yarn deploy:stage` on every push to `prod-release`, which
-publishes to the Firebase project `stage` (`awswidgets-stg`). A merge is therefore a
+`deploy-stage.yml` deploys the tested build artifact to the Firebase project `stage`
+(`awswidgets-stg`) on every push to `prod-release`. A merge is therefore a
 deployment action, not only a repository action. Require explicit merge authorization
 and say so in the report.
 
@@ -34,10 +34,14 @@ Require:
 - Required runtime UI assertions have evidence; process-only work may be
   `SKIPPED — no runtime change`
 
-`prod-release` has no branch protection and the repository has zero rulesets
-(measured 2026-09-03). GitHub will not block a merge that violates these
-preconditions; this skill is the only gate. Do not skip a precondition because the
-platform allows it.
+`prod-release` protection now enforces part of this list: the `Build and Unit Test`
+check, a pull request, no force pushes, no deletions, and resolved conversations. A
+rejection naming one of those is a real missing precondition, not a transient
+failure — re-read the PR rather than retrying the merge.
+
+The platform does **not** enforce the rest: `enforce_admins` is `false` and the
+required approval count is `0`, so an administrator can merge with a failing local
+`yarn validate` or missing UI evidence. Those preconditions are this skill's alone.
 
 If the PR is Draft and the user explicitly asked to land it, invoke ready-pr, then use
 babysit-pr to verify the new `Build and Unit Test` run for the unchanged head SHA.
@@ -73,7 +77,7 @@ Do not use auto-merge to bypass a currently failing or pending precondition.
 Find the `Build, Test and Stage` push run whose `headSha` exactly equals
 `mergeCommit.oid`:
 
-    gh run list --repo cloudman-hq/aws-widgets --workflow "Build, Test and Stage" --event push --branch prod-release --limit 20 --json databaseId,headSha,status,conclusion,url
+    gh run list --repo cloudman-hq/aws-widgets --workflow deploy-stage.yml --event push --branch prod-release --limit 20 --json databaseId,headSha,status,conclusion,url
 
 Watch that run and re-read its jobs. Require:
 

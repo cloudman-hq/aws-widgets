@@ -1,7 +1,10 @@
 # Pull requests run the secretless Build and Unit Test gate only.
-# Pushes to prod-release run the same gate, then deploy to the Firebase stage project.
+# Pushes to prod-release run the same gate, then deploy the tested artifact to the
+# Firebase stage project.
+#
 # Node is pinned to 10.x because node-sass@4.13.1 has no prebuilt binary above Node 13
-# and its node-gyp@3.8.0 fallback needs Python 2. See docs/policies/git-workflow.md.
+# and its node-gyp@3.8.0 fallback needs Python 2. The action versions are independent
+# of that constraint, so they track current majors. See docs/policies/git-workflow.md.
 
 name: Build, Test and Stage
 
@@ -10,12 +13,16 @@ on:
     branches: [ prod-release ]  # master has code that is not ready for prod
   pull_request:
     branches: [ prod-release ]
+    # ready_for_review is not a default activity type. Without it, marking a Draft PR
+    # Ready starts no run, and the lifecycle skills wait for one that never appears.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # Include the event so a push run and a pull request run for the same branch do not
-# cancel each other. A superseding run of the same event still cancels its predecessor.
+# cancel each other. Cancellation is limited to pull requests: cancelling a push run
+# can kill an in-flight `firebase deploy` and leave the stage site half-updated.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -29,13 +36,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js 10.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 10.x
-      # actions/setup-node ships yarn 1.x, so the Corepack shim that breaks under
-      # Node 10 locally is not on the runner.
       - run: yarn install --frozen-lockfile
       - name: Lint
         run: yarn lint:check
@@ -43,6 +48,15 @@ jobs:
         run: yarn test --ci
       - name: Build
         run: yarn build
+      # The deploy job publishes this exact artifact, so the bytes that were tested
+      # are the bytes that ship.
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+          retention-days: 7
+          if-no-files-found: error
 
   deploy-stage:
     name: Deploy legacy Connect app to stage
@@ -51,10 +65,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js 10.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 10.x
       - run: yarn install --frozen-lockfile
-      - run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}
+      - name: Download the tested build output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+      # firebase deploy publishes the `build` directory that firebase.json points at.
+      # Calling the CLI directly skips the rebuild inside `yarn deploy:stage`.
+      - name: Deploy to Firebase stage
+        run: yarn firebase deploy --project stage --token ${{ secrets.FIREBASE_TOKEN }}

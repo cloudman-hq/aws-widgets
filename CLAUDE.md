@@ -82,12 +82,15 @@ yarn validate
 
 ```bash
 yarn lint:check    # tslint, no --fix
-yarn test --ci     # jest
+yarn test --ci     # jest; --ci is load-bearing, see below
 yarn build         # webpack production, output to build/ (gitignored)
 ```
 
-Use `lint:check`, not `lint`. The `lint` script passes `--fix` and rewrites source; it
-is what the husky v4 pre-commit hook runs, and it must not be the validation gate.
+Use `lint:check`, not `lint`. The `lint` script passes `--fix` and rewrites source, so
+it must not be a validation gate; the husky v4 pre-commit hook runs `lint:check`.
+
+Keep `--ci` on jest. Without it jest writes new snapshots instead of failing on
+missing ones, so a hand-run check can pass where CI fails.
 
 `yarn install` compiles `node-sass` and `fsevents` through `node-gyp@3.8.0`. The
 `fsevents` `gyp ERR!` block is optional-dependency noise and does not fail the install.

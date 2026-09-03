@@ -59,7 +59,7 @@ that branch.
 
     git fetch --prune
     git rev-parse origin/prod-release
-    gh run list --repo cloudman-hq/aws-widgets --workflow "Build, Test and Stage" \
+    gh run list --repo cloudman-hq/aws-widgets --workflow deploy-stage.yml \
       --event push --branch prod-release --limit 20 \
       --json databaseId,headSha,status,conclusion,url,createdAt
 
@@ -123,7 +123,7 @@ already taken, not that the ruleset is wrong.
 
 Find the run caused by that tag:
 
-    gh run list --repo cloudman-hq/aws-widgets --workflow "Deploy to Prod" \
+    gh run list --repo cloudman-hq/aws-widgets --workflow deploy-prod.yml \
       --event push --limit 20 \
       --json databaseId,event,headBranch,headSha,createdAt,status,conclusion,url
 

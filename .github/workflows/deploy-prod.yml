@@ -1,7 +1,9 @@
 # Production deploy. Fires on a pushed tag matching release-*.
 # The deploy job targets the `production` GitHub environment, which requires a
-# human approval and accepts only `release-*` tags. Node is pinned to 10.x because
-# node-sass@4.13.1 has no prebuilt binary above Node 13.
+# reviewer decision and accepts only `release-*` tags.
+#
+# Node is pinned to 10.x because node-sass@4.13.1 has no prebuilt binary above
+# Node 13. The action versions are independent of that constraint.
 
 name: Deploy to Prod
 
@@ -10,8 +12,10 @@ on:
     tags:
       - release-*
 
+# A constant group. Keying on github.ref would give every tag its own group and
+# serialize nothing, so an older release approved late could overwrite a newer one.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
@@ -23,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js 10.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 10.x
       - run: yarn install --frozen-lockfile
@@ -35,6 +39,15 @@ jobs:
         run: yarn test --ci
       - name: Build
         run: yarn build
+      # The deploy job publishes this exact artifact, so the bytes that were tested
+      # are the bytes that ship.
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+          retention-days: 7
+          if-no-files-found: error
 
   deploy-prod:
     name: Deploy legacy Connect app to production
@@ -43,10 +56,18 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js 10.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 10.x
       - run: yarn install --frozen-lockfile
-      - run: yarn deploy:prod --token ${{ secrets.FIREBASE_TOKEN }}
+      - name: Download the tested build output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+      # firebase deploy publishes the `build` directory that firebase.json points at.
+      # Calling the CLI directly skips the rebuild inside `yarn deploy:prod`.
+      - name: Deploy to Firebase production
+        run: yarn firebase deploy --project prod --token ${{ secrets.FIREBASE_TOKEN }}

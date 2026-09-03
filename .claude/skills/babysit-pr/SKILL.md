@@ -28,7 +28,7 @@ The PR workflow is `Build, Test and Stage`. The required PR job is exactly
 
 List both event types for the exact branch and inspect only the recorded head SHA:
 
-    gh run list --repo cloudman-hq/aws-widgets --workflow "Build, Test and Stage" \
+    gh run list --repo cloudman-hq/aws-widgets --workflow deploy-stage.yml \
       --branch HEAD_BRANCH --limit 40 \
       --json databaseId,event,headSha,status,conclusion,url,createdAt
 

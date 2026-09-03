@@ -45,9 +45,10 @@ Proceed only when the user authorized the Draft-to-Ready transition:
 
 Re-read the PR and verify `isDraft` is false.
 
-`ready_for_review` is one of the workflow's `pull_request` trigger types, so readying
+`deploy-stage.yml` lists `ready_for_review` in its `pull_request` `types:`, so readying
 starts a new `Build and Unit Test` run for the same SHA. Wait for that run rather than
-trusting the pre-ready result.
+trusting the pre-ready result. That activity type is not a GitHub default; if it is
+ever removed from the workflow, readying starts no run and waiting for one hangs.
 
 The workflow runs `Build and Unit Test` for the PR. It does not prove macro UI
 behavior and does not deploy the PR to stage — the stage deploy job is gated on a

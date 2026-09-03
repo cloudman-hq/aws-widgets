@@ -60,11 +60,12 @@ Find an existing PR for the exact head branch:
 Reuse it only when `headRefName` and `baseRefName` match the intended branch and
 `prod-release`.
 
-## Submit — STRUCTURAL ONLY / UNVALIDATED
+## Submit — VALIDATED 2026-09-03
 
-Never exercised in this repository. The last pull-request-based change predates the
-current history; recent commits went straight onto `prod-release`. Mark this skill
-VALIDATED only after a real PR run.
+Exercised once. Branch pushed, PR #70 created as Draft against `prod-release`, and
+its `Build and Unit Test` run passed on the exact head SHA. Before that PR the
+repository had no pull-request-based change in its current history; commits went
+straight onto `prod-release`.
 
 Proceed only when the user asked to submit or create a PR.
 

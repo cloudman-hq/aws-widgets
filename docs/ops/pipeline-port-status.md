@@ -99,7 +99,7 @@ Measured before this work package, then configured and re-read on 2026-09-03.
 | `prod-release` branch protection | not configured | requires the `Build and Unit Test` check and a pull request; force pushes and deletions blocked; conversation resolution required | `LIVE` |
 | Environments | 0 | `production`, required reviewer `MrCoder`, deployment branch policy `tag release-*` | `LIVE` |
 | Rulesets | 0 | `Protect release tags` (id 22166010), target `tag`, active, rules `deletion` and `non_fast_forward` on `refs/tags/release-*` | `LIVE` |
-| `master` branch protection | HTTP 404 `Branch not protected` | unchanged | `SKIPPED` — `master` is frozen at 2020-06-27 and is not a deployment target |
+| `master` branch protection | HTTP 404 `Branch not protected` | unchanged | `BLOCKED` — see the default-branch blocker below. An earlier revision called `master` "not a deployment target", which is wrong: `master`'s own `deploy-stage.yml` deploys to `awswidgets-stg` on every push and pull request into `master`. |
 | Actions variables | 0 | 0 | `SKIPPED` — nothing in these workflows reads one |
 | Secrets | `FIREBASE_TOKEN` only | unchanged | — |
 | Visibility | `public` | unchanged | — |
@@ -117,6 +117,12 @@ oversights:
   but GitHub does not let an author approve their own pull request, so requiring one
   approval would deadlock a single-maintainer repository. Raise it when a second
   reviewer exists.
+- `prevent_self_review: false` on the `production` environment, for the same reason:
+  the sole reviewer is the only person who can push a `release-*` tag. The approval is
+  therefore a confirmation step by the releaser, not a second person's authorization.
+  Do not describe it as independent review until a second reviewer exists.
+  `can_admins_bypass` was `true` when the environment was created and is now `false`,
+  so the confirmation cannot be skipped.
 
 ## Production promotion is now gated
 
@@ -143,6 +149,46 @@ change.
 | E2E workflow | `SKIPPED` | No E2E suite exists in this repository. |
 | Scheduled smoke test | `LOCAL` | Both unknowns closed by measurement. Production URL is `https://awswidgets.web.app` — `/` and `/atlassian-connect.json` both returned 200 on 2026-09-03, and the served descriptor carries the expected app key, macro key and `baseUrl`. Alert routing is GitHub's own workflow-failure notification to the repository owner; no external alerting service was configured. |
 | Merging `codex/forge-conversion` | `DEFERRED` | Not a history problem. `git merge-base prod-release codex/forge-conversion` returns `ef8d6d3`, the `prod-release` tip, and `--is-ancestor` exits 0: the branch is `prod-release` plus 16 commits and merges by fast-forward. It stays deferred because it lands a second toolchain (Node 24 beside the root Node 10 pin) and a Forge app identity, which is a product decision. Owner: the user. |
+
+## Default-branch blocker — this work package does not close the gap it describes
+
+Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
+repository default branch is `master`. GitHub resolves several things from the default
+branch, not from `prod-release`, so four defects survive this branch:
+
+1. **A `release-*` tag on any pre-merge commit still deploys ungated to production.**
+   GitHub runs the `deploy-prod.yml` found at the tagged ref.
+   `git show origin/master:.github/workflows/deploy-prod.yml` still has no
+   `environment:`, no test job, and runs `yarn deploy:prod` directly. Tagging any
+   commit that predates this branch bypasses every gate added here. The
+   `Protect release tags` ruleset blocks `deletion` and `non_fast_forward`, not tag
+   creation on an arbitrary commit.
+2. **A pull request into `master` still deploys to stage with the token.**
+   `git show origin/master:.github/workflows/deploy-stage.yml` triggers on `push` and
+   `pull_request` for `master` and runs `yarn deploy:stage` with `FIREBASE_TOKEN`, no
+   lint and no test. `master` is the default branch, so it is the natural target for a
+   drive-by pull request, and 37 Dependabot branches are open.
+3. **`smoke-test.yml` cannot fire.** `schedule` and `workflow_dispatch` run only from
+   the default branch. Merging this branch into `prod-release` leaves the file off
+   `master`, so the cron never runs and `gh workflow run` errors.
+4. **Workflow lookup by display name fails.** The workflow entity is still registered
+   as `Deploy to Stage`, taken from `master`.
+   `gh run list --workflow "Build, Test and Stage"` returns
+   `could not find any workflows named Build, Test and Stage`. The skills now look
+   workflows up by file path (`--workflow deploy-stage.yml`), which is stable across
+   renames, so this one is closed inside the branch.
+
+Items 1 to 3 cannot be fixed from a branch that merges into `prod-release`. Two paths,
+both owned by the repository administrator:
+
+- **Change the default branch to `prod-release`.** Closes 1, 2 and 3 at once. It also
+  retargets what Dependabot opens against and what a fresh clone checks out, and the
+  37 open pull requests currently targeting `master` need retargeting or closing.
+- **Push the fixed workflows to `master` directly.** Narrower, but a pull request into
+  `master` is itself unsafe until the fix lands there, which is defect 2.
+
+Until one of them happens, the claim that production and stage are gated holds only
+for commits that carry the new workflow files.
 
 ## Merge ordering against the Forge branch
 
