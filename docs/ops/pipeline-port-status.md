@@ -49,6 +49,7 @@ Runtime code is unchanged. No file under `src/**`, `functions/**`, `public/**`,
 | `package.json` scripts `lint:check`, `validate` | `LOCAL` | `yarn validate` exit 0. |
 | `.github/workflows/deploy-stage.yml` gate | `LIVE` | Two pull-request runs on PR #70. Run [33714331769](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714331769) on `9801be9`: `Build and Unit Test (10.x)` success, `Deploy legacy Connect app to stage` **skipped**. Run [33714466994](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714466994) on `f842bb6`: `Build and Unit Test` success, deploy skipped. |
 | `.github/workflows/deploy-prod.yml` gate | `STRUCTURAL ONLY` | Parsed with PyYAML: job `build` named `Build and Unit Test`, job `deploy-prod` with `needs: build` and `environment: production`. Running it needs a pushed `release-*` tag, which is a production action and was not taken. |
+| `.github/workflows/smoke-test.yml` | `LOCAL` | Parsed with PyYAML. Its assertion script ran here against live production and exited 0: `key com.aws.widget.confluence-addon`, `baseUrl https://awswidgets.web.app`, `macros ['aws-widget-macro']`. It cannot be dispatched on GitHub yet — `workflow_dispatch` only offers workflows present on the default branch, and `master` does not have this file. |
 
 ## Local validation evidence — 2026-09-03
 
@@ -134,7 +135,7 @@ change.
 | `prepare-draft-release.yml` | `DEFERRED` | Exact-SHA draft releases presuppose the GitHub Release production path, which this repository does not use. |
 | Reusable `staging-deploy.yml` (`workflow_call`) | `DEFERRED` | One deploy target and one caller; a reusable workflow adds no separation yet. |
 | E2E workflow | `SKIPPED` | No E2E suite exists in this repository. |
-| Scheduled smoke test | `PENDING` | Useful, but it needs a production URL check and a decision on alert routing. |
+| Scheduled smoke test | `LOCAL` | Both unknowns closed by measurement. Production URL is `https://awswidgets.web.app` — `/` and `/atlassian-connect.json` both returned 200 on 2026-09-03, and the served descriptor carries the expected app key, macro key and `baseUrl`. Alert routing is GitHub's own workflow-failure notification to the repository owner; no external alerting service was configured. |
 | Merging `codex/forge-conversion` | `BLOCKED` | Unrelated histories; needs `--allow-unrelated-histories` and separate authorization. Owner: the user. |
 
 ## Check-name correction
@@ -150,8 +151,10 @@ reported as `Build and Unit Test`. Branch protection requires that exact string.
    `Deploy legacy Connect app to stage` against the Firebase `awswidgets-stg` project.
 2. Decide the Forge integration path before porting `release-app`, `pvt`, and
    `spot-check`.
-3. Consider a scheduled production smoke test — still `PENDING`; it needs a production
-   URL to probe and a decision on where an alert goes.
+3. After merging, run `Production Smoke Test` once by hand
+   (`gh workflow run "Production Smoke Test" --repo cloudman-hq/aws-widgets`) to move
+   it from `LOCAL` to `LIVE`. It cannot be dispatched before the file reaches the
+   default branch.
 4. 378 Dependabot alerts stand on the default branch (25 critical, 175 high, 127
    moderate, 51 low), reported by the remote on push. Raising the Node pin is not a
    fix path; see `CLAUDE.md`.
