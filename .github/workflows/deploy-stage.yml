@@ -83,4 +83,10 @@ jobs:
       # firebase deploy publishes the `build` directory that firebase.json points at.
       # Calling the CLI directly skips the rebuild inside `yarn deploy:stage`.
       - name: Deploy to Firebase stage
-        run: yarn firebase deploy --project stage --token ${{ secrets.FIREBASE_TOKEN }}
+      # --only hosting: firebase.json configures hosting alone, but the CLI
+      # auto-detects the functions/ directory and tries to deploy it. Those
+      # functions declare engines.node 10, a Cloud Functions runtime Google
+      # decommissioned, so including them fails the whole deploy with
+      # DEPLOYS_NOT_ALLOWED before hosting is released. The three functions
+      # stay on their existing deployment and keep serving.
+        run: yarn firebase deploy --only hosting --project stage --token ${{ secrets.FIREBASE_TOKEN }}
