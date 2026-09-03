@@ -7,12 +7,6 @@ import {
 } from '../shared/contracts';
 import { PublicResolverError } from './errors';
 
-type ResourceListInput = {
-  region: SupportedRegion;
-  resourceType: Exclude<ResourceType, 's3'>;
-};
-
-const LISTABLE_RESOURCE_TYPES = ['ec2', 'lambda', 'ecs', 'dynamodb'] as const;
 const ACCOUNT_ID = '[0-9]{12}';
 
 const invalidInput = (): never => {
@@ -129,18 +123,6 @@ const parseResourceId = (
   return match && match[1] === partition && match[2] === region
     ? match[3]!
     : invalidInput();
-};
-
-export const parseResourceListInput = (payload: unknown): ResourceListInput => {
-  if (!isPlainObject(payload) || !hasOnlyKeys(payload, ['region', 'resourceType'])) {
-    return invalidInput();
-  }
-  const region = parseRegion(payload.region);
-  const resourceType = parseResourceType(payload.resourceType);
-  if (!LISTABLE_RESOURCE_TYPES.includes(resourceType as ResourceListInput['resourceType'])) {
-    return invalidInput();
-  }
-  return { region, resourceType: resourceType as ResourceListInput['resourceType'] };
 };
 
 export const parseMacroConfig = (payload: unknown): MacroConfigV1 => {

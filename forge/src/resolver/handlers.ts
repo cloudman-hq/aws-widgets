@@ -7,10 +7,7 @@ import { toSafeEnvelope, type SafeLogEvent } from './safety';
 import { createResourceOperations } from './resources/operations';
 import type { ResourceAdapterFactory } from './resources/types';
 import { PublicResolverError } from './errors';
-import { parseMacroConfig } from './resource-schemas';
-import type { MacroConfigV1, MacroConfigResolution } from '../shared/contracts';
-
-type LegacyMacroReference = { contentId: string; uuid: string };
+import { ANALYTICS_EVENTS, type AnalyticsEvent, type AnalyticsTracker } from './analytics';
 
 type ResolverDependencies = {
   repository: CredentialRepository;
@@ -19,41 +16,16 @@ type ResolverDependencies = {
   createRequestId: () => string;
   log: (event: SafeLogEvent) => void;
   createResourceAdapter?: ResourceAdapterFactory;
-  resolveLegacyMacroConfig?: (reference: LegacyMacroReference) => Promise<MacroConfigV1 | undefined>;
+  analytics?: AnalyticsTracker;
 };
 
-const resolveMacroConfig = async (
-  context: Request<unknown>['context'],
-  resolveLegacy?: ResolverDependencies['resolveLegacyMacroConfig'],
-): Promise<MacroConfigResolution> => {
-  const extension = Reflect.get(context, 'extension');
-  if (typeof extension !== 'object' || extension === null) {
+const analyticsEvent = (payload: unknown): AnalyticsEvent => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new PublicResolverError('INVALID_INPUT');
+  const event = Reflect.get(payload, 'event');
+  if (typeof event !== 'string' || !ANALYTICS_EVENTS.includes(event as AnalyticsEvent)) {
     throw new PublicResolverError('INVALID_INPUT');
   }
-  const rawConfig = Reflect.get(extension, 'config');
-  try {
-    return { config: parseMacroConfig(rawConfig), source: 'forge' };
-  } catch {
-    // Existing Connect macros expose their original parameters in config.
-  }
-  const uuid = typeof rawConfig === 'object' && rawConfig !== null
-    ? Reflect.get(rawConfig, 'uuid')
-    : undefined;
-  const content = Reflect.get(extension, 'content');
-  const contentId = typeof content === 'object' && content !== null
-    ? Reflect.get(content, 'id')
-    : undefined;
-  if (
-    !resolveLegacy ||
-    typeof uuid !== 'string' ||
-    !/^[A-Za-z0-9-]{1,64}$/.test(uuid) ||
-    typeof contentId !== 'string' ||
-    !/^\d+$/.test(contentId)
-  ) {
-    return { source: 'none' };
-  }
-  const config = await resolveLegacy({ contentId, uuid });
-  return config ? { config, source: 'connect' } : { source: 'none' };
+  return event as AnalyticsEvent;
 };
 
 export const createResolverHandlers = (dependencies: ResolverDependencies) => {
@@ -64,9 +36,12 @@ export const createResolverHandlers = (dependencies: ResolverDependencies) => {
       throw new PublicResolverError('INTERNAL_ERROR', true);
     }),
   });
+  const track = (event: AnalyticsEvent, outcome: 'attempt' | 'success' | 'failure', errorCode?: import('../shared/contracts').PublicErrorCode) => {
+    void dependencies.analytics?.track(event, outcome, errorCode).catch(() => undefined);
+  };
   const credentialHandler =
     <T>(
-      operation: 'credentials.status' | 'credentials.validate' | 'credentials.save' | 'credentials.delete',
+      operation: 'credentials.status' | 'credentials.save' | 'credentials.delete',
       execute: (payload: unknown) => Promise<T>,
     ) =>
     ({ payload, context }: Request<unknown>) => {
@@ -84,12 +59,12 @@ export const createResolverHandlers = (dependencies: ResolverDependencies) => {
 
   const resourceHandler =
     <T>(
-      operation: 'resource.list' | 'resource.describe',
+      operation: 'resource.describe',
       execute: (payload: unknown) => Promise<T>,
     ) =>
-    ({ payload, context }: Request<unknown>) => {
+    async ({ payload, context }: Request<unknown>) => {
       const requestId = dependencies.createRequestId();
-      return toSafeEnvelope(
+      const result = await toSafeEnvelope(
         requestId,
         operation,
         async () => {
@@ -98,26 +73,29 @@ export const createResolverHandlers = (dependencies: ResolverDependencies) => {
         },
         dependencies.log,
       );
+      track('aws_describe', result.ok ? 'success' : 'failure', result.ok ? undefined : result.error.code);
+      return result;
     };
 
   return {
-    'macro.config.resolve': ({ context }: Request<unknown>) => {
+    'analytics.track': async ({ payload, context }: Request<unknown>) => {
       const requestId = dependencies.createRequestId();
-      return toSafeEnvelope(
+      const result = await toSafeEnvelope(
         requestId,
-        'macro.config.resolve',
+        'analytics.track',
         async () => {
           authorizeModule(context, MACRO_MODULE_KEY);
-          return resolveMacroConfig(context, dependencies.resolveLegacyMacroConfig);
+          const event = analyticsEvent(payload);
+          track(event, 'attempt');
+          return { tracked: true };
         },
         dependencies.log,
       );
+      return result;
     },
     'credentials.status': credentialHandler('credentials.status', operations.status),
-    'credentials.validate': credentialHandler('credentials.validate', operations.validate),
     'credentials.save': credentialHandler('credentials.save', operations.save),
     'credentials.delete': credentialHandler('credentials.delete', operations.delete),
-    'resource.list': resourceHandler('resource.list', resourceOperations.list),
     'resource.describe': resourceHandler('resource.describe', resourceOperations.describe),
   };
 };

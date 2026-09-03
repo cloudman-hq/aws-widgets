@@ -6,10 +6,9 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
 export type CredentialInput = {
   accessKeyId: string;
   secretAccessKey: string;
-  sessionToken?: string;
 };
 
-const CREDENTIAL_FIELDS = new Set(['accessKeyId', 'secretAccessKey', 'sessionToken']);
+const CREDENTIAL_FIELDS = new Set(['accessKeyId', 'secretAccessKey']);
 const PRINTABLE_NON_WHITESPACE = /^[!-~]+$/;
 
 const parseCredentialField = (
@@ -51,12 +50,5 @@ export const parseCredentialInput = (payload: unknown): CredentialInput => {
 
   const accessKeyId = parseCredentialField(payload.accessKeyId, 16, 128);
   const secretAccessKey = parseCredentialField(payload.secretAccessKey, 32, 256);
-  const sessionToken =
-    payload.sessionToken === undefined
-      ? undefined
-      : parseCredentialField(payload.sessionToken, 16, 4096);
-
-  return sessionToken === undefined
-    ? { accessKeyId, secretAccessKey }
-    : { accessKeyId, secretAccessKey, sessionToken };
+  return { accessKeyId, secretAccessKey };
 };

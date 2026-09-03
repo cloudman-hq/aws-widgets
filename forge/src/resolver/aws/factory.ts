@@ -6,17 +6,13 @@ import {
 import {
   DescribeClustersCommand,
   ECSClient,
-  ListClustersCommand,
   type DescribeClustersCommandOutput,
-  type ListClustersCommandOutput,
 } from '@aws-sdk/client-ecs';
 import {
   GetFunctionCommand,
   LambdaClient,
-  ListFunctionsCommand,
   ListTagsCommand,
   type GetFunctionCommandOutput,
-  type ListFunctionsCommandOutput,
   type ListTagsCommandOutput,
 } from '@aws-sdk/client-lambda';
 import {
@@ -33,9 +29,7 @@ import {
 import {
   DescribeTableCommand,
   DynamoDBClient,
-  ListTablesCommand,
   type DescribeTableCommandOutput,
-  type ListTablesCommandOutput,
 } from '@aws-sdk/client-dynamodb';
 import type { ResourceType, SupportedRegion } from '../../shared/contracts';
 import type { StoredCredentialV1 } from '../credentials/repository';
@@ -66,7 +60,6 @@ const clientConfig = (region: SupportedRegion, credential: StoredCredentialV1) =
   credentials: {
     accessKeyId: credential.accessKeyId,
     secretAccessKey: credential.secretAccessKey,
-    ...(credential.sessionToken ? { sessionToken: credential.sessionToken } : {}),
   },
   maxAttempts: 2,
 });
@@ -90,10 +83,7 @@ export const createAwsResourceAdapter = (
       describeInstances: async (input) => {
         const output = await sendBounded<DescribeInstancesCommandOutput>(
           client,
-          new DescribeInstancesCommand({
-            ...(input.instanceIds ? { InstanceIds: input.instanceIds } : {}),
-            ...(input.nextToken ? { NextToken: input.nextToken } : {}),
-          }),
+          new DescribeInstancesCommand({ InstanceIds: input.instanceIds }),
         );
         return {
           reservations: output.Reservations?.map((reservation) => ({
@@ -111,7 +101,6 @@ export const createAwsResourceAdapter = (
               tags: instance.Tags?.map((tag) => ({ key: tag.Key, value: tag.Value })),
             })),
           })),
-          nextToken: output.NextToken,
         };
       },
     }, region, now), client);
@@ -120,19 +109,6 @@ export const createAwsResourceAdapter = (
   if (resourceType === 'lambda') {
     const client = new LambdaClient(config);
     return disposable(createLambdaAdapter({
-      listFunctions: async (input) => {
-        const output = await sendBounded<ListFunctionsCommandOutput>(
-          client,
-          new ListFunctionsCommand(input.marker ? { Marker: input.marker } : {}),
-        );
-        return {
-          functions: output.Functions?.map((fn) => ({
-            functionName: fn.FunctionName,
-            functionArn: fn.FunctionArn,
-          })),
-          nextMarker: output.NextMarker,
-        };
-      },
       getFunction: async ({ functionName }) => {
         const output = await sendBounded<GetFunctionCommandOutput>(
           client,
@@ -161,13 +137,6 @@ export const createAwsResourceAdapter = (
   if (resourceType === 'ecs') {
     const client = new ECSClient(config);
     return disposable(createEcsAdapter({
-      listClusters: async (input) => {
-        const output = await sendBounded<ListClustersCommandOutput>(
-          client,
-          new ListClustersCommand(input.nextToken ? { nextToken: input.nextToken } : {}),
-        );
-        return { clusterArns: output.clusterArns, nextToken: output.nextToken };
-      },
       describeClusters: async ({ clusters }) => {
         const output = await sendBounded<DescribeClustersCommandOutput>(
           client,
@@ -188,18 +157,6 @@ export const createAwsResourceAdapter = (
   if (resourceType === 'dynamodb') {
     const client = new DynamoDBClient(config);
     return disposable(createDynamoDbAdapter({
-      listTables: async (input) => {
-        const output = await sendBounded<ListTablesCommandOutput>(
-          client,
-          new ListTablesCommand(input.exclusiveStartTableName
-            ? { ExclusiveStartTableName: input.exclusiveStartTableName }
-            : {}),
-        );
-        return {
-          tableNames: output.TableNames,
-          lastEvaluatedTableName: output.LastEvaluatedTableName,
-        };
-      },
       describeTable: async ({ tableName }) => {
         const output = await sendBounded<DescribeTableCommandOutput>(
           client,

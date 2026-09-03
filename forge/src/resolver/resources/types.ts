@@ -1,6 +1,5 @@
 import type {
   MacroConfigV1,
-  ResourceOptions,
   ResourceType,
   ResourceView,
   SupportedRegion,
@@ -8,7 +7,6 @@ import type {
 import type { StoredCredentialV1 } from '../credentials/repository';
 
 export type ResourceAdapter = {
-  list?: () => Promise<ResourceOptions>;
   describe: (resourceId: string) => Promise<ResourceView>;
   dispose?: () => void;
 };
@@ -20,7 +18,6 @@ export type ResourceAdapterFactory = (
 ) => ResourceAdapter;
 
 export type ResourceOperations = {
-  list(payload: unknown): Promise<ResourceOptions>;
   describe(payload: unknown): Promise<ResourceView>;
 };
 

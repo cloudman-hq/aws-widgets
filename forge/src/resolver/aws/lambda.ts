@@ -2,21 +2,14 @@ import type { SupportedRegion } from '../../shared/contracts';
 import { PublicResolverError } from '../errors';
 import type { ResourceAdapter } from '../resources/types';
 import {
-  assertPageWithinLimit,
   definedFields,
-  finishOptions,
   formatTags,
   makeField,
-  resultLimitIfNeeded,
   safeString,
 } from './common';
 import { mapAwsError } from './errors';
 
 export type LambdaApi = {
-  listFunctions(input: { marker?: string }): Promise<{
-    functions?: Array<{ functionName?: unknown | undefined; functionArn?: unknown | undefined }> | undefined;
-    nextMarker?: unknown | undefined;
-  }>;
   getFunction(input: { functionName: string }): Promise<{
     configuration?: {
       functionName?: unknown | undefined;
@@ -34,27 +27,6 @@ export const createLambdaAdapter = (
   region: SupportedRegion,
   now: () => Date,
 ): ResourceAdapter => ({
-  list: async () => {
-    try {
-      const items = new Map<string, string>();
-      let marker: string | undefined;
-      for (let pageNumber = 1; ; pageNumber += 1) {
-        const page = await api.listFunctions(marker ? { marker } : {});
-        for (const fn of page.functions ?? []) {
-          const id = safeString(fn.functionArn, 512) ?? safeString(fn.functionName, 64);
-          if (!id) continue;
-          items.set(id, safeString(fn.functionName, 64) ?? id);
-          resultLimitIfNeeded(items);
-        }
-        assertPageWithinLimit(pageNumber, page.nextMarker);
-        marker = safeString(page.nextMarker, 2048);
-        if (!marker) return finishOptions(items);
-      }
-    } catch (error: unknown) {
-      if (error instanceof PublicResolverError) throw error;
-      throw mapAwsError(error);
-    }
-  },
   describe: async (resourceId) => {
     try {
       const result = await api.getFunction({ functionName: resourceId });

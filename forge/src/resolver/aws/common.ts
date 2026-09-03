@@ -1,8 +1,4 @@
-import type { ResourceOptions, ResourceView } from '../../shared/contracts';
-import { PublicResolverError } from '../errors';
-
-export const MAX_RESOURCE_ITEMS = 500;
-export const MAX_AWS_PAGES = 50;
+import type { ResourceView } from '../../shared/contracts';
 
 const compareText = (left: string, right: string): number =>
   left < right ? -1 : left > right ? 1 : 0;
@@ -47,24 +43,4 @@ export const formatTags = (tags: readonly AwsTag[] | undefined): string[] => {
       return key && value ? [`${key}: ${value}`] : [];
     })
     .sort(compareText);
-};
-
-export const finishOptions = (items: Map<string, string>): ResourceOptions => {
-  if (items.size > MAX_RESOURCE_ITEMS) throw new PublicResolverError('RESULT_LIMIT');
-  return {
-    items: [...items]
-      .map(([id, label]) => ({ id, label }))
-      .sort((a, b) => compareText(a.id, b.id)),
-    truncated: false,
-  };
-};
-
-export const assertPageWithinLimit = (page: number, nextToken: unknown): void => {
-  if (page >= MAX_AWS_PAGES && typeof nextToken === 'string' && nextToken.length > 0) {
-    throw new PublicResolverError('RESULT_LIMIT');
-  }
-};
-
-export const resultLimitIfNeeded = (items: Map<string, string>): void => {
-  if (items.size > MAX_RESOURCE_ITEMS) throw new PublicResolverError('RESULT_LIMIT');
 };

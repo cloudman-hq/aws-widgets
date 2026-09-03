@@ -1,7 +1,6 @@
 import {
   RESOURCE_TYPES,
   SUPPORTED_REGIONS,
-  type MacroConfigResolution,
   type MacroConfigV1,
   type ResolverEnvelope,
   type ResolverOperation,
@@ -51,21 +50,8 @@ export async function mountMacroConfig(
   dependencies: MacroConfigDependencies,
 ): Promise<void> {
   const context = await dependencies.getContext();
-  let current = existingConfig(context);
-  if (
-    current.schemaVersion !== 1 &&
-    typeof Reflect.get(current, 'uuid') === 'string'
-  ) {
-    try {
-      const resolution = await dependencies.invoke('macro.config.resolve', {});
-      if (resolution.ok) {
-        const migrated = (resolution.data as MacroConfigResolution).config;
-        if (migrated) current = migrated;
-      }
-    } catch {
-      // Leave the fields empty so the author can still repair the macro manually.
-    }
-  }
+  const current = existingConfig(context);
+  void dependencies.invoke('analytics.track', { event: 'macro_config_opened' }).catch(() => undefined);
   installTheme();
   root.replaceChildren();
   root.className = 'aws-shell aws-shell--config';
@@ -138,14 +124,11 @@ export async function mountMacroConfig(
   resourceId.autocomplete = 'off';
   resourceId.setAttribute('aria-describedby', 'resource-id-hint');
   resourceId.value = current.resourceId ?? '';
-  resourceId.setAttribute('list', 'resource-options');
   idLabel.append(resourceId);
-  const resourceOptions = document.createElement('datalist');
-  resourceOptions.id = 'resource-options';
   const idHint = document.createElement('span');
   idHint.id = 'resource-id-hint';
   idHint.className = 'field-hint';
-  idHint.textContent = 'Choose a loaded option or enter an exact AWS identifier.';
+  idHint.textContent = 'Enter the exact AWS resource identifier.';
   idLabel.append(idHint);
 
   const liveStatus = document.createElement('p');
@@ -164,10 +147,8 @@ export async function mountMacroConfig(
       : 'TYPE';
     setCoordinate(coordinate, region.value || 'REGION', selectedType);
   };
-  let listRequest = 0;
-  const loadOptions = async (): Promise<void> => {
+  const updateHint = (): void => {
     updateCoordinate();
-    resourceOptions.replaceChildren();
     if (!region.value || !resourceType.value) {
       setStatus(liveStatus, 'Choose a region and resource type.', 'neutral');
       return;
@@ -179,48 +160,10 @@ export async function mountMacroConfig(
     }
 
     resourceId.placeholder = 'Exact name, ID, or ARN';
-    const request = ++listRequest;
-    setStatus(liveStatus, 'Loading resource choices…', 'busy');
-    let response: ResolverEnvelope<unknown>;
-    try {
-      response = await dependencies.invoke('resource.list', {
-        region: region.value,
-        resourceType: resourceType.value,
-      });
-    } catch {
-      if (request === listRequest) {
-        setStatus(liveStatus, 'Resource choices unavailable. Enter an identifier manually.', 'warning');
-      }
-      return;
-    }
-    if (request !== listRequest) return;
-    if (!response.ok) {
-      setStatus(liveStatus, 'Resource choices unavailable. Enter an identifier manually.', 'warning');
-      return;
-    }
-
-    const data = response.data;
-    const items = typeof data === 'object' && data !== null && Array.isArray(Reflect.get(data, 'items'))
-      ? Reflect.get(data, 'items') as Array<unknown>
-      : [];
-    for (const item of items) {
-      if (typeof item !== 'object' || item === null) continue;
-      const id = Reflect.get(item, 'id');
-      const label = Reflect.get(item, 'label');
-      if (typeof id !== 'string' || typeof label !== 'string') continue;
-      const choice = option(id, label);
-      resourceOptions.append(choice);
-    }
-    setStatus(
-      liveStatus,
-      items.length > 0
-        ? 'Resource choices loaded. You can also enter an identifier manually.'
-        : 'No resource choices found. Enter an identifier manually.',
-      items.length > 0 ? 'success' : 'warning',
-    );
+    setStatus(liveStatus, 'Enter the exact resource identifier.', 'neutral');
   };
-  region.addEventListener('change', () => void loadOptions());
-  resourceType.addEventListener('change', () => void loadOptions());
+  region.addEventListener('change', updateHint);
+  resourceType.addEventListener('change', updateHint);
   updateCoordinate();
 
   form.addEventListener('submit', async (event) => {
@@ -236,6 +179,7 @@ export async function mountMacroConfig(
     };
     try {
       await dependencies.submit({ config });
+      void dependencies.invoke('analytics.track', { event: 'macro_config_saved' }).catch(() => undefined);
       setStatus(liveStatus, 'Resource saved', 'success');
     } catch {
       setStatus(liveStatus, 'Resource was not saved. Check the fields and try again.', 'danger');
@@ -247,8 +191,8 @@ export async function mountMacroConfig(
   const actions = document.createElement('div');
   actions.className = 'surface-actions';
   actions.append(liveStatus, submitButton);
-  fieldGrid.append(regionLabel, typeLabel, idLabel, resourceOptions);
+  fieldGrid.append(regionLabel, typeLabel, idLabel);
   form.append(fieldGrid, actions);
   root.append(header, coordinate, form);
-  await loadOptions();
+  updateHint();
 }

@@ -33,9 +33,4 @@ export const createCredentialOperations = ({
     await repository.write({ schemaVersion: 1, ...credential, updatedAt });
     return { configured: true, updatedAt };
   },
-  validate: async (payload: unknown): Promise<{ valid: true }> => {
-    const credential = parseCredentialInput(payload);
-    await validateWithAws(credential);
-    return { valid: true };
-  },
 });

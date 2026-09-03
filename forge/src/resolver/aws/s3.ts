@@ -90,7 +90,3 @@ export const createS3Adapter = (
     };
   },
 });
-
-export const unsupportedS3List = (): never => {
-  throw new PublicResolverError('INVALID_INPUT');
-};

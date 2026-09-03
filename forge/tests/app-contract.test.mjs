@@ -19,8 +19,8 @@ test('Forge workspace exposes the isolated app contract', async () => {
   assert.match(manifest, /handler: resolver\/index\.handler/);
   assert.match(manifest, /name: nodejs24\.x/);
   assert.match(manifest, /- storage:app/);
-  assert.match(manifest, /- read:confluence-content\.all/);
-  assert.match(manifest, /- read:app-data:confluence/);
+  assert.doesNotMatch(manifest, /read:confluence-content\.all/);
+  assert.doesNotMatch(manifest, /read:app-data:confluence/);
   assert.match(manifest, /key: CONNECT_KEY\n\s+default: com\.aws\.widget\.confluence-addon/);
   assert.match(manifest, /connect:\n\s+key: \$\{CONNECT_KEY\}/);
   assert.match(manifest, /^ {2}connectToForgeMigration:/m);
@@ -35,8 +35,8 @@ test('Forge workspace exposes the isolated app contract', async () => {
   assert.doesNotMatch(manifest, /^remotes:/m);
   assert.doesNotMatch(manifest, /^ {2}connectModules:/m);
   assert.doesNotMatch(manifest, /^\s+client:/m);
-  assert.match(migrationGuide, /same Marketplace app/i);
-  assert.match(migrationGuide, /existing AWS Widgets macros/i);
+  assert.match(migrationGuide, /existing Marketplace app/i);
+  assert.match(migrationGuide, /manual setup migration/i);
   assert.match(migrationGuide, /Forge secret storage/i);
 
   for (const script of ['lint', 'typecheck', 'unit', 'build', 'forge:lint', 'verify']) {

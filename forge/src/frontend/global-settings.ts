@@ -41,13 +41,13 @@ const input = (
   field.name = name;
   field.type = type;
   field.autocomplete = 'off';
-  if (name !== 'sessionToken') field.required = true;
+  field.required = true;
   label.append(field);
   return label;
 };
 
 const clearCredentialFields = (form: HTMLFormElement): void => {
-  for (const name of ['accessKeyId', 'secretAccessKey', 'sessionToken']) {
+  for (const name of ['accessKeyId', 'secretAccessKey']) {
     const field = form.elements.namedItem(name);
     if (field instanceof HTMLInputElement) field.value = '';
   }
@@ -90,12 +90,10 @@ export async function mountGlobalSettings(
   fieldGrid.append(
     input('access-key-id', 'accessKeyId', 'Access key ID', 'text'),
     input('secret-access-key', 'secretAccessKey', 'Secret access key', 'password'),
-    input('session-token', 'sessionToken', 'Session token (optional)', 'password'),
   );
-  fieldGrid.lastElementChild?.classList.add('field--wide');
   const hint = document.createElement('p');
   hint.className = 'field-hint field--wide';
-  hint.textContent = 'Saving validates with AWS, then replaces the previous installation credential. Leave session token empty for long-lived access keys.';
+  hint.textContent = 'Saving validates with AWS, then replaces the previous installation credential.';
   fieldGrid.append(hint);
   const saveButton = document.createElement('button');
   saveButton.type = 'submit';
@@ -120,10 +118,7 @@ export async function mountGlobalSettings(
     const formData = new FormData(form);
     const accessKeyId = String(formData.get('accessKeyId') ?? '');
     const secretAccessKey = String(formData.get('secretAccessKey') ?? '');
-    const sessionToken = String(formData.get('sessionToken') ?? '');
-    const payload = sessionToken.length > 0
-      ? { accessKeyId, secretAccessKey, sessionToken }
-      : { accessKeyId, secretAccessKey };
+    const payload = { accessKeyId, secretAccessKey };
 
     saveButton.disabled = true;
     setStatus(liveStatus, 'Validating and saving credential…', 'busy');

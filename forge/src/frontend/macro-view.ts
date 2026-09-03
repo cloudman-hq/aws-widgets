@@ -1,7 +1,6 @@
 import {
   RESOURCE_TYPES,
   SUPPORTED_REGIONS,
-  type MacroConfigResolution,
   type MacroConfigV1,
   type PublicErrorCode,
   type ResolverEnvelope,
@@ -125,22 +124,13 @@ export async function mountMacroView(
   liveStatus.setAttribute('aria-live', 'polite');
   setStatus(liveStatus, 'Loading AWS resource…', 'busy');
   root.append(header, liveStatus);
+  void dependencies.invoke('analytics.track', { event: 'macro_view_attempt' }).catch(() => undefined);
 
-  let config = readConfig(await dependencies.getContext());
-  if (!config) {
-    try {
-      const resolution = await dependencies.invoke('macro.config.resolve', {});
-      if (resolution.ok) {
-        config = (resolution.data as MacroConfigResolution).config;
-      }
-    } catch {
-      // The normal safe unconfigured state below also covers migration lookup failures.
-    }
-  }
+  const config = readConfig(await dependencies.getContext());
   if (!config) {
     setStatus(
       liveStatus,
-      'Configure this macro to choose an AWS resource. If this is an existing Connect macro, its saved configuration could not be recovered safely.',
+      'Configure this macro to choose an AWS resource.',
       'warning',
     );
     return;

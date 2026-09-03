@@ -5,7 +5,6 @@ export type StoredCredentialV1 = {
   schemaVersion: 1;
   accessKeyId: string;
   secretAccessKey: string;
-  sessionToken?: string;
   updatedAt: string;
 };
 
@@ -27,7 +26,6 @@ const STORED_FIELDS = new Set([
   'schemaVersion',
   'accessKeyId',
   'secretAccessKey',
-  'sessionToken',
   'updatedAt',
 ]);
 
@@ -42,11 +40,9 @@ const parseStoredCredential = (value: unknown): StoredCredentialV1 => {
     ) {
       throw new PublicResolverError('INTERNAL_ERROR', true);
     }
-    const sessionToken = Reflect.get(value, 'sessionToken');
     const credential = parseCredentialInput({
       accessKeyId: Reflect.get(value, 'accessKeyId'),
       secretAccessKey: Reflect.get(value, 'secretAccessKey'),
-      ...(sessionToken === undefined ? {} : { sessionToken }),
     });
     const updatedAt = Reflect.get(value, 'updatedAt');
     if (

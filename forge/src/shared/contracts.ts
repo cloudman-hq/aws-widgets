@@ -27,12 +27,10 @@ export const SUPPORTED_REGIONS = [
 export const RESOURCE_TYPES = ['ec2', 's3', 'lambda', 'ecs', 'dynamodb'] as const;
 
 export const RESOLVER_OPERATIONS = [
-  'macro.config.resolve',
+  'analytics.track',
   'credentials.status',
-  'credentials.validate',
   'credentials.save',
   'credentials.delete',
-  'resource.list',
   'resource.describe',
 ] as const;
 
@@ -61,17 +59,7 @@ export type MacroConfigV1 = {
   resourceId: string;
 };
 
-export type MacroConfigResolution = {
-  config?: MacroConfigV1;
-  source: 'forge' | 'connect' | 'none';
-};
-
 export type CredentialStatus = { configured: boolean; updatedAt?: string };
-
-export type ResourceOptions = {
-  items: Array<{ id: string; label: string }>;
-  truncated: false;
-};
 
 export type ResourceView = {
   schemaVersion: 1;

@@ -6,7 +6,6 @@ describe('AWS credential validation', () => {
     const credential = {
       accessKeyId: 'FAKEACCESSKEY0001',
       secretAccessKey: 'fake-secret-access-key-that-is-never-returned',
-      sessionToken: 'fake-session-token-that-is-never-returned',
     };
     const getCallerIdentity = vi.fn(async () => ({ account: '000000000000' }));
     const validate = createCredentialValidator({ getCallerIdentity });

@@ -35,7 +35,7 @@ describe('global settings', () => {
     expect(root.textContent).toContain('Credential configured');
     expect(root.querySelector<HTMLInputElement>('#access-key-id')?.type).toBe('text');
     expect(root.querySelector<HTMLInputElement>('#secret-access-key')?.type).toBe('password');
-    expect(root.querySelector<HTMLInputElement>('#session-token')?.type).toBe('password');
+    expect(root.querySelector('#session-token')).toBeNull();
     expect(root.querySelector('[aria-live="polite"]')).not.toBeNull();
     expect(root.textContent).not.toContain('AKIA');
   });
@@ -53,12 +53,10 @@ describe('global settings', () => {
 
     const accessKey = root.querySelector<HTMLInputElement>('#access-key-id');
     const secretKey = root.querySelector<HTMLInputElement>('#secret-access-key');
-    const sessionToken = root.querySelector<HTMLInputElement>('#session-token');
     const form = root.querySelector<HTMLFormElement>('form');
-    if (!accessKey || !secretKey || !sessionToken || !form) throw new Error('form missing');
+    if (!accessKey || !secretKey || !form) throw new Error('form missing');
     accessKey.value = 'AKIAEXAMPLE12345678';
     secretKey.value = 'exampleSecretValueThatIsLongEnough123456';
-    sessionToken.value = 'exampleSessionTokenThatIsLongEnough';
 
     form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
 
@@ -66,14 +64,11 @@ describe('global settings', () => {
     expect(invoke).toHaveBeenLastCalledWith('credentials.save', {
       accessKeyId: 'AKIAEXAMPLE12345678',
       secretAccessKey: 'exampleSecretValueThatIsLongEnough123456',
-      sessionToken: 'exampleSessionTokenThatIsLongEnough',
     });
     expect(accessKey.value).toBe('');
     expect(secretKey.value).toBe('');
-    expect(sessionToken.value).toBe('');
     expect(root.innerHTML).not.toContain('AKIAEXAMPLE12345678');
     expect(root.innerHTML).not.toContain('exampleSecretValueThatIsLongEnough123456');
-    expect(root.innerHTML).not.toContain('exampleSessionTokenThatIsLongEnough');
   });
 
   it('deletes the installation credential and announces the empty state', async () => {

@@ -10,13 +10,11 @@
         "s3:GetEncryptionConfiguration",
         "s3:GetLifecycleConfiguration",
         "s3:GetBucketTagging",
-        "lambda:ListFunctions",
         "lambda:GetFunction",
         "lambda:ListTags",
-        "ecs:ListClusters",
         "ecs:DescribeClusters",
-        "dynamodb:ListTables",
-        "dynamodb:DescribeTable"
+        "dynamodb:DescribeTable",
+        "sts:GetCallerIdentity"
       ],
       "Resource": "*"
     }

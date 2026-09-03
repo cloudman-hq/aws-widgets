@@ -40,13 +40,12 @@ resources:
 permissions:
   scopes:
     - storage:app
-    - read:confluence-content.all
-    - read:app-data:confluence
   external:
     fetch:
       backend:
         - '*.amazonaws.com'
         - '*.amazonaws.com.cn'
+        - https://api.mixpanel.com
 
 app:
   id: ari:cloud:ecosystem::app/bd4e3a18-d223-45bf-a301-b2b4eab5beed

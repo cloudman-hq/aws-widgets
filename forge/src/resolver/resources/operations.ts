@@ -1,5 +1,5 @@
 import { PublicResolverError } from '../errors';
-import { parseMacroConfig, parseResourceListInput } from '../resource-schemas';
+import { parseMacroConfig } from '../resource-schemas';
 import type { CredentialRepository } from '../credentials/repository';
 import type { ResourceAdapterFactory, ResourceOperations } from './types';
 
@@ -12,18 +12,6 @@ export const createResourceOperations = ({
   repository,
   createAdapter,
 }: ResourceDependencies): ResourceOperations => ({
-  list: async (payload) => {
-    const input = parseResourceListInput(payload);
-    const credential = await repository.read();
-    if (!credential) throw new PublicResolverError('NOT_CONFIGURED');
-    const adapter = createAdapter(input.resourceType, input.region, credential);
-    try {
-      if (!adapter.list) throw new PublicResolverError('INVALID_INPUT');
-      return await adapter.list();
-    } finally {
-      adapter.dispose?.();
-    }
-  },
   describe: async (payload) => {
     const input = parseMacroConfig(payload);
     const credential = await repository.read();

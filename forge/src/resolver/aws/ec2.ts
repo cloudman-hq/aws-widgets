@@ -3,12 +3,9 @@ import type { SupportedRegion } from '../../shared/contracts';
 import { PublicResolverError } from '../errors';
 import { mapAwsError } from './errors';
 import {
-  assertPageWithinLimit,
   definedFields,
-  finishOptions,
   formatTags,
   makeField,
-  resultLimitIfNeeded,
   safeString,
 } from './common';
 
@@ -28,11 +25,10 @@ export type Ec2Instance = {
 
 export type Ec2Page = {
   reservations?: Array<{ instances?: Ec2Instance[] | undefined }> | undefined;
-  nextToken?: unknown | undefined;
 };
 
 export type Ec2Api = {
-  describeInstances(input: { instanceIds?: string[]; nextToken?: string }): Promise<Ec2Page>;
+  describeInstances(input: { instanceIds: string[] }): Promise<Ec2Page>;
 };
 
 export const createEc2Adapter = (
@@ -40,29 +36,6 @@ export const createEc2Adapter = (
   region: SupportedRegion,
   now: () => Date,
 ): ResourceAdapter => ({
-  list: async () => {
-    try {
-      const items = new Map<string, string>();
-      let nextToken: string | undefined;
-      for (let pageNumber = 1; ; pageNumber += 1) {
-        const page = await api.describeInstances(nextToken ? { nextToken } : {});
-        for (const reservation of page.reservations ?? []) {
-          for (const instance of reservation.instances ?? []) {
-            const id = safeString(instance.instanceId, 64);
-            if (!id) continue;
-            items.set(id, safeString(instance.privateIpAddress, 64) ?? id);
-            resultLimitIfNeeded(items);
-          }
-        }
-        assertPageWithinLimit(pageNumber, page.nextToken);
-        nextToken = safeString(page.nextToken, 2048);
-        if (!nextToken) return finishOptions(items);
-      }
-    } catch (error: unknown) {
-      if (error instanceof PublicResolverError) throw error;
-      throw mapAwsError(error);
-    }
-  },
   describe: async (resourceId) => {
     try {
       const page = await api.describeInstances({ instanceIds: [resourceId] });

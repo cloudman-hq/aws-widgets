@@ -2,20 +2,13 @@ import type { SupportedRegion } from '../../shared/contracts';
 import { PublicResolverError } from '../errors';
 import type { ResourceAdapter } from '../resources/types';
 import {
-  assertPageWithinLimit,
   definedFields,
-  finishOptions,
   makeField,
-  resultLimitIfNeeded,
   safeString,
 } from './common';
 import { mapAwsError } from './errors';
 
 export type EcsApi = {
-  listClusters(input: { nextToken?: string }): Promise<{
-    clusterArns?: unknown[] | undefined;
-    nextToken?: unknown | undefined;
-  }>;
   describeClusters(input: { clusters: string[] }): Promise<{
     clusters?: Array<{ clusterArn?: unknown | undefined; clusterName?: unknown | undefined; status?: unknown | undefined }> | undefined;
     failures?: unknown[] | undefined;
@@ -29,27 +22,6 @@ export const createEcsAdapter = (
   region: SupportedRegion,
   now: () => Date,
 ): ResourceAdapter => ({
-  list: async () => {
-    try {
-      const items = new Map<string, string>();
-      let nextToken: string | undefined;
-      for (let pageNumber = 1; ; pageNumber += 1) {
-        const page = await api.listClusters(nextToken ? { nextToken } : {});
-        for (const value of page.clusterArns ?? []) {
-          const id = safeString(value, 512);
-          if (!id) continue;
-          items.set(id, clusterNameFromArn(id));
-          resultLimitIfNeeded(items);
-        }
-        assertPageWithinLimit(pageNumber, page.nextToken);
-        nextToken = safeString(page.nextToken, 2048);
-        if (!nextToken) return finishOptions(items);
-      }
-    } catch (error: unknown) {
-      if (error instanceof PublicResolverError) throw error;
-      throw mapAwsError(error);
-    }
-  },
   describe: async (resourceId) => {
     try {
       const result = await api.describeClusters({ clusters: [resourceId] });

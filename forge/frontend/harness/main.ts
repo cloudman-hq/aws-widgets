@@ -26,24 +26,14 @@ const invoke = async (
 ): Promise<ResolverEnvelope<unknown>> => {
   void payload;
   switch (operation) {
-    case 'macro.config.resolve':
-      return success({ config, source: 'forge' });
+    case 'analytics.track':
+      return success({ tracked: true });
     case 'credentials.status':
       return success({ configured: true, updatedAt: '2026-08-28T08:45:00.000Z' });
-    case 'credentials.validate':
-      return success({ valid: true });
     case 'credentials.save':
       return success({ configured: true, updatedAt: '2026-08-28T08:45:00.000Z' });
     case 'credentials.delete':
       return success({ configured: false });
-    case 'resource.list':
-      return success({
-        items: [
-          { id: config.resourceId, label: 'invoice-worker' },
-          { id: 'arn:aws:lambda:ap-southeast-2:123456789012:function:receipt-worker', label: 'receipt-worker' },
-        ],
-        truncated: false,
-      });
     case 'resource.describe':
       return success({
         schemaVersion: 1,
