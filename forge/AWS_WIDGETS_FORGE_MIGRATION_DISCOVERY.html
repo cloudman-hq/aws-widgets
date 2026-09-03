@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Widgets — Forge Migration Discovery</title>
+  <style>
+    :root { --ink:#172b4d; --muted:#6b778c; --line:#dfe1e6; --blue:#0052cc; --soft:#f4f5f7; --good:#00875a; --warn:#ff8b00; --bad:#de350b; }
+    * { box-sizing:border-box } body { margin:0; color:var(--ink); font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:#fff; }
+    main { max-width:1120px; margin:0 auto; padding:56px 28px 88px; } h1 { font-size:42px; line-height:1.1; margin:0 0 12px; letter-spacing:-.03em } h2 { font-size:26px; margin:48px 0 14px; letter-spacing:-.02em } h3 { font-size:18px; margin:0 0 8px } p,li { max-width:86ch } .eyebrow { color:var(--blue); font-weight:750; letter-spacing:.08em; text-transform:uppercase; font-size:12px }.lede { font-size:21px; color:#42526e; max-width:76ch }.meta { color:var(--muted); font-size:14px }.callout { border-left:5px solid var(--blue); background:#e9f2ff; padding:18px 20px; border-radius:0 8px 8px 0; margin:24px 0 }.risk { border-left-color:var(--bad); background:#fff0eb }.warn { border-left-color:var(--warn); background:#fffae6 }.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:18px 0 }.card { border:1px solid var(--line); border-radius:10px; padding:18px; background:#fff }.card strong { display:block; font-size:25px; margin:4px 0 }.tag { display:inline-block; border-radius:999px; padding:2px 9px; margin:0 4px 6px 0; background:var(--soft); color:#42526e; font-weight:650; font-size:12px }.status { font-weight:750; font-size:13px }.yes { color:var(--good) }.no { color:var(--bad) }.unknown { color:var(--warn) } table { width:100%; border-collapse:collapse; margin:18px 0; font-size:14px } th,td { text-align:left; vertical-align:top; padding:12px; border-bottom:1px solid var(--line) } th { color:#42526e; background:var(--soft) }.flow { display:grid; grid-template-columns:repeat(5,1fr); align-items:center; gap:8px; margin:24px 0 }.node { min-height:92px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; border-radius:10px; border:1px solid var(--line); background:#fff; font-weight:650 }.arrow { text-align:center; color:var(--blue); font-size:24px }.source { font-size:13px; color:var(--muted) }.priority { display:grid; grid-template-columns:44px 1fr; gap:14px; margin:14px 0 }.rank { width:36px; height:36px; display:grid; place-items:center; background:var(--ink); color:#fff; border-radius:50%; font-weight:800 } code { padding:1px 5px; background:var(--soft); border-radius:4px; font-size:.92em } @media(max-width:700px){ main{padding:36px 18px}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)} h1{font-size:34px} }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Read-only discovery · 28 August 2026</div>
+  <h1>AWS Widgets: Forge migration and product decision</h1>
+  <p class="lede">The current app is a legacy Connect macro that puts AWS credentials in the browser and stores encrypted credentials in a Confluence app property. A Forge migration is feasible, but it should be treated as a security-and-product decision, not a descriptor conversion.</p>
+  <p class="meta">Scope: repository evidence, existing migration patterns in conf-app and AsyncAPI, the live Marketplace partner view, Firebase lifecycle logs, the retained lifecycle sheet, read-only Cloudflare HTTP traffic analytics, and a controlled Connect-to-Forge rehearsal on <code>lite-dev.atlassian.net</code>. The evidence review is complete as of 28 August 2026. No production systems, customer content, Marketplace versions, or settings were changed.</p>
+
+  <div class="callout risk"><strong>Recommendation:</strong> do not perform a direct lift-and-shift, and do not production-roll out Forge yet. The evidence audit confirms an installed footprint and credible recent interaction from at least one external customer network, but still cannot prove a successful AWS resource result. Proceed with the smallest development-only Forge rebuild and a safe trust-model spike; keep production rollout behind outcome telemetry and customer validation. The rebuild must use a server-side credential model or customer-owned federation.</div>
+  <div class="callout"><strong>Implementation update — development only:</strong> the focused Forge rebuild is implemented, registered in a dedicated developer space, deployed to the Forge <code>development</code> environment, and installed only on <code>lite-dev.atlassian.net</code>. Credentials use installation-scoped Forge secret storage; AWS SDK v3 calls run only in the resolver; EC2, S3, Lambda, ECS, and DynamoDB return allow-listed view models. Local verification passes 72 Vitest tests plus 3 app-contract tests, and authenticated Forge manifest lint has zero errors. A controlled real-site rehearsal installed public Connect <code>1.1.11-AC</code>, created an old-format macro fixture, and successfully replaced it with same-key Forge while preserving the page macro, UUID, content property and CQL identity. This does not clear the production gate: browser Custom UI execution, real AWS success, customer migration, Marketplace adoption, and production deployment remain unproven.</div>
+
+  <h2>What exists today</h2>
+  <div class="flow" aria-label="Current architecture">
+    <div class="node">Confluence Connect macro</div><div class="arrow">→</div>
+    <div class="node">Browser React app<br><small>old toolchain</small></div><div class="arrow">→</div>
+    <div class="node">AWS SDK in browser</div><div class="arrow">→</div>
+    <div class="node">AWS resource APIs</div>
+  </div>
+  <div class="grid">
+    <div class="card"><span class="tag">Surface</span><h3>One block macro + admin settings</h3><p>Authors select a region and resource. The rendered card supports EC2, S3, Lambda and a generic resource view.</p></div>
+    <div class="card"><span class="tag">Persistence</span><h3>Two different data paths</h3><p>Macro configuration is saved through Connect Confluence APIs. Site-level AWS credentials are saved in a Confluence app property.</p></div>
+    <div class="card"><span class="tag">Runtime</span><h3>Legacy delivery stack</h3><p>React 16, TypeScript 3, Webpack 4, Firebase Hosting/Functions and an Atlassian Connect descriptor.</p></div>
+  </div>
+  <p class="source">Evidence: <code>functions/atlassian-connect.json</code>; <code>src/components/Macro/index.tsx</code>; <code>src/components/Settings/SettingsStore.ts</code>; <code>package.json</code>.</p>
+
+  <h2>The decisive migration concern: credentials</h2>
+  <div class="callout risk"><strong>Current behavior is not an acceptable Forge target.</strong> The front end receives an access key and secret key, initializes the AWS SDK in the browser, and calls AWS services from the viewer. The Connect code encrypts credentials with a key derived from public macro/site context; that is obfuscation, not a secure secret boundary. A Forge migration must not reproduce this browser-secret design.</div>
+  <table>
+    <thead><tr><th>Concern</th><th>Current behavior</th><th>Required Forge design decision</th></tr></thead>
+    <tbody>
+      <tr><td>Credential exposure</td><td>AWS credentials are loaded into each macro viewer's browser.</td><td>Choose either a vendor-managed server-side secret, or customer-owned short-lived federation. Do not send long-lived AWS keys to Custom UI.</td></tr>
+      <tr><td>Least privilege</td><td>The UI recommends read-only access but cannot enforce an AWS policy.</td><td>Publish supported resource types and minimum IAM policies; use assumed roles/scoped sessions where possible.</td></tr>
+      <tr><td>Data residency / egress</td><td>Browser talks to AWS directly; Firebase also hosts Connect lifecycle endpoints.</td><td>Declare every remote and data flow. Forge permissions/egress must reflect the actual implementation, not an aspirational architecture.</td></tr>
+      <tr><td>Existing tenant settings</td><td>Credentials live in a Connect app property.</td><td>Implemented a server-only, STS-validated import into Forge secret storage under the unchanged Connect key. Never emit secrets to the browser or logs.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What we can and cannot say about usage</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">Current public signal</span><strong>105 installs</strong><p>Marketplace listing observed on 28 August 2026. This is an aggregate listing metric, not proof of use.</p></div>
+    <div class="card"><span class="tag">Lifecycle history</span><strong>4,785 events</strong><p>2,613 Install and 2,172 Uninstall rows since June 2020. Historical gaps prevent a current-tenant reconstruction.</p></div>
+    <div class="card"><span class="tag">Recent lifecycle</span><strong>1 site</strong><p>Five Install callbacks for the same site on 24 August 2026; likely repeated delivery, reinstall, or upgrade behavior.</p></div>
+    <div class="card"><span class="tag">Recent client signal</span><strong>26 sites</strong><p>Cloudflare observed 26 Atlassian referrer hosts over seven days; 25 were external to ZenUML. All directly referred requests were for the descriptor icon.</p></div>
+  </div>
+  <table>
+    <thead><tr><th>Question</th><th>Evidence found</th><th>Conclusion</th></tr></thead>
+    <tbody>
+      <tr><td>Does the app record installs?</td><td><span class="status yes">Yes, and the path still works.</span> Firebase lifecycle endpoints append Install/Uninstall events to the retained AWSWidgets sheet. Production logs show five successful writes on 24 August 2026.</td><td>This proves lifecycle callbacks, not five installations: all five recent callbacks belong to one site.</td></tr>
+      <tr><td>What public installation signal exists?</td><td><span class="status yes">105 Marketplace installs.</span> Observed directly on the public AWS Widgets listing on 28 August 2026.</td><td>This is the best current aggregate signal, but it is neither a tenant inventory nor active-use evidence.</td></tr>
+      <tr><td>What does the partner chart say?</td><td><span class="status unknown">Approximately 106 until 24 August; 0 on 27 August.</span> The latest zero conflicts with the public 105 count and the preceding curve. Atlassian states the chart covers about 70% of customer instances and includes licensed, unlicensed, unsubscribed, or unused installations.</td><td>Treat the final zero as an incomplete reporting point/anomaly, not a mass uninstall. The chart cannot establish use.</td></tr>
+      <tr><td>Can lifecycle history reconstruct current tenants?</td><td><span class="status no">No.</span> The sheet contains 2,613 Install and 2,172 Uninstall rows. Only 3,034 events have a site identifier; 1,751 events from April 2021 to August 2023 do not. Repeated callbacks also occur.</td><td>A last-event-per-site calculation would be structurally biased and is not reported as an installation count.</td></tr>
+      <tr><td>Can we inventory existing macros?</td><td><span class="status no">Not centrally.</span> Macro bodies live in tenant Confluence content properties. The lifecycle handler stores only base URL/event data and discards Connect installation credentials such as <code>sharedSecret</code> and <code>clientKey</code>.</td><td>The vendor has no legitimate central credential with which to scan customer content. Macro inventory requires customer-authorized access or a future opt-in mechanism.</td></tr>
+      <tr><td>Is anyone actively using it?</td><td><span class="status yes">There is credible recent interaction evidence.</span> In the preceding seven days Cloudflare recorded 553 successful icon requests from 26 Atlassian referrer hosts. The largest external referrer produced 380 icon requests. In one hour on 26 August local customer time, its matching corporate network also loaded <code>/index.html</code> four times, <code>/editor</code> twice, and the deployed JavaScript/CSS asset chain.</td><td>This is strong evidence that at least one external tenant interacted with the macro/editor, not merely that the app was installed. It still does not prove a successful AWS API call or customer value because the app emits no outcome event.</td></tr>
+      <tr><td>What does Google Analytics add?</td><td><span class="status no">No current evidence.</span> Production contains only the retired Universal Analytics property <code>UA-1211588-23</code>, with no GA4 property or product-success events.</td><td>Cloudflare request evidence is usable for delivery/activity correlation; Google Analytics cannot establish current use.</td></tr>
+      <tr><td>Can Cloudflare totals be treated as users?</td><td><span class="status no">No.</span> The seven-day hostname total was 26.56k requests, but the dominant ASN, user agents, and WordPress exploit paths show that most traffic is automated scanning. Cloudflare's page-view and visit counters are therefore not product KPIs.</td><td>Use only route/referrer/network correlations. The 553 Atlassian-referred requests all target <code>/logo192.png</code>; icon traffic alone means the app metadata was loaded, not that a resource card succeeded.</td></tr>
+      <tr><td>Is it licensed / revenue-generating?</td><td><span class="status no">No.</span> The Connect descriptor has licensing disabled, and the partner license-report UI exposes no AWS Widgets report.</td><td>There is no license-based tenant list to substitute for usage evidence.</td></tr>
+    </tbody>
+  </table>
+  <p class="source">Evidence: <code>functions/index.js</code>, <code>functions/atlassian-connect.json</code>, <code>src/index.html</code>, <code>src/components/Macro/index.tsx</code>, and <code>src/components/App/shared.ts</code>; the public <a href="https://marketplace.atlassian.com/apps/1222395/aws-widgets">Atlassian Marketplace listing</a>; the read-only Marketplace partner analytics view; Firebase production function logs; aggregate queries over the retained “ZenUML Confluence Install and Uninstalls” workbook, AWSWidgets tab; and read-only Cloudflare HTTP Traffic queries for the preceding seven days. Cloudflare Log Explorer's HTTP request dataset is disabled, so query strings and macro identifiers could not be recovered. Customer identifiers are not reproduced in this report.</p>
+  <div class="callout warn"><strong>S0 result — evidence audit complete, development gate passed; production gate not passed:</strong> correlated Cloudflare route, referrer, ASN, user-agent and timestamp evidence shows recent external macro/editor interaction. It does not establish a successful AWS resource-card result, and a privacy-safe macro inventory remains unavailable because Connect installation credentials were never retained. Proceed with development and instrumentation; require explicit successful-view evidence before production migration or Connect retirement.</div>
+  <div class="callout"><strong>How to unblock a build decision:</strong> obtain explicit customer-authorized validation from a small set of installed tenants, or add a separately reviewed, privacy-safe outcome signal before committing to migration. Classify <em>installed</em>, <em>configured</em>, <em>successful view</em>, and <em>retained use</em> separately. Do not recover or export AWS secrets, and do not contact customers as part of this read-only discovery.</div>
+
+  <h2>Lessons from the existing products</h2>
+  <table>
+    <thead><tr><th>Reference</th><th>Useful lesson</th><th>Application to AWS Widgets</th></tr></thead>
+    <tbody>
+      <tr><td>conf-app</td><td>Forge-from-Connect can retain a narrow Connect bridge during a controlled upgrade, but new runtime code is Forge-only. Its manifest declares remotes, operations, token use, storage and egress explicitly.</td><td>Begin with a minimum-scope Forge manifest. Keep Connect compatibility only for a defined migration window and only if it is needed to preserve macro/content continuity.</td></tr>
+      <tr><td>AsyncAPI</td><td>Modernizing hosting/tooling alone is not a business migration. Its later migration work treats tenant communication, paid distribution, staged sunset and outcome telemetry as first-class.</td><td>Do not declare victory after moving Firebase/Connect code. Establish demand, migration messaging, a cutover/rollback plan and success metrics.</td></tr>
+      <tr><td>Conf Mini-Sites</td><td>Forge is the Confluence shell and authorization boundary; an explicitly declared remote performs specialized external work. Its architecture separates browser UI, Forge resolver, remote compute, lifecycle and short-lived access.</td><td>It is a strong future foundation only if AWS Widgets becomes a broader embedded, interactive cloud dashboard/product. It is not automatically the cheapest answer for a single resource-status card.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Target options</h2>
+  <table>
+    <thead><tr><th>Option</th><th>When it wins</th><th>Cost / risk</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A. Focused Forge rebuild</strong><br>New Custom UI macro + Forge resolver; narrow resource set.</td><td>There are active customers who only need a few status/resource cards.</td><td>Still needs a safe AWS auth model and data/lifecycle design, but avoids carrying obsolete UI/tooling.</td><td><span class="status yes">Default if usage is proven.</span></td></tr>
+      <tr><td><strong>B. Build atop Conf Mini-Sites</strong><br>Shared Forge shell, external Worker capability.</td><td>The product direction is user-configured, multi-widget dashboards or interactive cloud tools with shared publishing/hosting needs.</td><td>Could overfit a simple macro; adds external hosting, lifecycle and security machinery not needed for a small viewer.</td><td><span class="status unknown">Explore only after product-surface validation.</span></td></tr>
+      <tr><td><strong>C. Merge into a shared project</strong><br>One app/codebase for generic embedded tools.</td><td>There is a common customer, permissions model, deployment model and roadmap—not merely a shared technology preference.</td><td>Premature merging couples release cadence, support, licensing and security boundaries.</td><td><span class="status unknown">Decision after evidence, not before.</span></td></tr>
+      <tr><td><strong>D. Retire Connect</strong><br>Archive source and publish a clear end-of-life path.</td><td>No current active usage/value is found, or safe AWS auth is not economically viable.</td><td>Requires careful customer notification if any installs remain.</td><td><span class="status yes">Preferred if the evidence gate fails.</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Recommended target architecture</h2>
+  <div class="flow" aria-label="Recommended Forge architecture">
+    <div class="node">Confluence page<br><small>Forge macro</small></div><div class="arrow">→</div>
+    <div class="node">Forge Custom UI<br><small>no AWS secret</small></div><div class="arrow">→</div>
+    <div class="node">Forge resolver<br><small>authorize + validate</small></div><div class="arrow">→</div>
+    <div class="node">AWS gateway / federation<br><small>short-lived, scoped access</small></div>
+  </div>
+  <p>For a proven narrow use case, the recommended architecture is a Forge Custom UI macro plus a resolver, with AWS calls delegated to a purpose-built gateway or federation exchange. The gateway returns only a resource view model needed by the macro; it never returns long-lived AWS credentials. The Forge resolver is the policy boundary: it validates macro context, performs only declared external work, and records safe outcome telemetry. The selected external component must use a per-tenant credential reference or short-lived role assumption, not a global shared AWS key.</p>
+  <div class="callout"><strong>Why this is deliberately smaller than Conf Mini-Sites:</strong> the Mini-Sites pattern is appropriate if AWS Widgets becomes a host for rich, user-created interactive dashboards. A single AWS resource card should not inherit an upload/publish/host-per-instance system just to render a status card. Share a foundation only after the product surface—not merely the framework—is shared.</div>
+
+  <h2>Manifest direction — align to conf-app without copying it</h2>
+  <p>The conf-app manifest is a useful <em>discipline</em>, not a template to copy. AWS Widgets should request the smallest Confluence scope set and declare only real remotes and operations. Copying conf-app's broad scope inventory would create unnecessary consent and review risk.</p>
+  <table>
+    <thead><tr><th>Manifest area</th><th>Proposed principle</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>App/runtime</td><td>Forge Node runtime; licensing choice only after business model is decided.</td><td>The old descriptor has licensing disabled; do not implicitly convert pricing while changing platform.</td></tr>
+      <tr><td>Macro module</td><td>One Forge macro with a Custom UI resource, config resource if configuration stays author-facing, and a resolver.</td><td>Maps the existing viewer/editor concept without Connect iframe APIs.</td></tr>
+      <tr><td>Remotes</td><td>Declare a dedicated AWS proxy/gateway remote only if selected; use the required remote operation and invocation-token design.</td><td>Keeps AWS credentials and service calls out of the browser while making external processing auditable.</td></tr>
+      <tr><td>Permissions</td><td>Start from least privilege. Add Confluence scopes only after mapping macro config, page context and lifecycle needs.</td><td>New scope consent is a migration and distribution risk.</td></tr>
+      <tr><td>Storage &amp; lifecycle</td><td>Explicitly model installation, uninstall cleanup, config versioning, credential reference rotation and macro/page copy semantics.</td><td>The old install/uninstall log is insufficient for a secure product lifecycle.</td></tr>
+      <tr><td>Analytics</td><td>Instrument viewer success/failure, configuration success, auth failure category and output/value events; never send credentials or resource payloads as analytics.</td><td>Allows an active-use decision without treating installation as engagement.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Staged plan and gates</h2>
+  <div class="priority"><div class="rank">0</div><div><h3>Evidence audit — complete; development go, production no-go</h3><p>Marketplace, Firebase, lifecycle-sheet and Cloudflare evidence has been recovered and reconciled. It proves an installed footprint and credible recent customer interaction, but not a successful AWS result or complete macro inventory. Continue the development-only Forge build; hold production migration until customer-authorized validation or privacy-safe outcome telemetry clears the final gate.</p></div></div>
+  <div class="priority"><div class="rank">1</div><div><h3>Choose the AWS trust model</h3><p>Decide customer-managed federation, vendor-managed encrypted secret, or unsupported/retire. Write an IAM minimum-policy and threat model before a Forge manifest or UI is built.</p></div></div>
+  <div class="priority"><div class="rank">2</div><div><h3>Prototype the narrowest valuable resource card</h3><p>One resource type, one Forge macro, non-production environment, no bulk credential migration. Verify user permissions, error states, page copy and credential rotation.</p></div></div>
+  <div class="priority"><div class="rank">3</div><div><h3>Validate controlled Connect-to-Forge continuity</h3><p>A development-site same-key replacement preserved an old-format macro and its content property. Complete browser Custom UI, editor, credential-import, and successful least-privilege AWS tests before production.</p></div></div>
+  <div class="priority"><div class="rank">4</div><div><h3>Roll out only with outcomes</h3><p>Measure configured tenant, successful resource view, error rate and retained weekly use. Make Connect sunset conditional on proven migration success.</p></div></div>
+
+  <h2>Prioritized implementation slices — only after the evidence gate</h2>
+  <table>
+    <thead><tr><th>Slice</th><th>Thin vertical outcome</th><th>Must be true before starting</th><th>Success / stop condition</th></tr></thead>
+    <tbody>
+      <tr><td><strong>S0 · Decision evidence</strong><br><span class="status yes">Evidence audit complete</span></td><td>Current public aggregate: 105 installs. Historical lifecycle: 4,785 events, with 1,751 rows missing site identity. Cloudflare: 26 Atlassian referrer hosts and one external customer network with a correlated macro/editor asset chain in the preceding seven days. No centralized macro inventory or successful-view telemetry exists.</td><td>Completed read-only using Marketplace, Firebase, the retained lifecycle sheet and Cloudflare HTTP Traffic; no secret handling or customer-content access.</td><td><span class="status yes">Development gate passed.</span> Build and instrument in development. <span class="status no">Production gate not passed.</span> Require successful resource-view evidence and an approved trust model.</td></tr>
+      <tr><td><strong>S1 · Trust-model spike</strong></td><td>One non-production request using a customer-approved, least-privilege AWS role/federation model; redact all identifiers in tests.</td><td>Written security ownership, an IAM policy proposal, revocation/rotation model.</td><td>No browser credential exposure; denied/expired access fails closed. Stop if no acceptable AWS auth model exists.</td></tr>
+      <tr><td><strong>S2 · Forge resource card</strong></td><td>One macro type, one supported resource category, view/config/error states, and safe telemetry.</td><td>Forge manifest design is approved; S1 is successful.</td><td>End-to-end staging verification proves Confluence authorization and resource rendering; no broad scopes or undeclared egress.</td></tr>
+      <tr><td><strong>S3 · Coexistence pilot</strong></td><td>Opt-in pilot with Connect kept intact; server-only legacy-property compatibility and fallback re-entry.</td><td>Known active tenants and support/communication plan.</td><td>Existing macros render without edits and recurring successful views are observed. Stop/revert to Connect if parity or trust assumptions fail.</td></tr>
+      <tr><td><strong>S4 · Transition or retirement</strong></td><td>Staged Connect sunset only after adoption thresholds are met.</td><td>Verified active-install list and documented fallback/notice policy.</td><td>No silent loss of macro function; final success is continued value, not merely a Forge install.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Open decisions</h2>
+  <ol>
+    <li>Will the owner seek customer-authorized demand validation, make an explicit strategic build decision despite unknown active use, or proceed toward controlled retirement?</li>
+    <li>Which AWS authentication model is acceptable to customers and security review?</li>
+    <li>Is AWS Widgets a narrow cloud-status macro, or the seed of a broader interactive dashboard/mini-site product?</li>
+    <li>Should the future app remain free, be paid, or be bundled—after usage evidence rather than by migration default?</li>
+    <li>What customer communication and support capacity exists for a Connect retirement if active installs are discovered?</li>
+  </ol>
+
+  <h2>Evidence register</h2>
+  <ul>
+    <li>AWS Widgets Connect descriptor and lifecycle: <code>functions/atlassian-connect.json</code>, <code>functions/index.js</code>.</li>
+    <li>AWS Widgets credentials / runtime: <code>src/components/Settings/SettingsStore.ts</code>, <code>src/components/App/index.tsx</code>, <code>src/components/Viewer/index.tsx</code>, <code>src/components/App/shared.ts</code>.</li>
+    <li>conf-app Forge-from-Connect / manifest practice: <code>manifest.yml</code>, <code>docs/policies/forge-only.md</code>.</li>
+    <li>AsyncAPI modernization and commercial migration lessons: <code>docs/MIGRATION_COMPLETED.md</code>, <code>docs/CONNECT_SUNSET_AND_MIGRATION_BANNER.md</code>.</li>
+    <li>Conf Mini-Sites Forge shell / remote model: <code>CONTEXT.md</code>, <code>forge-app/manifest.yml</code>.</li>
+    <li>Live operational evidence (read-only, 28 August 2026): Marketplace public listing and partner analytics; Firebase production lifecycle logs; retained lifecycle workbook aggregate queries; Cloudflare HTTP Traffic route/referrer/ASN correlations and exported hourly aggregates. No tenant identifiers are included in this report.</li>
+  </ul>
+  <p class="meta">This is a completed discovery and decision-gate report, not a production implementation specification. It intentionally contains no secret values, customer identities, raw AWS configuration, or unreliable site-derived installation count.</p>
+</main>
+</body>
+</html>

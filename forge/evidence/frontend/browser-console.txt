@@ -1,0 +1,9 @@
+AWS Widgets Custom UI local harness console evidence
+Captured: 2026-08-28 Australia/Melbourne
+URL: http://127.0.0.1:4178/
+Browser: agent-browser 0.35.0-local-patched-2026-08-27-08
+
+[debug] [vite] connecting...
+[debug] [vite] connected.
+
+Result: no console warnings or errors; no credential values or raw resolver errors emitted.
