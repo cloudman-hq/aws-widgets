@@ -40,13 +40,14 @@ Runtime code is unchanged. No file under `src/**`, `functions/**`, `public/**`,
 | `docs/policies/client-privacy.md` | `LOCAL` | Written; `gh api repos/cloudman-hq/aws-widgets -q .visibility` = `public`. |
 | `CLAUDE.md` | `LOCAL` | Written; every measured figure in it is listed in this register. |
 | `.claude/skills/validate-branch` | `LOCAL` | Its contract `yarn validate` ran green — see below. |
-| `.claude/skills/submit-branch` | `STRUCTURAL ONLY` | Frontmatter parses, `name` matches directory, description names the target repository. No PR was created. |
+| `.claude/skills/submit-branch` | `LIVE` | Exercised once: branch pushed, PR #70 "WP1: port the conf-app release process (deploy-agnostic half)" created as Draft against `prod-release`, and its `Build and Unit Test` run passed on the exact head SHA. |
 | `.claude/skills/ready-pr` | `STRUCTURAL ONLY` | Same check. No Draft transition performed. |
 | `.claude/skills/babysit-pr` | `STRUCTURAL ONLY` | Same check. No run monitored. |
 | `.claude/skills/land-pr` | `STRUCTURAL ONLY` | Same check. No merge performed. |
 | `.claude/skills/ship-branch` | `STRUCTURAL ONLY` | Same check. Composition never executed. |
 | `package.json` scripts `lint:check`, `validate` | `LOCAL` | `yarn validate` exit 0. |
-| `.github/workflows/deploy-stage.yml` gate | `STRUCTURAL ONLY` | Parsed with PyYAML: workflow `Build, Test and Stage`; job `build` named `Build and Unit Test`; job `deploy-stage` named `Deploy legacy Connect app to stage` with `needs: build` and `if: github.event_name == 'push'`. Never run on GitHub. |
+| `.github/workflows/deploy-stage.yml` gate | `LIVE` | Two pull-request runs on PR #70. Run [33714331769](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714331769) on `9801be9`: `Build and Unit Test (10.x)` success, `Deploy legacy Connect app to stage` **skipped**. Run [33714466994](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714466994) on `f842bb6`: `Build and Unit Test` success, deploy skipped. |
+| `.github/workflows/deploy-prod.yml` gate | `STRUCTURAL ONLY` | Parsed with PyYAML: job `build` named `Build and Unit Test`, job `deploy-prod` with `needs: build` and `environment: production`. Running it needs a pushed `release-*` tag, which is a production action and was not taken. |
 
 ## Local validation evidence — 2026-09-03
 
@@ -81,22 +82,44 @@ place `secrets.FIREBASE_TOKEN` appears.
 `STRUCTURAL ONLY`: this reasoning comes from reading the workflow file. No PR run was
 observed either before or after the change.
 
-## Repository controls — measured 2026-09-03
+## Repository controls
 
-| Control | Value | Owner |
-|---|---|---|
-| Environments | 0 | repository administrator |
-| Actions variables | 0 | repository administrator |
-| Rulesets | 0 | repository administrator |
-| `master` branch protection | HTTP 404 `Branch not protected` | repository administrator |
-| `prod-release` branch protection | not configured | repository administrator |
-| Secrets | `FIREBASE_TOKEN` only | repository administrator |
-| Visibility | `public` | repository administrator |
+Measured before this work package, then configured and re-read on 2026-09-03.
 
-`BLOCKED` — no platform control enforces the merge, review, or deploy preconditions
-that the ported skills describe. Until environments, a ruleset, and protection on
-`prod-release` exist, the skills are the only gate, and any user with write access can
-bypass them. Creating them requires repository administrator rights.
+| Control | Before | After | Status |
+|---|---|---|---|
+| `prod-release` branch protection | not configured | requires the `Build and Unit Test` check and a pull request; force pushes and deletions blocked; conversation resolution required | `LIVE` |
+| Environments | 0 | `production`, required reviewer `MrCoder`, deployment branch policy `tag release-*` | `LIVE` |
+| Rulesets | 0 | `Protect release tags` (id 22166010), target `tag`, active, rules `deletion` and `non_fast_forward` on `refs/tags/release-*` | `LIVE` |
+| `master` branch protection | HTTP 404 `Branch not protected` | unchanged | `SKIPPED` — `master` is frozen at 2020-06-27 and is not a deployment target |
+| Actions variables | 0 | 0 | `SKIPPED` — nothing in these workflows reads one |
+| Secrets | `FIREBASE_TOKEN` only | unchanged | — |
+| Visibility | `public` | unchanged | — |
+
+Each value above was re-read from the API after the write; the responses are in
+`~/.unattended-runs/aws-widgets/20260903-141328-wp1-pr/evidence/`.
+
+Two deliberate settings, both recorded so a later reader does not read them as
+oversights:
+
+- `enforce_admins: false`. This repository has one maintainer, who is an
+  administrator. Enforcing protection against administrators would leave no path to
+  an emergency fix.
+- `required_approving_review_count: 0`. A pull request is required before merging,
+  but GitHub does not let an author approve their own pull request, so requiring one
+  approval would deadlock a single-maintainer repository. Raise it when a second
+  reviewer exists.
+
+## Production promotion is now gated
+
+`deploy-prod.yml` previously ran `yarn deploy:prod` on a pushed `release-*` tag with
+no lint, no test, and no approval. It now runs `Build and Unit Test` first, and the
+deploy job targets the `production` environment, which requires a reviewer approval
+and accepts only `release-*` tags.
+
+The next `release-*` tag will therefore **wait for a human approval** in the Actions
+UI before it deploys to the Firebase `prod` project. This is a deliberate behavior
+change.
 
 ## Deferred and skipped
 
@@ -114,12 +137,21 @@ bypass them. Creating them requires repository administrator rights.
 | Scheduled smoke test | `PENDING` | Useful, but it needs a production URL check and a decision on alert routing. |
 | Merging `codex/forge-conversion` | `BLOCKED` | Unrelated histories; needs `--allow-unrelated-histories` and separate authorization. Owner: the user. |
 
+## Check-name correction
+
+The first run reported the check as `Build and Unit Test (10.x)`: a `strategy.matrix`
+appends its value to the check name, and branch protection matches the name exactly.
+The matrix held one Node version and was removed in `f842bb6`, after which the check
+reported as `Build and Unit Test`. Branch protection requires that exact string.
+
 ## Next actions
 
-1. Open a pull request from `chore/wp1-operational-convergence` into `prod-release`
-   and record the first real `Build and Unit Test` run. That promotes the workflow gate
-   and `submit-branch` from `STRUCTURAL ONLY`.
-2. Repository administrator: create branch protection on `prod-release` and a
-   `production` environment, so the ported preconditions have platform backing.
-3. Decide the Forge integration path before porting `release-app`, `pvt`, and
+1. Review and merge PR #70. Merging is a deployment — a push to `prod-release` runs
+   `Deploy legacy Connect app to stage` against the Firebase `awswidgets-stg` project.
+2. Decide the Forge integration path before porting `release-app`, `pvt`, and
    `spot-check`.
+3. Consider a scheduled production smoke test — still `PENDING`; it needs a production
+   URL to probe and a decision on where an alert goes.
+4. 378 Dependabot alerts stand on the default branch (25 critical, 175 high, 127
+   moderate, 51 low), reported by the remote on push. Raising the Node pin is not a
+   fix path; see `CLAUDE.md`.

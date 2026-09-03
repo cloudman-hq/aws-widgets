@@ -67,8 +67,30 @@ Merging, release publication, production deployment, and Marketplace descriptor
 changes are separate authorization boundaries. Creating a pull request does not
 authorize any of them.
 
+## What the platform enforces
+
+Configured 2026-09-03. These are real GitHub settings, not conventions:
+
+- `prod-release` requires the `Build and Unit Test` check and a pull request. Force
+  pushes and deletions are blocked; conversation resolution is required.
+- The `production` environment requires a reviewer approval and accepts only
+  `release-*` tags.
+- The `Protect release tags` ruleset blocks deletion and non-fast-forward on
+  `refs/tags/release-*`.
+
+`enforce_admins` is `false` and the required approval count is `0`, because this
+repository has one maintainer who is an administrator and cannot approve their own
+pull request. The reasoning is recorded in
+[the port register](../ops/pipeline-port-status.md).
+
+The required check name must match exactly. Do not add a `strategy.matrix` to the
+`build` job — a matrix renders the check as `Build and Unit Test (10.x)` and the
+protection rule stops matching.
+
 ## Release tags
 
-Production deploys fire on a pushed tag matching `release-*` (`deploy-prod.yml`).
-Existing tags are `release-20200612122734`, `release-20230506`, `release-20230506-2`.
-Tag creation is a production action and is never performed by branch work.
+Production deploys fire on a pushed tag matching `release-*` (`deploy-prod.yml`),
+which runs `Build and Unit Test` and then waits for the `production` environment
+approval. Existing tags are `release-20200612122734`, `release-20230506`,
+`release-20230506-2`. Tag creation is a production action and is never performed by
+branch work.

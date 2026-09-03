@@ -109,12 +109,23 @@ There is no E2E suite in this repository.
   `push` event. It is the only job that reads `secrets.FIREBASE_TOKEN`; pull-request
   jobs receive no secret.
 - Production is a pushed tag matching `release-*`, consumed by `deploy-prod.yml`,
-  which runs `yarn deploy:prod` against the Firebase `prod` project. Existing tags:
-  `release-20200612122734`, `release-20230506`, `release-20230506-2`. Tag creation is a
-  production action and is never performed by branch work.
-- Repository controls measured 2026-09-03: 0 environments, 0 Actions variables,
-  0 rulesets, `master` unprotected, 1 secret (`FIREBASE_TOKEN`). No platform gate
-  enforces the preconditions above; the skills are the only gate.
+  which runs `Build and Unit Test` and then deploys to the Firebase `prod` project
+  through the `production` environment. That environment requires a reviewer approval
+  and accepts only `release-*` tags, so a tag push waits for a human before it
+  deploys. Existing tags: `release-20200612122734`, `release-20230506`,
+  `release-20230506-2`. Tag creation is a production action and is never performed by
+  branch work.
+- Repository controls configured 2026-09-03: `prod-release` requires the
+  `Build and Unit Test` check and a pull request, blocks force pushes and deletions,
+  and requires conversation resolution; the `production` environment exists with a
+  required reviewer; the `Protect release tags` ruleset blocks deletion and
+  non-fast-forward on `refs/tags/release-*`. `enforce_admins` is `false` and
+  `required_approving_review_count` is `0` on purpose — one maintainer, who cannot
+  approve their own pull request. Reasoning is in
+  [the port register](docs/ops/pipeline-port-status.md).
+- Branch protection matches the check name exactly. Do not add a `strategy.matrix` to
+  the `build` job: a matrix appends its value to the check name
+  (`Build and Unit Test (10.x)`) and the protection rule stops matching.
 - Lifecycle skills follow `conf-app` order:
   `validate-branch` → `submit-branch` → `ready-pr` → `babysit-pr` → `land-pr` →
   `ship-branch`. `release-app`, `pvt`, `spot-check`, and `forge-tunnel` are **not
