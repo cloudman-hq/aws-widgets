@@ -221,6 +221,50 @@ Prepared for that: the `stage` environment exists with no reviewers, and
 `deploy-stage.yml` declares `environment: stage`. An environment job still falls back
 to a repository secret, so this change is inert until the repository secret is removed.
 
+## First release through the ported pipeline — 2026-09-03
+
+Tag `release-202609030645` on `4d97313`, previous tag `release-20230506-2` confirmed
+an ancestor.
+
+| Stage | Result |
+|---|---|
+| Staging run 33724224171 on `4d97313` | success; stage hosting released 2026-09-03 16:41:39 AEST, replacing 2023-05-06 21:04:17 |
+| Production run [33724755120](https://github.com/cloudman-hq/aws-widgets/actions/runs/33724755120) | `Build and Unit Test` success; `Deploy legacy Connect app to production` waited at the `production` environment, then success after approval |
+| Production hosting | released 2026-09-03 16:52:02 AEST, replacing 2023-05-06 21:42:35 |
+| Served bundle | `app.dfc02017ade68d94138f.4d97313.js`, replacing `…ef8d6d3.js` |
+| Descriptor | `https://awswidgets.web.app/atlassian-connect.json` returns 200, key `com.aws.widget.confluence-addon`, macro `aws-widget-macro` |
+
+Delta from `release-20230506-2`: 16 commits, 15 files, all `infra/test/docs`. No file
+under `src/`, `functions/`, `public/`, `webpack/`, `firebase.json` or `.firebaserc`
+changed. The webpack content hash `dfc02017ade68d94138f` is identical on both sides,
+so the bundle is byte-identical and republished under a new git-revision filename.
+**No user-visible change shipped.** The release exercised the pipeline while the
+payload was inert.
+
+Post-deploy validation: `BLOCKED — no approved production fixture`. A green deploy is
+not evidence that a user rendered a macro.
+
+Status promotions from this release:
+
+| Item | Was | Now |
+|---|---|---|
+| `.github/workflows/deploy-stage.yml` deploy job | `STRUCTURAL ONLY` | `LIVE` |
+| `.github/workflows/deploy-prod.yml` | `STRUCTURAL ONLY` | `LIVE` |
+| `production` environment approval | `LIVE` (configured) | `LIVE` (exercised; the run waited, then proceeded only after approval) |
+| `.claude/skills/release-app` | `STRUCTURAL ONLY` | `LIVE` |
+| `.claude/skills/land-pr` | `STRUCTURAL ONLY` | `LIVE` — exercised on PR #70, #71 and #72 |
+| `.claude/skills/ready-pr` | `STRUCTURAL ONLY` | `LIVE` — readying PR #70 started run 33718091855 on the unchanged SHA, confirming the `ready_for_review` trigger type |
+
+## Credential now lives on the environments
+
+The repository secret `FIREBASE_TOKEN` was deleted on 2026-09-03 after both
+environment secrets were verified present and a deploy succeeded through them. Every
+job that reads the secret declares an environment: `deploy-stage` uses `stage`,
+`deploy-prod` uses `production`. This closes blockers 1 and 2 of the default-branch
+section below — a workflow on any historical commit declares no environment, so it
+cannot read the secret and its deploy fails. Blocker 3, the smoke test never firing,
+still stands.
+
 ## Cloud Functions cannot be deployed — nodejs10 runtime decommissioned
 
 Found on 2026-09-03, after the credential was replaced. Run
