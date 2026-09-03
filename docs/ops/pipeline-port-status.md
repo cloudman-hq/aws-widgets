@@ -24,10 +24,16 @@ recorded evidence.
 ## Scope
 
 This work package ports the **deploy-target-agnostic** half of the `conf-app` release
-process. The Forge-specific half is `DEFERRED` — the tracked tree is an Atlassian
+process. The Forge-specific half is `DEFERRED`: the tracked tree is an Atlassian
 Connect app on Firebase, and the Forge conversion lives on `codex/forge-conversion`,
-whose 249 commits share no ancestor with the tracked history
-(`git merge-base master codex/forge-conversion` returns nothing).
+16 commits stacked on the current `prod-release` tip.
+
+**Correction, 2026-09-03.** An earlier revision of this register said those commits
+"share no ancestor with the tracked history" and needed `--allow-unrelated-histories`.
+That reading came from measuring against `master`, which has a different root commit.
+Measured against `prod-release`, the actual base branch, `git merge-base` returns
+`ef8d6d3` — the `prod-release` tip itself — and `--is-ancestor` exits 0. The branch
+fast-forwards. The deferral stands on product grounds, not on git mechanics.
 
 Runtime code is unchanged. No file under `src/**`, `functions/**`, `public/**`,
 `webpack/**`, `firebase.json`, or `.firebaserc` was modified.
@@ -136,7 +142,25 @@ change.
 | Reusable `staging-deploy.yml` (`workflow_call`) | `DEFERRED` | One deploy target and one caller; a reusable workflow adds no separation yet. |
 | E2E workflow | `SKIPPED` | No E2E suite exists in this repository. |
 | Scheduled smoke test | `LOCAL` | Both unknowns closed by measurement. Production URL is `https://awswidgets.web.app` — `/` and `/atlassian-connect.json` both returned 200 on 2026-09-03, and the served descriptor carries the expected app key, macro key and `baseUrl`. Alert routing is GitHub's own workflow-failure notification to the repository owner; no external alerting service was configured. |
-| Merging `codex/forge-conversion` | `BLOCKED` | Unrelated histories; needs `--allow-unrelated-histories` and separate authorization. Owner: the user. |
+| Merging `codex/forge-conversion` | `DEFERRED` | Not a history problem. `git merge-base prod-release codex/forge-conversion` returns `ef8d6d3`, the `prod-release` tip, and `--is-ancestor` exits 0: the branch is `prod-release` plus 16 commits and merges by fast-forward. It stays deferred because it lands a second toolchain (Node 24 beside the root Node 10 pin) and a Forge app identity, which is a product decision. Owner: the user. |
+
+## Merge ordering against the Forge branch
+
+Landing this work package first costs the Forge branch its fast-forward. Exactly one
+file is touched by both branches:
+
+```bash
+comm -12 <(git diff --name-only prod-release chore/wp1-operational-convergence | sort) \
+         <(git diff --name-only prod-release codex/forge-conversion | sort)
+# .github/workflows/deploy-stage.yml
+```
+
+`git merge-tree prod-release chore/wp1-operational-convergence codex/forge-conversion`
+reports that file as `changed in both`; every other Forge path is `added in remote`.
+The Forge branch's `1bafdf5 ci: separate legacy PR build from stage deploy` splits the
+PR build from the deploy step, which this work package supersedes with the
+`Build and Unit Test` job and the event-aware concurrency key. Resolve that one
+conflict by keeping this branch's version.
 
 ## Check-name correction
 

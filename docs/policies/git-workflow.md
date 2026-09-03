@@ -43,13 +43,28 @@ Only the assigned owner edits a shared package manifest, lockfile, workflow, or 
 exclusive file. Integrators stage and commit shared-checkout work by scoped path; a
 worker must not revert another worker's edits.
 
-## The `codex/forge-conversion` branch is not mergeable by fast-forward
+## The `codex/forge-conversion` branch branches from `prod-release`
 
-`git merge-base master codex/forge-conversion` returns nothing. The two histories have
-different root commits (`e38e548` on `master`, `b253e54` on the branch), so the 249
-commits on `codex/forge-conversion` share no ancestor with the tracked tree. Any
-integration needs `--allow-unrelated-histories` and a separate authorization. Do not
-merge it as part of ordinary branch work.
+Measure ancestry against `prod-release`, never against `master`:
+
+```bash
+git merge-base prod-release codex/forge-conversion   # ef8d6d3 — the prod-release tip
+git merge-base --is-ancestor prod-release codex/forge-conversion   # exit 0
+git rev-list --count prod-release..codex/forge-conversion          # 16
+git merge-base master codex/forge-conversion         # nothing — different root commit
+```
+
+`prod-release` is the exact merge base, so the branch is `prod-release` plus 16
+commits and merges by fast-forward while `prod-release` stays at `ef8d6d3`. The empty
+result against `master` reflects `master`'s separate root (`e38e548`), not the state
+of the Forge work.
+
+Merging it is still a separate authorization: it lands a second toolchain and a Forge
+app identity. It is not, however, a history-repair problem, and
+`--allow-unrelated-histories` is the wrong tool for it.
+
+Once any other commit lands on `prod-release` the fast-forward disappears and the
+merge becomes an ordinary three-way merge.
 
 ## Validate and submit
 

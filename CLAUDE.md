@@ -143,11 +143,16 @@ structural or deferred. Current status is recorded in
 
 ## Forge migration is out of scope here
 
-A Forge conversion exists on the branch `codex/forge-conversion` — 249 commits,
-`forge/manifest.yml` with app ID `bd4e3a18-d223-45bf-a301-b2b4eab5beed`, runtime
-`nodejs24.x`, and its own `forge-check.yml`. `git merge-base master codex/forge-conversion`
-returns nothing: the histories have different root commits and share no ancestor.
-Integration requires `--allow-unrelated-histories` and separate authorization.
+A Forge conversion exists on the branch `codex/forge-conversion`: `forge/manifest.yml`
+with app ID `bd4e3a18-d223-45bf-a301-b2b4eab5beed`, runtime `nodejs24.x`, and its own
+`forge-check.yml`.
+
+Measure its ancestry against `prod-release`, not `master`. `prod-release` is the exact
+merge base and an ancestor, so the branch is `prod-release` plus 16 commits and would
+fast-forward. `git merge-base master codex/forge-conversion` returns nothing only
+because `master` has a different root commit. Merging remains a separate
+authorization — it lands a second toolchain and a Forge app identity — but it is not a
+history-repair problem.
 
 Do not describe Forge resolvers, Forge KVS, or `@forge/bridge` as current
 implementation of this repository. The tracked tree is Connect on Firebase.
