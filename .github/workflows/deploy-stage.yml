@@ -21,20 +21,19 @@ permissions:
   contents: read
 
 jobs:
+  # No strategy.matrix here. A matrix appends its value to the check name
+  # ("Build and Unit Test (10.x)"), and branch protection must name the check
+  # exactly. One Node version needs no matrix.
   build:
     name: Build and Unit Test
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x]
-
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 10.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 10.x
       # actions/setup-node ships yarn 1.x, so the Corepack shim that breaks under
       # Node 10 locally is not on the runner.
       - run: yarn install --frozen-lockfile
@@ -51,15 +50,11 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x]
-
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 10.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 10.x
       - run: yarn install --frozen-lockfile
       - run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}
