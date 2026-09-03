@@ -1,5 +1,7 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Production deploy. Fires on a pushed tag matching release-*.
+# The deploy job targets the `production` GitHub environment, which requires a
+# human approval and accepts only `release-*` tags. Node is pinned to 10.x because
+# node-sass@4.13.1 has no prebuilt binary above Node 13.
 
 name: Deploy to Prod
 
@@ -8,20 +10,43 @@ on:
     tags:
       - release-*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
 jobs:
   build:
-
+    name: Build and Unit Test
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x]
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 10.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn install
+          node-version: 10.x
+      - run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn lint:check
+      - name: Unit tests
+        run: yarn test --ci
+      - name: Build
+        run: yarn build
+
+  deploy-prod:
+    name: Deploy legacy Connect app to production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - run: yarn install --frozen-lockfile
       - run: yarn deploy:prod --token ${{ secrets.FIREBASE_TOKEN }}
