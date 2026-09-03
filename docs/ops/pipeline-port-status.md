@@ -221,6 +221,37 @@ Prepared for that: the `stage` environment exists with no reviewers, and
 `deploy-stage.yml` declares `environment: stage`. An environment job still falls back
 to a repository secret, so this change is inert until the repository secret is removed.
 
+## Cloud Functions cannot be deployed — nodejs10 runtime decommissioned
+
+Found on 2026-09-03, after the credential was replaced. Run
+[33720488945](https://github.com/cloudman-hq/aws-widgets/actions/runs/33720488945) on
+`e08ae79` authenticated, resolved the project, and reached
+`hosting[awswidgets-stg]: file upload complete`, then failed:
+
+    HTTP Error: 400, runtime: Runtime validation errors:
+    [error_code: DEPLOYS_NOT_ALLOWED
+     message: "Runtime nodejs10 is decommissioned and no longer allowed.
+               Please use the latest Node.js runtime for Cloud Functions."]
+
+for `descriptor`, `installedEndpoint` and `uninstalledEndpoint`.
+
+`functions/package.json` declares `engines.node: "10"`. `firebase.json` has no
+`functions` block — the CLI auto-detects the `functions/` directory and includes it.
+
+**Nothing shipped.** `firebase hosting:channel:list --project stage` reported the live
+release as `2023-05-06 21:04:17`, and the served page still referenced
+`aws-sdk.…ef8d6d3.js` while the built bundle was `aws-sdk.…e2f7a7c.js`. The deploy
+aborted before finalising the hosting release, so the failure was closed, not partial.
+
+Both deploy jobs now pass `--only hosting`. The three functions stay on their existing
+deployment and keep serving: `https://awswidgets-stg.web.app/atlassian-connect.json`
+returns 200 through the `descriptor` function.
+
+`DEFERRED` — migrating the functions to a supported runtime. It needs
+`engines.node` raised plus upgrades from `firebase-functions@3.6.1` and
+`firebase-admin@8.10.0`, and the Connect install and uninstall webhooks retested. No
+change under `functions/` can deploy until that happens.
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
