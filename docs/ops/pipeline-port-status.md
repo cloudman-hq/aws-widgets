@@ -45,6 +45,7 @@ Runtime code is unchanged. No file under `src/**`, `functions/**`, `public/**`,
 | `.claude/skills/babysit-pr` | `STRUCTURAL ONLY` | Same check. No run monitored. |
 | `.claude/skills/land-pr` | `STRUCTURAL ONLY` | Same check. No merge performed. |
 | `.claude/skills/ship-branch` | `STRUCTURAL ONLY` | Same check. Composition never executed. |
+| `.claude/skills/release-app` | `STRUCTURAL ONLY` | Rewritten for this repository's tag trigger: select a `prod-release` SHA with a green staging run under 24 hours old, check ancestry against the previous `release-*` tag, classify the delta, push `release-YYYYMMDDHHMM`, then watch `Deploy to Prod` stop at the `production` environment approval. Never run — that needs a production tag push. |
 | `package.json` scripts `lint:check`, `validate` | `LOCAL` | `yarn validate` exit 0. |
 | `.github/workflows/deploy-stage.yml` gate | `LIVE` | Two pull-request runs on PR #70. Run [33714331769](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714331769) on `9801be9`: `Build and Unit Test (10.x)` success, `Deploy legacy Connect app to stage` **skipped**. Run [33714466994](https://github.com/cloudman-hq/aws-widgets/actions/runs/33714466994) on `f842bb6`: `Build and Unit Test` success, deploy skipped. |
 | `.github/workflows/deploy-prod.yml` gate | `STRUCTURAL ONLY` | Parsed with PyYAML: job `build` named `Build and Unit Test`, job `deploy-prod` with `needs: build` and `environment: production`. Running it needs a pushed `release-*` tag, which is a production action and was not taken. |
@@ -125,8 +126,7 @@ change.
 
 | Item | Status | Reason |
 |---|---|---|
-| `.claude/skills/release-app` | `DEFERRED` | `conf-app`'s version drives a GitHub Release and `forge deploy -e production`. Production here is a pushed `release-*` tag into Firebase. Port it with the Forge migration or rewrite it for tags in a separate work package. |
-| `.claude/skills/pvt` | `DEFERRED` | Production validation needs an authenticated Confluence fixture; none is approved for this app. |
+| `.claude/skills/pvt` | `DEFERRED` | Production validation needs an authenticated Confluence fixture for the `aws-widget-macro`; none is approved for this app. `release-app` therefore reports post-deploy validation as `BLOCKED` rather than passing. |
 | `.claude/skills/spot-check` | `DEFERRED` | Depends on the same fixture. |
 | `.claude/skills/forge-tunnel` | `DEFERRED` | Forge-only. |
 | `docs/policies/forge-only.md` | `SKIPPED` | The tracked tree is a Connect app. Copying a policy that forbids Connect runtime code would contradict the shipped product. |

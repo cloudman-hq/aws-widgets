@@ -128,8 +128,12 @@ There is no E2E suite in this repository.
   (`Build and Unit Test (10.x)`) and the protection rule stops matching.
 - Lifecycle skills follow `conf-app` order:
   `validate-branch` → `submit-branch` → `ready-pr` → `babysit-pr` → `land-pr` →
-  `ship-branch`. `release-app`, `pvt`, `spot-check`, and `forge-tunnel` are **not
-  ported** — they depend on the Forge migration. Do not claim they ran.
+  `ship-branch` → `release-app`. `release-app` is adapted to this repository's tag
+  trigger rather than a GitHub Release object. `pvt`, `spot-check`, and
+  `forge-tunnel` are **not ported**: the first two need an approved authenticated
+  Confluence fixture for the `aws-widget-macro`, which does not exist, and the third
+  is Forge-only. Do not claim they ran, and never present a green deploy as
+  user-verified.
 - Always label a PR reference with its purpose, never only a bare number.
 
 Project skills live under `.claude/skills/`. Treat a skill as available only after its

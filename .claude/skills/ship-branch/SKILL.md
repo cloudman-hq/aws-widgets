@@ -90,8 +90,10 @@ Production is a pushed `release-*` tag consumed by `deploy-prod.yml`, which runs
 `yarn deploy:prod` against the Firebase `prod` project. Never create or push that tag
 from this flow. Report production as NOT PERFORMED.
 
-The `release-app`, `pvt`, and `spot-check` skills are not ported into this repository
-yet — they are deferred with the Forge migration. Do not claim they ran.
+Production promotion belongs to the `release-app` skill, which is a separate,
+separately authorized flow. `pvt` and `spot-check` are not ported — both need an
+approved authenticated Confluence fixture that does not exist for this app. Do not
+claim any of them ran.
 
 ## Stop conditions
 
