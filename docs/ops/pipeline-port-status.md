@@ -221,6 +221,34 @@ Prepared for that: the `stage` environment exists with no reviewers, and
 `deploy-stage.yml` declares `environment: stage`. An environment job still falls back
 to a repository secret, so this change is inert until the repository secret is removed.
 
+## First deploy on nodejs22 partly succeeded, then a new blocker
+
+Run [33727207957](https://github.com/cloudman-hq/aws-widgets/actions/runs/33727207957)
+on `2a5c057`, the merge of the runtime migration:
+
+    functions[installedEndpoint]    Successful update operation
+    functions[uninstalledEndpoint]  Successful update operation
+    functions[descriptor]           Successful update operation
+    hosting[awswidgets-stg]         file upload complete
+    Error: Functions successfully deployed but could not set up cleanup policy
+    in location us-central1. Pass the --force option to automatically set up a
+    cleanup policy or run 'firebase functions:artifacts:setpolicy' to manually
+    set up a cleanup policy.
+
+All three functions deployed on `Node.js 22 (1st Gen)`, confirmed live:
+`https://us-central1-awswidgets-stg.cloudfunctions.net/descriptor` returns key
+`com.aws.widget.confluence-addon`. Hosting did not release —
+`firebase hosting:channel:list --project stage` still reported the release time from
+the previous deploy, unchanged.
+
+Not the runtime migration's defect: this is a new Artifact Registry cleanup-policy
+requirement in firebase-tools 15, orthogonal to the `nodejs10` → `nodejs22` change.
+
+Fix: `--force` on both deploy commands, per the CLI's own suggested remedy. `--force`
+also skips confirming a Cloud Function deletion when source is missing a function
+present in the deployed project; `functions/index.js` still exports all three
+deployed functions, so nothing is deleted by this change.
+
 ## Cloud Functions migrated off nodejs10 — 2026-09-03
 
 Closes the blocker recorded in the next section. `--only hosting` is removed from both

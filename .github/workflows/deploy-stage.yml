@@ -90,5 +90,9 @@ jobs:
       - name: Install Cloud Functions dependencies
         working-directory: functions
         run: npm ci
+      # --force: firebase-tools 15 exits nonzero if it cannot also set an
+      # Artifact Registry cleanup policy for function container images, and
+      # skips prompting to delete a function missing from source. Every
+      # function in functions/index.js is deployed here, so nothing is deleted.
       - name: Deploy hosting and functions to Firebase stage
-        run: npx --yes firebase-tools@15.29.0 deploy --project stage --token ${{ secrets.FIREBASE_TOKEN }}
+        run: npx --yes firebase-tools@15.29.0 deploy --force --project stage --token ${{ secrets.FIREBASE_TOKEN }}
