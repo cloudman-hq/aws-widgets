@@ -1,7 +1,9 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Pull requests run the secretless Build and Unit Test gate only.
+# Pushes to prod-release run the same gate, then deploy to the Firebase stage project.
+# Node is pinned to 10.x because node-sass@4.13.1 has no prebuilt binary above Node 13
+# and its node-gyp@3.8.0 fallback needs Python 2. See docs/policies/git-workflow.md.
 
-name: Deploy to Stage
+name: Build, Test and Stage
 
 on:
   push:
@@ -9,9 +11,18 @@ on:
   pull_request:
     branches: [ prod-release ]
 
+# Include the event so a push run and a pull request run for the same branch do not
+# cancel each other. A superseding run of the same event still cancels its predecessor.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   build:
-
+    name: Build and Unit Test
     runs-on: ubuntu-latest
 
     strategy:
@@ -24,5 +35,31 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
+      # actions/setup-node ships yarn 1.x, so the Corepack shim that breaks under
+      # Node 10 locally is not on the runner.
+      - run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn lint:check
+      - name: Unit tests
+        run: yarn test --ci
+      - name: Build
+        run: yarn build
+
+  deploy-stage:
+    name: Deploy legacy Connect app to stage
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn install --frozen-lockfile
       - run: yarn deploy:stage --token ${{ secrets.FIREBASE_TOKEN }}

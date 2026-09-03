@@ -6,6 +6,8 @@
   "scripts": {
     "test": "jest",
     "lint": "tslint -c tslint.json './src/**/*.ts?(x)' --fix",
+    "lint:check": "tslint -c tslint.json './src/**/*.ts?(x)'",
+    "validate": "yarn lint:check && yarn test --ci && yarn build",
     "build": "cross-env NODE_ENV=production webpack --mode production --config ./webpack/webpack.client.js",
     "start": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.client.js",
     "deploy:stage": "yarn build && firebase deploy --project stage",
