@@ -63,30 +63,32 @@ jobs:
     needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    # The credential lives on this environment, not on the repository. A workflow
+    # The credential is stored on this environment, not on the repository. A workflow
     # that declares no environment cannot read it, so every historical commit's
     # ungated deploy job fails closed instead of publishing.
     environment: stage
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 10.x
+      # Node 22 here, not the repository's pinned 10.x. This job runs the Firebase
+      # CLI and installs functions/, neither of which needs the legacy toolchain.
+      # firebase-tools 15 requires Node >= 20, and it is the first CLI in this
+      # repository that can deploy a nodejs22 Cloud Functions runtime.
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 10.x
-      - run: yarn install --frozen-lockfile
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
       - name: Download the tested build output
         uses: actions/download-artifact@v4
         with:
           name: build-${{ github.sha }}
           path: build
-      # firebase deploy publishes the `build` directory that firebase.json points at.
-      # Calling the CLI directly skips the rebuild inside `yarn deploy:stage`.
-      - name: Deploy to Firebase stage
-      # --only hosting: firebase.json configures hosting alone, but the CLI
-      # auto-detects the functions/ directory and tries to deploy it. Those
-      # functions declare engines.node 10, a Cloud Functions runtime Google
-      # decommissioned, so including them fails the whole deploy with
-      # DEPLOYS_NOT_ALLOWED before hosting is released. The three functions
-      # stay on their existing deployment and keep serving.
-        run: yarn firebase deploy --only hosting --project stage --token ${{ secrets.FIREBASE_TOKEN }}
+      # firebase-tools loads the functions source to discover triggers, so the
+      # dependencies must be installed before the deploy.
+      - name: Install Cloud Functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Deploy hosting and functions to Firebase stage
+        run: npx --yes firebase-tools@15.29.0 deploy --project stage --token ${{ secrets.FIREBASE_TOKEN }}

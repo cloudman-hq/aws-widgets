@@ -221,7 +221,42 @@ Prepared for that: the `stage` environment exists with no reviewers, and
 `deploy-stage.yml` declares `environment: stage`. An environment job still falls back
 to a repository secret, so this change is inert until the repository secret is removed.
 
-## Cloud Functions cannot be deployed — nodejs10 runtime decommissioned
+## Cloud Functions migrated off nodejs10 — 2026-09-03
+
+Closes the blocker recorded in the next section. `--only hosting` is removed from both
+deploy jobs; hosting and functions deploy together again.
+
+| Change | Detail |
+|---|---|
+| `functions/package.json` | `engines.node` `"10"` to `"22"`; `firebase-functions` `^3.6.1` to `^7.3.2`; dropped `firebase-admin@^8.10.0` and `firebase-functions-test@^0.2.0`, neither of which is imported anywhere under `functions/` |
+| `functions/index.js` | `require('firebase-functions')` to `require('firebase-functions/v1')`. v7 exports the 2nd-gen API at the root; these three are 1st-gen HTTP functions whose URLs are referenced by `firebase.json` rewrites and by the Connect descriptor, so the v1 API is imported explicitly and the functions stay 1st-gen |
+| `functions/package-lock.json` | regenerated, lockfile version 3, 290 packages |
+| `functions/yarn.lock` | removed — two lockfiles for one directory left the server-side install ambiguous |
+| `firebase.json` | explicit `functions` block with `source: functions` |
+| Both deploy jobs | now run Node 22 rather than the repository's pinned 10.x, install `functions/` with `npm ci`, and deploy through `npx firebase-tools@15.29.0` |
+
+The deploy job never needed Node 10: it uploads a prebuilt artifact and runs the
+Firebase CLI. Only the build job needs the legacy toolchain. firebase-tools 8.4.2
+recognises `nodejs6`, `nodejs8` and `nodejs10` only, which is why it could not deploy
+this runtime; 15.29.0 recognises `nodejs20`, `nodejs22` and `nodejs24`. It still
+accepts `--token`, with a deprecation warning, so the existing environment secret
+continues to work.
+
+Verified locally before pushing, on Node 24.18.0:
+
+- `npm ci` in `functions/` succeeds.
+- `node --check index.js` passes.
+- Loading `index.js` exports `installedEndpoint`, `uninstalledEndpoint` and
+  `descriptor`, each carrying an HTTPS trigger.
+- Invoking the `descriptor` handler with a mock request returns key
+  `com.aws.widget.confluence-addon`, `baseUrl https://awswidgets-stg.web.app`,
+  `links.self /atlassian-connect.json`, macro `aws-widget-macro`, scopes `READ,WRITE` —
+  identical to what production serves.
+
+`STRUCTURAL ONLY` for the deploy itself: no Cloud Function has been deployed on the new
+runtime yet. The first push to `prod-release` is that test.
+
+## Cloud Functions cannot be deployed — nodejs10 runtime decommissioned (RESOLVED, see above)
 
 Found on 2026-09-03, after the credential was replaced. Run
 [33720488945](https://github.com/cloudman-hq/aws-widgets/actions/runs/33720488945) on
