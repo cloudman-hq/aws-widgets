@@ -63,6 +63,10 @@ jobs:
     needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # The credential lives on this environment, not on the repository. A workflow
+    # that declares no environment cannot read it, so every historical commit's
+    # ungated deploy job fails closed instead of publishing.
+    environment: stage
 
     steps:
       - uses: actions/checkout@v4

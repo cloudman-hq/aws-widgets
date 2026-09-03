@@ -183,6 +183,44 @@ Local checks only: `yarn firebase --version` returns `8.4.2` from
 `node_modules/.bin`, and `firebase.json` points hosting at `build`, which is where the
 artifact restores. The first merge to `prod-release` is the real test of that path.
 
+## The Firebase credential is dead — releases are blocked on it
+
+Found by merging PR #70 on 2026-09-03. The first push-event deploy since the merge
+failed:
+
+    Error: Failed to get Firebase project awswidgets-stg.
+    Please make sure the project exists and your account has permission to access it.
+
+Run [33718219036](https://github.com/cloudman-hq/aws-widgets/actions/runs/33718219036)
+on `cda31e2`: `Build and Unit Test` success, `Deploy legacy Connect app to stage`
+failure.
+
+**Not caused by this work package.** The identical error appears in run
+[33168223802](https://github.com/cloudman-hq/aws-widgets/actions/runs/33168223802) on
+2026-08-28, under the old workflow running `yarn deploy:stage --token ***`. Commit
+`1bafdf5` on `codex/forge-conversion` then made pull-request runs build-only, which
+stopped the error appearing without fixing it.
+
+**The project is fine; the credential is not.** `awswidgets-stg` serves 200 at
+`https://awswidgets-stg.web.app/` with the correct descriptor, and a local
+`firebase projects:list` lists both `awswidgets` and `awswidgets-stg`. The repository
+secret `FIREBASE_TOKEN` was last updated 2023-05-06 and no longer authenticates. The
+window in which it stopped working is unknown: nothing deployed between 2023-05-06 and
+2026-08-28, and workflow logs older than the retention window are gone.
+
+**No damage.** `firebase deploy` failed at project resolution, before uploading. The
+stage site is unchanged.
+
+Replacing it is the only thing between this repository and a release. Because the
+value has to be entered again anyway, entering it as an **environment** secret rather
+than a repository secret costs one extra paste and closes the two ungated-deploy
+blockers below: a job that declares no `environment:` cannot read an environment
+secret, so every historical commit's deploy job fails closed.
+
+Prepared for that: the `stage` environment exists with no reviewers, and
+`deploy-stage.yml` declares `environment: stage`. An environment job still falls back
+to a repository secret, so this change is inert until the repository secret is removed.
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
