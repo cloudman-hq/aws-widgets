@@ -1,0 +1,77 @@
+# Daily production smoke test. Reads the public Connect descriptor and the hosted
+# page; asserts identity rather than mere reachability, so a deploy that publishes
+# the wrong project or an empty build fails here instead of at an install.
+#
+# No secrets, no checkout of application code, no Node install — the runner's curl
+# and python3 are enough, which keeps this job independent of the Node 10 toolchain.
+#
+# Failure routing is GitHub's own workflow-failure notification to the repository
+# owner. No external alerting service is configured.
+
+name: Production Smoke Test
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Production descriptor and page
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      BASE_URL: https://awswidgets.web.app
+      APP_KEY: com.aws.widget.confluence-addon
+      MACRO_KEY: aws-widget-macro
+
+    steps:
+      - name: Hosted page responds
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$BASE_URL/")
+          echo "GET $BASE_URL/ -> $code"
+          test "$code" = "200"
+
+      - name: Descriptor responds
+        run: |
+          code=$(curl -sS -o descriptor.json -w '%{http_code}' --max-time 20 "$BASE_URL/atlassian-connect.json")
+          echo "GET $BASE_URL/atlassian-connect.json -> $code"
+          test "$code" = "200"
+
+      - name: Descriptor identity is correct
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+
+          expected_key = os.environ["APP_KEY"]
+          expected_macro = os.environ["MACRO_KEY"]
+          expected_base = os.environ["BASE_URL"]
+
+          with open("descriptor.json") as handle:
+              descriptor = json.load(handle)
+
+          macros = [m.get("key") for m in descriptor.get("modules", {}).get("dynamicContentMacros", [])]
+          failures = []
+
+          if descriptor.get("key") != expected_key:
+              failures.append("key is %r, expected %r" % (descriptor.get("key"), expected_key))
+          if expected_macro not in macros:
+              failures.append("macro %r missing; found %r" % (expected_macro, macros))
+          if descriptor.get("baseUrl", "").rstrip("/") != expected_base.rstrip("/"):
+              failures.append("baseUrl is %r, expected %r" % (descriptor.get("baseUrl"), expected_base))
+
+          for line in failures:
+              print("FAIL: " + line)
+          if failures:
+              sys.exit(1)
+
+          print("key      %s" % descriptor["key"])
+          print("name     %s" % descriptor.get("name"))
+          print("baseUrl  %s" % descriptor["baseUrl"])
+          print("macros   %s" % macros)
+          print("scopes   %s" % descriptor.get("scopes"))
+          PY

@@ -1,5 +1,9 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Production deploy. Fires on a pushed tag matching release-*.
+# The deploy job targets the `production` GitHub environment, which requires a
+# reviewer decision and accepts only `release-*` tags.
+#
+# Node is pinned to 10.x because node-sass@4.13.1 has no prebuilt binary above
+# Node 13. The action versions are independent of that constraint.
 
 name: Deploy to Prod
 
@@ -8,20 +12,62 @@ on:
     tags:
       - release-*
 
+# A constant group. Keying on github.ref would give every tag its own group and
+# serialize nothing, so an older release approved late could overwrite a newer one.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
 jobs:
   build:
-
+    name: Build and Unit Test
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 10.x
+      - run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn lint:check
+      - name: Unit tests
+        run: yarn test --ci
+      - name: Build
+        run: yarn build
+      # The deploy job publishes this exact artifact, so the bytes that were tested
+      # are the bytes that ship.
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+          retention-days: 7
+          if-no-files-found: error
+
+  deploy-prod:
+    name: Deploy legacy Connect app to production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn deploy:prod --token ${{ secrets.FIREBASE_TOKEN }}
+          node-version: 10.x
+      - run: yarn install --frozen-lockfile
+      - name: Download the tested build output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: build
+      # firebase deploy publishes the `build` directory that firebase.json points at.
+      # Calling the CLI directly skips the rebuild inside `yarn deploy:prod`.
+      - name: Deploy to Firebase production
+        run: yarn firebase deploy --project prod --token ${{ secrets.FIREBASE_TOKEN }}
