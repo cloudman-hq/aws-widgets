@@ -1,0 +1,55 @@
+environment:
+  variables:
+    - key: CONNECT_KEY
+      default: com.aws.widget.confluence-addon
+
+modules:
+  connectToForgeMigration:
+    - key: aws-widgets-forge-migration
+      migrationGuideUrl: https://github.com/cloudman-hq/aws-widgets/blob/prod-release/forge/docs/FORGE-MIGRATION-GUIDE.md
+      willMigrateToForgeBeforeEOS: YES
+  # Forge CLI 13 uses the product-scoped `macro` module key for Confluence.
+  macro:
+    - key: aws-widget-macro
+      resource: macro-view
+      resolver:
+        function: resolver
+      title: AWS Widgets Resource
+      description: Display a read-only view of an AWS resource.
+      config:
+        resource: macro-config
+        viewportSize: medium
+  confluence:globalSettings:
+    - key: aws-widgets-settings
+      resource: global-settings
+      resolver:
+        function: resolver
+      title: AWS Widgets settings
+  function:
+    - key: resolver
+      handler: resolver/index.handler
+
+resources:
+  - key: macro-view
+    path: dist/macro-view
+  - key: macro-config
+    path: dist/macro-config
+  - key: global-settings
+    path: dist/global-settings
+
+permissions:
+  scopes:
+    - storage:app
+  external:
+    fetch:
+      backend:
+        - '*.amazonaws.com'
+        - '*.amazonaws.com.cn'
+        - https://api.mixpanel.com
+
+app:
+  id: ari:cloud:ecosystem::app/bd4e3a18-d223-45bf-a301-b2b4eab5beed
+  connect:
+    key: ${CONNECT_KEY}
+  runtime:
+    name: nodejs24.x
