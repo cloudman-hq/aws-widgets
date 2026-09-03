@@ -379,6 +379,75 @@ No further deploy to any environment should happen until this is understood. Thi
 finding supersedes the earlier "no PVT fixture" gap: the fixture existed and was used;
 the app failed it.
 
+### Correction, 2026-09-04 — the CSP lead was a capture-window artifact; re-verified with four targeted checks
+
+The original write-up above overstates two pieces of evidence and understates one. The
+render-fails conclusion and the deploy freeze both stand; the **candidate direction
+naming CSP is retracted** and replaced below.
+
+**What was wrong:**
+
+- `macroRenderedOutput: {}` is not evidence for anything here — that field belongs to
+  the Connect/server-macro rendering path and is not populated for Forge Custom UI
+  macros. It should not have been cited as supporting evidence.
+- The "12 CSP violations, zero app requests" reading came from calling
+  `read_network_requests` several seconds *after* clicking insert — the tool's own
+  output states tracking starts only when first called for a tab. **Redone with
+  tracking started before the click**: zero CSP violation reports, in either the
+  legacy-fixture-page load or the fresh-insert flow. That lead does not reproduce.
+
+**Four checks run, each read directly rather than assumed:**
+
+1. `forge install list` — installation `a8345426-bea2-42e8-9ade-3b3dc888ce85` reports
+   **app version 4, Up-to-date**. Rules out "looking at code that isn't actually
+   live."
+2. `forge logs -e development --since 2d -n 500` — **zero log lines**, i.e. the
+   `resolver` function (`manifest.yml`: `macro.resolver.function: resolver`) has not
+   been invoked once in the last two days, across every attempt including the ones
+   below. This is Atlassian's own invocation telemetry, not a client-side
+   observation.
+3. `GET /wiki/rest/api/content/74383361?expand=body.view` (the apples-to-apples
+   comparison the original write-up skipped, having compared `body.storage`
+   instead): `body.view` is 103 bytes —
+   `<p>Disposable migration continuity fixture. No real AWS credentials.</p><div>AWS Widgets Resource</div>`.
+   "AWS Widgets Resource" is the macro's `title:` from `manifest.yml` — Confluence's
+   content API is emitting the macro's configured title as a fallback, meaning the
+   macro instance is recognized server-side. The live rendered page does **not** show
+   that div at all; only the static paragraph appears. The API-level fallback and the
+   client-side render disagree, which itself is a data point (client hydration never
+   reaches even that fallback).
+4. Real-browser reproduction redone with `read_network_requests` tracking started
+   *before* the triggering action, on both flows:
+   - Legacy fixture page (`74383361`) load: 65 requests captured, standard Confluence
+     bootstrap only. **Zero requests to any Forge resource domain, zero CSP reports.**
+   - Fresh macro insertion (draft page `78151681`, `OVNT3`): inserted via the editor's
+     `/` macro picker (confirms Confluence's editor sees the macro as installed and
+     selectable — matches check 1). On insert, the macro-config dialog opens and
+     stays blank, matching the earlier screenshot. Network capture during that window:
+     **3 requests total** — one Chrome-extension asset (unrelated noise from the
+     browser profile), one Atlassian telemetry beacon, one `as.atlassian.com` batch
+     call. **No Forge resource request, no CSP report.**
+   - `read_page` on the open dialog shows Confluence *did* mount a host container for
+     the app — `dialog > generic "Embedded app content for
+     bd4e3a18-d223-45bf-a301-b2b4eab5beed"`, matching `manifest.yml`'s `app.id`
+     exactly — but nothing renders inside it and no iframe ever requests a resource.
+
+**Sharper conclusion.** The failure is not a blocked resource request (no such
+request is ever made, so a CSP explanation requires a request that never happens).
+The consistent pattern across the legacy instance, a fresh instance, and the resolver
+telemetry is: **Confluence recognizes and mounts the app's host container, but never
+populates it with a working iframe**, and correspondingly never calls the backend.
+This points at the Custom UI iframe-host bootstrap for this specific app/macro
+registration, not at network-level blocking. Still not root-caused — the next
+diagnostic step is comparing against a Forge Custom UI macro in the same space that
+*is* known to render (`My API Documents`, app `8ad26115-211f-4216-971b-0540f606303d`,
+also visible as an "Embedded app content for …" container in the same page's
+accessibility tree) to see whether that one actually populates its iframe, which
+would isolate the defect to this app's manifest/resource declaration rather than
+something wrong with Forge Custom UI macros on this site generally.
+
+The deploy freeze from the original finding stands unchanged.
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
