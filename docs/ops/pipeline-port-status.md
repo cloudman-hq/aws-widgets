@@ -150,6 +150,39 @@ change.
 | Scheduled smoke test | `LOCAL` | Both unknowns closed by measurement. Production URL is `https://awswidgets.web.app` — `/` and `/atlassian-connect.json` both returned 200 on 2026-09-03, and the served descriptor carries the expected app key, macro key and `baseUrl`. Alert routing is GitHub's own workflow-failure notification to the repository owner; no external alerting service was configured. |
 | Merging `codex/forge-conversion` | `DEFERRED` | Not a history problem. `git merge-base prod-release codex/forge-conversion` returns `ef8d6d3`, the `prod-release` tip, and `--is-ancestor` exits 0: the branch is `prod-release` plus 16 commits and merges by fast-forward. It stays deferred because it lands a second toolchain (Node 24 beside the root Node 10 pin) and a Forge app identity, which is a product decision. Owner: the user. |
 
+## Code review round — 2026-09-03
+
+A review of PR #70 found 15 issues. Closed inside the branch, each re-verified:
+
+| Finding | Fix | Evidence |
+|---|---|---|
+| `gh run list --workflow "Build, Test and Stage"` returns `could not find any workflows named…` — the workflow entity is still registered under `master`'s name | every skill now looks up by file path, `--workflow deploy-stage.yml` / `deploy-prod.yml` | `gh run list --workflow deploy-stage.yml` returns runs |
+| `ready_for_review` is not a default `pull_request` activity type, so readying a Draft started no run and `ready-pr`/`land-pr` waited forever | `types: [opened, synchronize, reopened, ready_for_review]` | parsed from the file |
+| `land-pr` claimed no branch protection and zero rulesets, contradicting this register | rewritten to say what the platform does and does not enforce | — |
+| `submit-branch` said `STRUCTURAL ONLY` while the register said `LIVE` | marked `VALIDATED 2026-09-03` | — |
+| `deploy-prod.yml` concurrency keyed on `github.ref`, unique per tag, so it serialized nothing | constant group `${{ github.workflow }}` | parsed from the file |
+| `cancel-in-progress: true` could kill an in-flight `firebase deploy` on a push | `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` | parsed from the file |
+| The husky pre-commit hook still ran the mutating `lint --fix` | hook runs `lint:check` | commit output shows `> aws-widgets@0.1.0 lint:check` |
+| Build output was discarded and rebuilt in the deploy job, so the tested bytes were not the shipped bytes | `upload-artifact` in `build`, `download-artifact` in both deploy jobs, deploy calls `yarn firebase deploy` directly | artifact `build-84979117…`, 1238580 bytes, on run 33716904456 |
+| New steps used `actions/checkout@v2` and `actions/setup-node@v1`, both on a deprecated action runtime | `@v4` for both, Node version still `10.x` | run 33716904456 green with `Run actions/checkout@v4` |
+| `production` environment had `can_admins_bypass: true`, so the approval could be skipped silently | set to `false` | `gh api …/environments` returns `can_admins_bypass=false` |
+| `validate-branch` and `CLAUDE.md` documented `yarn validate` without `--ci` | both corrected, with the reason | — |
+| The register called `master` "not a deployment target" | corrected; `master`'s own `deploy-stage.yml` deploys to `awswidgets-stg` | see the blocker below |
+
+Two findings are recorded rather than fixed:
+
+- **The single reviewer is the tag pusher.** `prevent_self_review` stays `false`
+  because raising it would deadlock a one-maintainer repository. Documented above.
+- **Nine commits on this branch carry prose bodies**, against the one-line subject
+  rule. Later commits use one-line subjects; the earlier nine are already pushed, and
+  rewriting pushed history costs more than it saves. A squash merge collapses them.
+
+**Not verified:** the deploy half of both workflows. A pull request never runs it, so
+`download-artifact` followed by `yarn firebase deploy` has not executed on a runner.
+Local checks only: `yarn firebase --version` returns `8.4.2` from
+`node_modules/.bin`, and `firebase.json` points hosting at `build`, which is where the
+artifact restores. The first merge to `prod-release` is the real test of that path.
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
