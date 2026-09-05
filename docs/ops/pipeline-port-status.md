@@ -475,6 +475,34 @@ app in the same space, app id `8ad26115-211f-4216-971b-0540f606303d`) is what wo
 show whether this is specific to this app's manifest/resource declaration or a
 site-wide condition affecting Forge Custom UI macros generally on this install.
 
+### Correction, 2026-09-05 — a different Forge app on the same site does invoke
+
+Compared against `My API Documents (Development)`, an unrelated Forge app installed
+in the same space (`OVNT3`, `lite-dev.atlassian.net`) — the AsyncAPI-for-Confluence
+project, not part of this repository. Opened its space-page URL with network capture
+started before navigation.
+
+**Caveat:** this app's module is a `confluence:globalPage`-style space page, not a
+`macro`. It is not a perfect control for `aws-widget-macro`'s content-macro mounting
+path, and its own visible body stayed blank throughout the check — a state that may
+be expected for that project (no documents configured) rather than a defect; that
+project's behavior is out of scope here and was not investigated further.
+
+**What it does establish:** its network capture shows a real
+`useInvokeExtensionRelayMutation` GraphQL call, 200, on load — an actual Forge
+extension invocation. `aws-widget-macro` has never produced a comparable request in
+any of the three reproductions above (legacy page, fresh insert under normal deploy,
+fresh insert under `forge tunnel`).
+
+This weakens the "Forge Custom UI is broken for this account/site generally"
+alternative from the original finding: the site's Forge extension-invocation
+machinery does function for at least one other app under the same account. The
+narrower, still-unconfirmed hypothesis — something in `aws-widget-macro`'s own
+manifest or resource registration prevents the iframe host from ever attempting an
+invocation — is not weakened by this comparison, and no further check narrows it
+past this point without deeper Forge platform-side visibility this account does not
+have (e.g. Atlassian-side extension-registration logs).
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
