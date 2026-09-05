@@ -448,6 +448,33 @@ something wrong with Forge Custom UI macros on this site generally.
 
 The deploy freeze from the original finding stands unchanged.
 
+### Correction, 2026-09-05 — `forge tunnel` rules out the deployed bundle
+
+Ran `forge tunnel -e development` (local port 49936, confirmed alive throughout via
+`TaskOutput`) and redid the fresh-insert flow on a new draft page (`79200257`; the
+earlier draft, `78151681`, had gone edit-restricted for this browser identity — an
+access-scope issue, not a Forge issue). Network capture again started before the
+insert action.
+
+Result: the macro-config modal opens blank, exactly as under the normal deploy.
+Console: zero errors. Network: **2 requests total, both Atlassian telemetry — zero
+requests, to any destination, including `localhost:49936`.**
+
+This is the discriminating result `forge tunnel` exists to produce: if the deployed
+CDN-hosted Custom UI bundle were the problem, tunnel mode redirects that same request
+to the local dev server, and it would show up hitting port 49936. It does not. The
+iframe host never attempts to load *anything*, under either serving path. That rules
+out a broken deployed resource as the cause, on top of already ruling out CSP
+blocking (check 4 above) and a stale install (check 1 above).
+
+**Conclusion, updated:** the defect is upstream of resource serving entirely. Something
+in how this app's `macro-config` Custom UI is registered or resolved by Confluence
+never results in an iframe element being given a `src` to request — independent of
+what would be served at that URL. The next comparison (the `My API Documents` Forge
+app in the same space, app id `8ad26115-211f-4216-971b-0540f606303d`) is what would
+show whether this is specific to this app's manifest/resource declaration or a
+site-wide condition affecting Forge Custom UI macros generally on this install.
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The
