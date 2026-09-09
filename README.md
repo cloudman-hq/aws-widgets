@@ -14,9 +14,8 @@ This application can be tested on developer's local environment with **storybook
 ### `yarn storybook`
 Starts the storybook. Open storybook at http://localhost:9009/?path=/story/demo--editor-component.
 
-![storybook editor](./public/storybook-editor.png)
-
-Input your access key, secret key and resource id and click the **Describe** button.
+Use non-production test credentials when exercising AWS integrations locally. Never commit or
+publish access keys or secret keys in documentation, screenshots, or source files.
 
 ## Available Scripts
 
