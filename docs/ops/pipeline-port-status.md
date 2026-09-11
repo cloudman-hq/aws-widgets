@@ -315,6 +315,194 @@ returns 200 through the `descriptor` function.
 `firebase-admin@8.10.0`, and the Connect install and uninstall webhooks retested. No
 change under `functions/` can deploy until that happens.
 
+## Forge macro does not render — real UI verification, 2026-09-04
+
+Found by actually opening the macro in a browser, on the real `lite-dev.atlassian.net`
+development install (installation `a8345426-bea2-42e8-9ade-3b3dc888ce85`), after the
+simplified branch was merged and deployed.
+
+**Steps taken, all `forge` CLI, account `eagle.xiao@gmail.com`:**
+
+1. `npm approve-scripts @forge/cli` — the CLI binary was missing because `npm ci`
+   blocks postinstall scripts by default; approving `@forge/cli`'s own postinstall is
+   what creates `node_modules/.bin/forge`.
+2. `npm run build` in `forge/` — required; `forge lint` reported three
+   `valid-resource-required` errors for missing `dist/macro-view`,
+   `dist/macro-config`, `dist/global-settings` before this.
+3. `forge lint --fix` — fixed one deprecation warning (egress permission format).
+4. `forge deploy -e development --approve MAJOR_VERSION_RULE` — succeeded, app
+   version 4.0.0. The approval flag was needed because the new `api.mixpanel.com`
+   egress domain triggers Atlassian's major-version-upgrade gate. Deploying to
+   `development` has no customer impact; this account's rights on this specific app
+   were unverified before this — confirmed now.
+5. `forge install --upgrade -e development -s lite-dev.atlassian.net -p confluence` —
+   succeeded, upgraded the existing install from app version 3 to 4.
+
+**Verification, in the real browser (Chrome, the user's authenticated session):**
+
+- Opened the known fixture page (`74383361`, `OVNT3` space, documented in
+  `forge/evidence/connect-to-forge-continuity-2026-08-28.md` as rendering
+  `AWS Widgets Resource` at app version 3). After the upgrade to version 4, the page
+  shows only its static text; no macro card, no error placeholder, nothing.
+  Screenshot: `forge-fixture-page-blank.jpg`.
+- Confirmed via `GET /wiki/rest/api/content/74383361?expand=body.storage`: the macro
+  placeholder is still present in the page (`<ac:structured-macro ac:name="aws-widget-macro" ... ><ac:parameter ac:name="uuid">codex-forge-continuity-20260828</ac:parameter></ac:structured-macro>`),
+  and `"macroRenderedOutput":{}` is empty.
+- Inserted a **fresh** instance of the macro (no legacy `uuid` parameter) on a new,
+  unpublished draft page in the same space, to isolate whether the failure is
+  specific to legacy-adopted instances. The macro-config Custom UI opened as a modal
+  and rendered completely blank — no form, no error, no content.
+  Screenshot: `forge-macro-config-blank-modal.jpg`.
+- `read_network_requests` during that modal load showed 12 POSTs to
+  `web-security-reports.services.atlassian.com/csp-report/confluence-frontend` and no
+  request to any Forge invocation or resource domain — the browser attempted to load
+  something the page's Content Security Policy rejected, and whatever that was never
+  reached the app.
+
+**Conclusion: the Forge app does not render in the browser at all**, for a
+legacy-adopted macro instance or a freshly inserted one. This is not the
+"admin must reconfigure" tradeoff the simplification intentionally accepted — it is a
+render failure with no observable path to a working state, discovered only by real
+UI verification. It is `FAILED`, not `BLOCKED`: the deploy path itself works; what
+Confluence renders does not.
+
+**Not yet root-caused.** Two candidate directions, neither confirmed:
+
+- A CSP violation for a Custom UI resource — possibly related to the manifest change
+  in the same commit that added `api.mixpanel.com` to `permissions.external.fetch`,
+  since Custom UI content-security-policy directives in Forge are partly derived from
+  declared external domains.
+- Something specific to this account/site pairing — untested against a second site or
+  a clean install with no prior Connect-adoption history.
+
+No further deploy to any environment should happen until this is understood. This
+finding supersedes the earlier "no PVT fixture" gap: the fixture existed and was used;
+the app failed it.
+
+### Correction, 2026-09-04 — the CSP lead was a capture-window artifact; re-verified with four targeted checks
+
+The original write-up above overstates two pieces of evidence and understates one. The
+render-fails conclusion and the deploy freeze both stand; the **candidate direction
+naming CSP is retracted** and replaced below.
+
+**What was wrong:**
+
+- `macroRenderedOutput: {}` is not evidence for anything here — that field belongs to
+  the Connect/server-macro rendering path and is not populated for Forge Custom UI
+  macros. It should not have been cited as supporting evidence.
+- The "12 CSP violations, zero app requests" reading came from calling
+  `read_network_requests` several seconds *after* clicking insert — the tool's own
+  output states tracking starts only when first called for a tab. **Redone with
+  tracking started before the click**: zero CSP violation reports, in either the
+  legacy-fixture-page load or the fresh-insert flow. That lead does not reproduce.
+
+**Four checks run, each read directly rather than assumed:**
+
+1. `forge install list` — installation `a8345426-bea2-42e8-9ade-3b3dc888ce85` reports
+   **app version 4, Up-to-date**. Rules out "looking at code that isn't actually
+   live."
+2. `forge logs -e development --since 2d -n 500` — **zero log lines**, i.e. the
+   `resolver` function (`manifest.yml`: `macro.resolver.function: resolver`) has not
+   been invoked once in the last two days, across every attempt including the ones
+   below. This is Atlassian's own invocation telemetry, not a client-side
+   observation.
+3. `GET /wiki/rest/api/content/74383361?expand=body.view` (the apples-to-apples
+   comparison the original write-up skipped, having compared `body.storage`
+   instead): `body.view` is 103 bytes —
+   `<p>Disposable migration continuity fixture. No real AWS credentials.</p><div>AWS Widgets Resource</div>`.
+   "AWS Widgets Resource" is the macro's `title:` from `manifest.yml` — Confluence's
+   content API is emitting the macro's configured title as a fallback, meaning the
+   macro instance is recognized server-side. The live rendered page does **not** show
+   that div at all; only the static paragraph appears. The API-level fallback and the
+   client-side render disagree, which itself is a data point (client hydration never
+   reaches even that fallback).
+4. Real-browser reproduction redone with `read_network_requests` tracking started
+   *before* the triggering action, on both flows:
+   - Legacy fixture page (`74383361`) load: 65 requests captured, standard Confluence
+     bootstrap only. **Zero requests to any Forge resource domain, zero CSP reports.**
+   - Fresh macro insertion (draft page `78151681`, `OVNT3`): inserted via the editor's
+     `/` macro picker (confirms Confluence's editor sees the macro as installed and
+     selectable — matches check 1). On insert, the macro-config dialog opens and
+     stays blank, matching the earlier screenshot. Network capture during that window:
+     **3 requests total** — one Chrome-extension asset (unrelated noise from the
+     browser profile), one Atlassian telemetry beacon, one `as.atlassian.com` batch
+     call. **No Forge resource request, no CSP report.**
+   - `read_page` on the open dialog shows Confluence *did* mount a host container for
+     the app — `dialog > generic "Embedded app content for
+     bd4e3a18-d223-45bf-a301-b2b4eab5beed"`, matching `manifest.yml`'s `app.id`
+     exactly — but nothing renders inside it and no iframe ever requests a resource.
+
+**Sharper conclusion.** The failure is not a blocked resource request (no such
+request is ever made, so a CSP explanation requires a request that never happens).
+The consistent pattern across the legacy instance, a fresh instance, and the resolver
+telemetry is: **Confluence recognizes and mounts the app's host container, but never
+populates it with a working iframe**, and correspondingly never calls the backend.
+This points at the Custom UI iframe-host bootstrap for this specific app/macro
+registration, not at network-level blocking. Still not root-caused — the next
+diagnostic step is comparing against a Forge Custom UI macro in the same space that
+*is* known to render (`My API Documents`, app `8ad26115-211f-4216-971b-0540f606303d`,
+also visible as an "Embedded app content for …" container in the same page's
+accessibility tree) to see whether that one actually populates its iframe, which
+would isolate the defect to this app's manifest/resource declaration rather than
+something wrong with Forge Custom UI macros on this site generally.
+
+The deploy freeze from the original finding stands unchanged.
+
+### Correction, 2026-09-05 — `forge tunnel` rules out the deployed bundle
+
+Ran `forge tunnel -e development` (local port 49936, confirmed alive throughout via
+`TaskOutput`) and redid the fresh-insert flow on a new draft page (`79200257`; the
+earlier draft, `78151681`, had gone edit-restricted for this browser identity — an
+access-scope issue, not a Forge issue). Network capture again started before the
+insert action.
+
+Result: the macro-config modal opens blank, exactly as under the normal deploy.
+Console: zero errors. Network: **2 requests total, both Atlassian telemetry — zero
+requests, to any destination, including `localhost:49936`.**
+
+This is the discriminating result `forge tunnel` exists to produce: if the deployed
+CDN-hosted Custom UI bundle were the problem, tunnel mode redirects that same request
+to the local dev server, and it would show up hitting port 49936. It does not. The
+iframe host never attempts to load *anything*, under either serving path. That rules
+out a broken deployed resource as the cause, on top of already ruling out CSP
+blocking (check 4 above) and a stale install (check 1 above).
+
+**Conclusion, updated:** the defect is upstream of resource serving entirely. Something
+in how this app's `macro-config` Custom UI is registered or resolved by Confluence
+never results in an iframe element being given a `src` to request — independent of
+what would be served at that URL. The next comparison (the `My API Documents` Forge
+app in the same space, app id `8ad26115-211f-4216-971b-0540f606303d`) is what would
+show whether this is specific to this app's manifest/resource declaration or a
+site-wide condition affecting Forge Custom UI macros generally on this install.
+
+### Correction, 2026-09-05 — a different Forge app on the same site does invoke
+
+Compared against `My API Documents (Development)`, an unrelated Forge app installed
+in the same space (`OVNT3`, `lite-dev.atlassian.net`) — the AsyncAPI-for-Confluence
+project, not part of this repository. Opened its space-page URL with network capture
+started before navigation.
+
+**Caveat:** this app's module is a `confluence:globalPage`-style space page, not a
+`macro`. It is not a perfect control for `aws-widget-macro`'s content-macro mounting
+path, and its own visible body stayed blank throughout the check — a state that may
+be expected for that project (no documents configured) rather than a defect; that
+project's behavior is out of scope here and was not investigated further.
+
+**What it does establish:** its network capture shows a real
+`useInvokeExtensionRelayMutation` GraphQL call, 200, on load — an actual Forge
+extension invocation. `aws-widget-macro` has never produced a comparable request in
+any of the three reproductions above (legacy page, fresh insert under normal deploy,
+fresh insert under `forge tunnel`).
+
+This weakens the "Forge Custom UI is broken for this account/site generally"
+alternative from the original finding: the site's Forge extension-invocation
+machinery does function for at least one other app under the same account. The
+narrower, still-unconfirmed hypothesis — something in `aws-widget-macro`'s own
+manifest or resource registration prevents the iframe host from ever attempting an
+invocation — is not weakened by this comparison, and no further check narrows it
+past this point without deeper Forge platform-side visibility this account does not
+have (e.g. Atlassian-side extension-registration logs).
+
 ## Default-branch blocker — this work package does not close the gap it describes
 
 Found by code review of PR #70 on 2026-09-03 and confirmed by measurement. The

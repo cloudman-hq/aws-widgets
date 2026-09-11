@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    // Forge serves each Custom UI resource below a path-prefixed CDN URL.
+    base: './',
     root: resolve(import.meta.dirname, 'frontend', mode),
     build: {
       emptyOutDir: false,

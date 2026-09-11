@@ -1,4 +1,5 @@
 import { PublicResolverError } from '../errors';
+import { PUBLIC_ERROR_CODES, type PublicErrorCode } from '../../shared/contracts';
 
 const AUTH_ERROR_NAMES = new Set([
   'ExpiredToken',
@@ -39,7 +40,21 @@ const NETWORK_ERROR_NAMES = new Set([
   'EAI_AGAIN',
 ]);
 
+const safeDiagnostic = (value: string): string | undefined =>
+  /^[A-Za-z0-9_.-]{1,80}$/.test(value) ? value : undefined;
+
 export const mapAwsError = (error: unknown): PublicResolverError => {
+  if (error instanceof PublicResolverError) return error;
+  if (typeof error === 'object' && error !== null) {
+    const publicCode = Reflect.get(error, 'code');
+    const retryable = Reflect.get(error, 'retryable');
+    if (
+      typeof publicCode === 'string'
+      && PUBLIC_ERROR_CODES.includes(publicCode as PublicErrorCode)
+    ) {
+      return new PublicResolverError(publicCode as PublicErrorCode, retryable === true);
+    }
+  }
   const name =
     typeof error === 'object' && error !== null && typeof Reflect.get(error, 'name') === 'string'
       ? (Reflect.get(error, 'name') as string)
@@ -64,5 +79,5 @@ export const mapAwsError = (error: unknown): PublicResolverError => {
   if (PERMISSION_ERROR_NAMES.has(name) || PERMISSION_ERROR_NAMES.has(code)) {
     return new PublicResolverError('PERMISSION_DENIED');
   }
-  return new PublicResolverError('INTERNAL_ERROR', true);
+  return new PublicResolverError('INTERNAL_ERROR', true, safeDiagnostic(name) ?? safeDiagnostic(code));
 };

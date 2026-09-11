@@ -72,3 +72,57 @@ test('legacy TypeScript build excludes the independent Forge workspace', async (
     'root tsconfig must exclude forge or the legacy build type-checks Forge without its dependencies',
   );
 });
+
+// Forge serves Custom UI resources from a path-prefixed CDN URL, never the origin
+// root. Vite's default `base: '/'` emits <script src="/assets/...">, which resolves
+// off the app's own resource path, 404s, and leaves the iframe blank with no error:
+// the macro and its config modal render nothing and the resolver is never invoked.
+test('Custom UI bundles reference their assets relatively', async () => {
+  const viteConfig = await read('vite.config.ts');
+
+  assert.match(
+    viteConfig,
+    /base:\s*'\.\/'/,
+    "vite.config.ts must set base: './' or Forge serves the bundle from a URL where its assets 404",
+  );
+
+  const entrypoints = ['macro-view', 'macro-config', 'global-settings'];
+  for (const entrypoint of entrypoints) {
+    let html;
+    try {
+      html = await read(`dist/${entrypoint}/index.html`);
+    } catch {
+      continue; // not built in this run; the config assertion above still gates it
+    }
+
+    assert.doesNotMatch(
+      html,
+      /(?:src|href)="\//,
+      `dist/${entrypoint}/index.html references an asset from the origin root`,
+    );
+  }
+});
+
+// Forge's production CSP rejects style elements created at runtime. The visual
+// contract therefore has to ship as an external stylesheet in every Custom UI
+// resource rather than relying on JavaScript to inject CSS after page load.
+test('Custom UI bundles ship the AWS theme as a relative stylesheet', async () => {
+  const entrypoints = ['macro-view', 'macro-config', 'global-settings'];
+
+  for (const entrypoint of entrypoints) {
+    const html = await read(`dist/${entrypoint}/index.html`);
+    const stylesheet = html.match(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+\.css)"/);
+
+    assert.ok(stylesheet, `dist/${entrypoint}/index.html has no external stylesheet`);
+    assert.match(
+      stylesheet[1],
+      /^\.\/assets\//,
+      `dist/${entrypoint}/index.html stylesheet is not relative`,
+    );
+
+    const css = await read(
+      `dist/${entrypoint}/${stylesheet[1].replace(/^\.\//, '')}`,
+    );
+    assert.match(css, /\.aws-shell/, `${entrypoint} stylesheet does not contain the AWS theme`);
+  }
+});
