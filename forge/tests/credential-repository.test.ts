@@ -27,7 +27,7 @@ describe('Forge secret credential repository', () => {
 
     expect(CREDENTIAL_SECRET_KEY).toBe('aws.credentials.v1');
     expect(secretStore.getSecret).toHaveBeenCalledWith(CREDENTIAL_SECRET_KEY);
-    expect(secretStore.setSecret).toHaveBeenCalledWith(CREDENTIAL_SECRET_KEY, STORED);
+    expect(secretStore.setSecret).toHaveBeenCalledWith(CREDENTIAL_SECRET_KEY, JSON.stringify(STORED));
     expect(secretStore.deleteSecret).toHaveBeenCalledWith(CREDENTIAL_SECRET_KEY);
   });
 

@@ -1,6 +1,7 @@
 import { invoke, view } from '@forge/bridge';
 import type { ResolverEnvelope } from '../../src/shared/contracts.js';
 import { mountMacroView } from '../../src/frontend/macro-view.js';
+import '../../src/frontend/theme.css';
 
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root');

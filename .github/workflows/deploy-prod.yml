@@ -49,9 +49,38 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+  forge-check:
+    name: Validate Forge subtree
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: forge
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+          cache-dependency-path: forge/package-lock.json
+      - name: Install Forge dependencies
+        run: npm ci
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify Forge app
+        run: npm run verify
+      - name: Upload verified Forge build
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-dist-${{ github.sha }}
+          path: forge/dist
+          retention-days: 7
+          if-no-files-found: error
+
   deploy-prod:
-    name: Deploy legacy Connect app to production
-    needs: build
+    name: Deploy Connect and Forge apps to production
+    needs: [build, forge-check]
     runs-on: ubuntu-latest
     # The credential is stored on this environment, not on the repository. A workflow
     # that declares no environment cannot read it, so every historical commit's
@@ -86,3 +115,27 @@ jobs:
       # function in functions/index.js is deployed here, so nothing is deleted.
       - name: Deploy hosting and functions to Firebase production
         run: npx --yes firebase-tools@15.29.0 deploy --force --project prod --token ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Use Node.js 24 for Forge
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+          cache-dependency-path: forge/package-lock.json
+      - name: Install Forge deployment dependencies
+        working-directory: forge
+        run: npm ci
+      - name: Download the verified Forge build
+        uses: actions/download-artifact@v4
+        with:
+          name: forge-dist-${{ github.sha }}
+          path: forge/dist
+      - name: Disable Forge CLI usage analytics
+        working-directory: forge
+        run: npx forge settings set usage-analytics false
+      - name: Deploy Forge app to production
+        working-directory: forge
+        env:
+          FORGE_EMAIL: ${{ secrets.FORGE_EMAIL }}
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+        run: npx forge deploy --environment production --non-interactive

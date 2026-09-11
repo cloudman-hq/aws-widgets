@@ -6,6 +6,7 @@ import type {
 import { mountGlobalSettings } from '../../src/frontend/global-settings.js';
 import { mountMacroConfig } from '../../src/frontend/macro-config.js';
 import { mountMacroView } from '../../src/frontend/macro-view.js';
+import '../../src/frontend/theme.css';
 
 const success = <T>(data: T): ResolverEnvelope<T> => ({
   ok: true,

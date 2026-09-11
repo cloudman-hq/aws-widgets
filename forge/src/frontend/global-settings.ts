@@ -4,7 +4,7 @@ import type {
   ResolverEnvelope,
   ResolverOperation,
 } from '../shared/contracts.js';
-import { installTheme, setCoordinate, setStatus } from './theme.js';
+import { setCoordinate, setStatus } from './theme.js';
 
 type Invoke = (
   operation: ResolverOperation,
@@ -57,7 +57,6 @@ export async function mountGlobalSettings(
   root: HTMLElement,
   { invoke }: GlobalSettingsDependencies,
 ): Promise<void> {
-  installTheme();
   root.replaceChildren();
   root.className = 'aws-shell aws-shell--settings';
 

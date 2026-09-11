@@ -7,7 +7,7 @@ import {
   type ResourceType,
   type SupportedRegion,
 } from '../shared/contracts.js';
-import { installTheme, setCoordinate, setStatus } from './theme.js';
+import { setCoordinate, setStatus } from './theme.js';
 
 type Invoke = (
   operation: ResolverOperation,
@@ -52,38 +52,72 @@ export async function mountMacroConfig(
   const context = await dependencies.getContext();
   const current = existingConfig(context);
   void dependencies.invoke('analytics.track', { event: 'macro_config_opened' }).catch(() => undefined);
-  installTheme();
   root.replaceChildren();
   root.className = 'aws-shell aws-shell--config';
+  root.style.cssText = [
+    'box-sizing:border-box',
+    'width:100%',
+    'max-width:680px',
+    'margin:0 auto',
+    'overflow:hidden',
+    'border:1px solid #c7ced7',
+    'border-radius:8px',
+    'background:#fff',
+    'color:#17202a',
+    'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+  ].join(';');
 
   const header = document.createElement('header');
   header.className = 'surface-header';
-  const eyebrow = document.createElement('p');
-  eyebrow.className = 'surface-eyebrow';
-  eyebrow.textContent = 'Macro configuration';
+  header.style.cssText = 'margin:0;padding:21px 24px 19px;background:#2bcf96;color:#112438';
   const heading = document.createElement('h1');
   heading.className = 'surface-title';
-  heading.textContent = 'Configure resource';
+  heading.textContent = 'AWS resource';
+  heading.style.cssText = 'margin:0;color:#112438;font-size:26px;font-weight:760;line-height:1.1;letter-spacing:-.03em';
   const intro = document.createElement('p');
   intro.className = 'surface-intro';
-  intro.textContent = 'Choose one read-only AWS resource for this macro. The identifier is saved with the page; the installation credential is not.';
-  header.append(eyebrow, heading, intro);
+  intro.textContent = 'Choose the live resource this macro should display.';
+  intro.style.cssText = 'margin:5px 0 0;color:rgba(17,36,56,.8);font-size:13px;line-height:1.5';
+  header.append(heading, intro);
   const coordinate = document.createElement('p');
   coordinate.className = 'coordinate-strip';
   coordinate.dataset.coordinateStrip = '';
+  coordinate.style.cssText = [
+    'display:flex', 'align-items:center', 'gap:10px', 'min-height:36px',
+    'margin:0', 'padding:8px 24px', 'border:0', 'border-bottom:1px solid #c7ced7',
+    'background:#f4f6f8', 'color:#34495e',
+    'font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',
+    'font-size:12px', 'font-weight:700',
+  ].join(';');
 
   const form = document.createElement('form');
   form.className = 'surface-panel';
+  form.style.cssText = 'margin:0;border:0;background:#fff';
   const fieldGrid = document.createElement('div');
   fieldGrid.className = 'field-grid';
+  fieldGrid.style.cssText = 'display:block;padding:0';
+  const rowStyle = [
+    'display:grid', 'grid-template-columns:minmax(138px,.42fr) minmax(0,1fr)',
+    'align-items:center', 'gap:16px', 'min-height:62px', 'margin:0', 'padding:10px 24px',
+    'border-bottom:1px solid #c7ced7', 'color:#17202a',
+    'font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',
+    'font-size:14px', 'font-weight:500',
+  ].join(';');
+  const fieldStyle = [
+    'width:100%', 'min-width:0', 'min-height:38px', 'border:0', 'border-radius:0',
+    'background:transparent', 'color:#e87500', 'padding:6px 0',
+    'font:500 16px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',
+  ].join(';');
   const regionLabel = document.createElement('label');
   regionLabel.className = 'field';
+  regionLabel.style.cssText = rowStyle;
   regionLabel.htmlFor = 'region';
-  regionLabel.textContent = 'AWS region';
+  regionLabel.textContent = 'Region';
   const region = document.createElement('select');
   region.id = 'region';
   region.name = 'region';
   region.required = true;
+  region.style.cssText = fieldStyle;
   const blankRegion = option('', 'Choose a region');
   blankRegion.disabled = true;
   region.append(blankRegion);
@@ -95,12 +129,14 @@ export async function mountMacroConfig(
 
   const typeLabel = document.createElement('label');
   typeLabel.className = 'field';
+  typeLabel.style.cssText = rowStyle;
   typeLabel.htmlFor = 'resource-type';
-  typeLabel.textContent = 'Resource type';
+  typeLabel.textContent = 'Service';
   const resourceType = document.createElement('select');
   resourceType.id = 'resource-type';
   resourceType.name = 'resourceType';
   resourceType.required = true;
+  resourceType.style.cssText = fieldStyle;
   const blankType = option('', 'Choose a resource type');
   blankType.disabled = true;
   resourceType.append(blankType);
@@ -114,14 +150,16 @@ export async function mountMacroConfig(
 
   const idLabel = document.createElement('label');
   idLabel.className = 'field field--wide';
+  idLabel.style.cssText = `${rowStyle};padding-bottom:7px`;
   idLabel.htmlFor = 'resource-id';
-  idLabel.textContent = 'Resource identifier';
+  idLabel.textContent = 'Resource ID or name';
   const resourceId = document.createElement('input');
   resourceId.id = 'resource-id';
   resourceId.name = 'resourceId';
   resourceId.required = true;
   resourceId.maxLength = 512;
   resourceId.autocomplete = 'off';
+  resourceId.style.cssText = fieldStyle;
   resourceId.setAttribute('aria-describedby', 'resource-id-hint');
   resourceId.value = current.resourceId ?? '';
   idLabel.append(resourceId);
@@ -129,17 +167,20 @@ export async function mountMacroConfig(
   idHint.id = 'resource-id-hint';
   idHint.className = 'field-hint';
   idHint.textContent = 'Enter the exact AWS resource identifier.';
+  idHint.style.cssText = 'grid-column:2;margin-top:-11px;color:#687787;font:12px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
   idLabel.append(idHint);
 
   const liveStatus = document.createElement('p');
   liveStatus.className = 'status-rail';
   liveStatus.setAttribute('aria-live', 'polite');
   liveStatus.tabIndex = -1;
+  liveStatus.style.cssText = 'flex:1 1 auto;margin:0;padding:8px 0;border:0;background:transparent;color:#687787;font-size:13px;line-height:1.45';
 
   const submitButton = document.createElement('button');
   submitButton.type = 'submit';
   submitButton.textContent = 'Save resource';
   submitButton.className = 'button button--primary';
+  submitButton.style.cssText = 'min-height:38px;border:1px solid #168d67;border-radius:5px;padding:8px 15px;background:#168d67;color:#fff;font-size:14px;font-weight:700;cursor:pointer';
 
   const updateCoordinate = (): void => {
     const selectedType = RESOURCE_TYPES.includes(resourceType.value as ResourceType)
@@ -160,7 +201,11 @@ export async function mountMacroConfig(
     }
 
     resourceId.placeholder = 'Exact name, ID, or ARN';
-    setStatus(liveStatus, 'Enter the exact resource identifier.', 'neutral');
+    setStatus(
+      liveStatus,
+      `${TYPE_LABELS[resourceType.value as ResourceType]} in ${region.value}`,
+      'neutral',
+    );
   };
   region.addEventListener('change', updateHint);
   resourceType.addEventListener('change', updateHint);
@@ -190,6 +235,7 @@ export async function mountMacroConfig(
 
   const actions = document.createElement('div');
   actions.className = 'surface-actions';
+  actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:16px 24px;background:#fff';
   actions.append(liveStatus, submitButton);
   fieldGrid.append(regionLabel, typeLabel, idLabel);
   form.append(fieldGrid, actions);

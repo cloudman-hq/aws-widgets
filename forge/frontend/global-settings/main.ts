@@ -1,6 +1,7 @@
 import { invoke } from '@forge/bridge';
 import type { ResolverEnvelope } from '../../src/shared/contracts.js';
 import { mountGlobalSettings } from '../../src/frontend/global-settings.js';
+import '../../src/frontend/theme.css';
 
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root');

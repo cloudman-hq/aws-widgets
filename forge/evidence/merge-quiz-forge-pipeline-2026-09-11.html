@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Widgets — Forge stylesheet and pipeline release review</title>
+  <style>
+    :root { color: #17202a; background: #f4f7fa; font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; }
+    main { width: min(920px, calc(100% - 32px)); margin: 32px auto; }
+    header { padding: 28px; border-left: 8px solid #ff9900; background: #232f3e; color: white; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    header p { margin: 0; color: #dce3ea; }
+    section { margin-top: 18px; padding: 24px; border: 1px solid #d5dce4; background: white; }
+    h2 { margin: 0 0 12px; font-size: 20px; }
+    code { padding: 2px 5px; background: #eef2f6; }
+    li + li { margin-top: 8px; }
+    .status { display: inline-block; padding: 4px 9px; background: #e7f5ec; color: #176b3a; font-weight: 700; }
+    .warning { border-left: 4px solid #ff9900; padding-left: 14px; }
+    .answer { color: #5f6b7a; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Forge production release review</h1>
+    <p>AWS Widgets · stylesheet CSP fix · pipeline-only deployment remediation</p>
+  </header>
+
+  <section>
+    <h2>Outcome</h2>
+    <p><span class="status">Technical verification passed</span></p>
+    <p>The production settings page had a complete theme in source but rendered with browser defaults. Forge kept the dynamically-created <code>&lt;style&gt;</code> element in the DOM while refusing to attach a stylesheet under its production CSP.</p>
+  </section>
+
+  <section>
+    <h2>Code correction</h2>
+    <ul>
+      <li>The existing theme moved from a JavaScript template string to <code>theme.css</code>.</li>
+      <li>Each Custom UI entrypoint imports that CSS so Vite emits a relative external stylesheet.</li>
+      <li>Runtime style injection was removed from settings, macro configuration, and macro view mounting.</li>
+      <li>A build-artifact regression test requires all three generated pages to link a relative stylesheet containing the AWS theme.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Release-process correction</h2>
+    <ul>
+      <li>The initial production hotfix was deployed locally and therefore bypassed GitHub Actions.</li>
+      <li><code>deploy-prod.yml</code> now validates the Forge subtree, uploads the verified <code>forge/dist</code> artifact, and makes production deployment depend on both legacy and Forge checks.</li>
+      <li>The existing GitHub <code>production</code> environment approval gate now protects both Firebase/Connect and Forge deployment in one job.</li>
+      <li><code>FORGE_EMAIL</code> and <code>FORGE_API_TOKEN</code> are stored as production-environment secrets; values were not printed or committed.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Evidence</h2>
+    <ul>
+      <li>The regression test was observed failing before the implementation and passing afterward.</li>
+      <li><code>npm run verify</code>: lint, typecheck, build, 23 tests, and Forge lint completed successfully.</li>
+      <li>Live production verification found one external stylesheet and the expected computed font, color, size, and zero title margin.</li>
+      <li>The workflow contract was parsed and checked with <code>yq</code>.</li>
+    </ul>
+    <p class="warning">Forge lint still reports the existing deprecated backend-egress warning. It has zero errors and is unrelated to the stylesheet correction.</p>
+  </section>
+
+  <section>
+    <h2>Quiz</h2>
+    <ol>
+      <li>Why did the production page render in Times with native controls?</li>
+      <li>What build artifact now prevents that failure from returning?</li>
+      <li>What must succeed before the pipeline can deploy Forge production?</li>
+      <li>What boundary did the local hotfix bypass, and what did it not submit?</li>
+    </ol>
+    <p class="answer">Answers are graded one at a time in the conversation.</p>
+  </section>
+</main>
+</body>
+</html>

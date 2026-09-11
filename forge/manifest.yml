@@ -43,8 +43,8 @@ permissions:
   external:
     fetch:
       backend:
-        - address: "*.amazonaws.com"
-        - address: "*.amazonaws.com.cn"
+        - '*.amazonaws.com'
+        - '*.amazonaws.com.cn'
         - address: https://api.mixpanel.com
 
 app:
