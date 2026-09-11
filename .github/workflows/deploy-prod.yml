@@ -68,10 +68,17 @@ jobs:
         run: npm ci
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
-      - name: Disable Forge CLI usage analytics
-        run: npx forge settings set usage-analytics false
-      - name: Verify Forge app
-        run: npm run verify
+      # Keep all pre-approval checks secretless. Forge CLI lint requires an
+      # authenticated account, so it runs implicitly as part of forge deploy in
+      # the production-gated job below.
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+      - name: Unit tests
+        run: npm run unit
       - name: Upload verified Forge build
         uses: actions/upload-artifact@v4
         with:
