@@ -68,6 +68,8 @@ jobs:
         run: npm ci
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
+      - name: Disable Forge CLI usage analytics
+        run: npx forge settings set usage-analytics false
       - name: Verify Forge app
         run: npm run verify
       - name: Upload verified Forge build
