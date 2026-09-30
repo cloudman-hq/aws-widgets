@@ -64,7 +64,7 @@ storage and is never loaded back into the page.
 | ECS | Cluster name or cluster ARN | `example-cluster` |
 | DynamoDB | Table name or table ARN | `example-table` |
 
-An ARN must belong to the selected region.
+A Lambda, ECS, or DynamoDB ARN must belong to the selected region.
 
 ## 4. What the macro shows
 
