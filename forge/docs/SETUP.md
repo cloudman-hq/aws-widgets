@@ -36,8 +36,7 @@ delete, or invoke anything, and it does not read S3 objects or DynamoDB items.
 ## 2. Store the credential (Confluence administrator)
 
 1. In Confluence, open **Confluence administration** from the gear icon.
-2. In the sidebar, open **AWS Widgets settings**. The **Jump to setting…**
-   search finds it by name.
+2. In the sidebar, expand **Apps** and open **AWS Widgets settings**.
 3. Enter the **Access key ID** and **Secret access key** from part 1.
 4. Select **Save credential**. The app validates the key with AWS before it
    stores it. The status line changes to **Credential saved**.
